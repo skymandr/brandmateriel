@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Camera(object):
     """
     A simple Camera object.
@@ -142,7 +143,7 @@ class Camera(object):
     def get_screen_coordinates(self, points):
         # Perform projections:
         projections = np.inner(points.reshape(points.size / 3, 3) -
-                             self.position, self.orientation)
+                               self.position, self.orientation)
 
         # Rescale to screen distance:
         projections *= np.abs(self.screen.distance /
@@ -156,7 +157,7 @@ class Camera(object):
 
             # Convert to pixel space and return:
             return np.array([projections[:, self.U] * self._norms[self.X],
-                             projections[:, self.W] * self._norms[self.Y]])
+                             projections[:, self.W] * self._norms[self.Y]]).T
         else:
             # Change origin to upper-left corner of screen:
             projections += np.array([self.screen.width * 0.5 - self.screen.u,
@@ -164,8 +165,8 @@ class Camera(object):
                                     self.screen.w])
 
             # Convert to left-handed pixel space and return:
-            return np.array([ projections[:, self.U] * self._norms[self.X],
-                             -projections[:, self.W] * self._norms[self.Y]])
+            return np.array([projections[:, self.U] * self._norms[self.X],
+                             -projections[:, self.W] * self._norms[self.Y]]).T
 
     def look_at_point(self, point):
         roll = self.get_roll()
@@ -226,7 +227,7 @@ class Screen(object):
 
         self.position = position
 
-        self.extent=extent
+        self.extent = extent
 
         self.resolution = resolution
 

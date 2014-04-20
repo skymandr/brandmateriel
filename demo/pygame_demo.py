@@ -1,5 +1,20 @@
+#! /usr/env python
+
+import sys
 import numpy as np
+import pygame
+# import pygame.locals as pgl
 import camera as c
+# import mapper as m
+
+RESOLUTION = (640, 480)
+
+if not pygame.font:
+    print "Warning: no fonts detected; fonts disabled."
+
+if not pygame.mixer:
+    print "Warning: no sound detected; sound disabled."
+
 
 def get_scene(filename=None):
     """
@@ -21,56 +36,71 @@ def get_scene(filename=None):
 
 
 def do_demo(filename='demodata.npy', cam=None, look_at=None):
-    import matplotlib.pyplot as plt
-
     scene = get_scene(filename)
+    screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
 
     if cam is None:
         cam = c.Camera(position=np.array([scene[:, 0].mean(),
                        -2 * np.ceil(scene[:, 2].max()) - 9.0,
                        2 * np.ceil(scene[:, 2].max()) + 6.0]),
-                       resolution=np.array([640, 480]),
-                       mpldebug=True)
+                       resolution=np.array(RESOLUTION),
+                       mpldebug=False)
 
     if look_at is not None:
         cam.look_at_point(look_at)
 
     pixels = cam.get_screen_coordinates(scene)
 
-    f = plt.figure(1)
-    f.clf()
-    plt.scatter(pixels[0], pixels[1], s=1)
-    plt.axis([0, cam.screen.resolution[0], 0, cam.screen.resolution[1]])
-    plt.grid('on')
+    # Use PixelArray instead:
+    for p in pixels:
+        screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
 
-    if filename is not None:
-        z = np.load(filename)
-        plt.imshow(z, extent=[20, 20 + 2 * z.shape[1],
-                              cam.screen.resolution[1] - 20 - 2 * z.shape[0],
-                              cam.screen.resolution[1] - 20],
-                   cmap=plt.cm.terrain)
+    pygame.display.flip()
 
     return scene, cam
 
-def do_live_demo(steps=42, delay=0.125, save_fig=False):
-    import string
-    import time
-    import matplotlib.pyplot as plt
 
+def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
+    import string
+    fps_clock = pygame.time.Clock()
+    screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
+
+    scene = get_scene(filename)
     look_at = np.array([31, 33, 21])
-    s, c = do_demo()
+    cam = c.Camera(position=np.array([scene[:, 0].mean(),
+                   -2 * np.ceil(scene[:, 2].max()) - 9.0,
+                   2 * np.ceil(scene[:, 2].max()) + 6.0]),
+                   resolution=np.array(RESOLUTION),
+                   mpldebug=False)
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
-    R = np.linalg.norm(c.position[: 2] - look_at[: 2])
+    R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
 
     for n, a in enumerate(angles):
-        t0 = time.time()
-        c.position = np.array([np.sin(a) * R + 31, np.cos(a) * R + 33, 42])
-        s, c = do_demo(cam=c, look_at=look_at)
-        plt.axis('off')
-        plt.draw()
-        if save_fig:
-            plt.savefig('out/{0}.png'.format(string.zfill(str(n), 2)))
+        screen.fill((0, 0, 0))
+        cam.position = np.array([np.sin(a) * R + 31, np.cos(a) * R + 33, 42])
+        cam.look_at_point(look_at)
+        pixels = cam.get_screen_coordinates(scene)
 
-        while(time.time() - t0 < delay):
-            pass
+        # Use PixelArray instead:
+        for p in pixels:
+            screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
+
+        pygame.display.flip()
+
+        if save_fig:
+            pygame.image.save(screen,
+                              'out/{0}.png'.format(string.zfill(str(n), 2)))
+
+        fps_clock.tick(fps)
+
+
+def main():
+    pygame.init()
+    # do_demo()
+    # do_live_demo()
+    do_live_demo(save_fig=True)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

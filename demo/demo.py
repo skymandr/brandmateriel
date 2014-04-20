@@ -1,6 +1,7 @@
 import numpy as np
 import camera as c
 
+
 def get_scene(filename=None):
     """
     Initialise scene.
@@ -39,7 +40,7 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None):
 
     f = plt.figure(1)
     f.clf()
-    plt.scatter(pixels[0], pixels[1], s=1)
+    plt.scatter(pixels[:, 0], pixels[:, 1], s=1)
     plt.axis([0, cam.screen.resolution[0], 0, cam.screen.resolution[1]])
     plt.grid('on')
 
@@ -51,6 +52,7 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None):
                    cmap=plt.cm.terrain)
 
     return scene, cam
+
 
 def do_live_demo(steps=42, delay=0.125, save_fig=False):
     import string
