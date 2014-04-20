@@ -46,6 +46,10 @@ class Camera(object):
           orientation.
     """
 
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
     def __init__(self,
                  position=np.array([6.0, -9.0, 6.0]),
                  orientation=np.array([[1.0, 0.0, 0.0],     # u
@@ -55,21 +59,85 @@ class Camera(object):
                  screen_position=np.array([0.0, 9.0, -1.5]), mpldebug=False):
 
         self.position = position
-        # These should not be instantiated, and only be accessed using Xetters:
-        self.x = position[0]
-        self.y = position[1]
-        self.z = position[2]
 
         self.orientation = orientation
-        # These should not be instantiated, and only be accessed using Xetters:
-        self.u = orientation[0]
-        self.v = orientation[1]
-        self.w = orientation[2]
 
         self.screen = Screen(extent, resolution, screen_position)
         self._norms = self.screen.resolution / self.screen.extent
 
-        self.mpldebug = mpldebug
+        self._mpldebug = mpldebug
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, val):
+        self._position = val
+
+    @property
+    def orientation(self):
+        return self._orientation
+
+    @orientation.setter
+    def orientation(self, val):
+        self._orientation = val
+
+    @property
+    def screen(self):
+        return self._screen
+
+    @screen.setter
+    def screen(self, val):
+        self._screen = val
+
+    @property
+    def x(self):
+        return self._position[self.X]
+
+    @x.setter
+    def x(self, val):
+        self._position[self.X] = val
+
+    @property
+    def y(self):
+        return self._position[self.Y]
+
+    @y.setter
+    def y(self, val):
+        self._position[self.Y] = val
+
+    @property
+    def z(self):
+        return self._position[self.Z]
+
+    @z.setter
+    def z(self, val):
+        self._position[self.Z] = val
+
+    @property
+    def u(self):
+        return self._orientation[self.U]
+
+    @u.setter
+    def u(self, val):
+        self._orientation[self.U] = val
+
+    @property
+    def v(self):
+        return self._orientation[self.V]
+
+    @v.setter
+    def v(self, val):
+        self._orientation[self.V] = val
+
+    @property
+    def w(self):
+        return self._orientation[self.W]
+
+    @w.setter
+    def w(self, val):
+        self._orientation[self.W] = val
 
     def get_screen_coordinates(self, points):
         # Perform projections:
@@ -80,15 +148,15 @@ class Camera(object):
         projections *= np.abs(self.screen.distance /
                               projections[:, np.newaxis, 1])
 
-        if self.mpldebug:
+        if self._mpldebug:
             # Change origin to lower-left corner of screen:
             projections += np.array([self.screen.width * 0.5 - self.screen.u,
                                     0.0, self.screen.height * 0.5 -
                                     self.screen.w])
 
             # Convert to pixel space and return:
-            return np.array([projections[:, 0] * self._norms[0],
-                             projections[:, 2] * self._norms[1]])
+            return np.array([projections[:, self.U] * self._norms[self.X],
+                             projections[:, self.W] * self._norms[self.Y]])
         else:
             # Change origin to upper-left corner of screen:
             projections += np.array([self.screen.width * 0.5 - self.screen.u,
@@ -96,8 +164,8 @@ class Camera(object):
                                     self.screen.w])
 
             # Convert to left-handed pixel space and return:
-            return np.array([ projections[:, 0] * self._norms[0],
-                             -projections[:, 2] * self._norms[1]])
+            return np.array([ projections[:, self.U] * self._norms[self.X],
+                             -projections[:, self.W] * self._norms[self.Y]])
 
     def look_at_point(self, point):
         roll = self.get_roll()
@@ -110,19 +178,15 @@ class Camera(object):
 
         # This is clumsy:
         self.orientation = np.c_[u, v, w].T
-        # Or rather, this is:
-        self.u = u
-        self.v = v
-        self.w = w
 
         # This is not implemented:
         self.set_roll(roll)
 
     def get_azimuth(self):
-        return np.arctan2(self.v[1], self.v[0])
+        return np.arctan2(self.v[self.Y], self.v[self.X])
 
     def get_elevation(self):
-        return np.arcsin(self.v[2])
+        return np.arcsin(self.v[self.W])
 
     def get_roll(self):
         u = np.cross(self.v, np.array([0.0, 0.0, 1.0]))
@@ -152,23 +216,84 @@ class Screen(object):
           the Camera.
     """
 
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
     def __init__(self,
                  extent=np.array([12.0, 9.0]), resolution=np.array([320, 240]),
                  position=np.array([0.0, 9.0, -1.5])):
 
         self.position = position
-        # These should not be instantiated, and only be accessed using Xetters:
-        self.u = position[0]
-        self.v = position[1]
-        self.w = position[2]
 
         self.extent=extent
-        # These should not be instantiated, and only be accessed using Xetters:
-        self.width = extent[0]
-        self.height = extent[1]
-        self.distance = position[1]
 
         self.resolution = resolution
-        # These should not be instantiated, and only be accessed using Xetters:
-        self.xres = resolution[0]
-        self.yres = resolution[1]
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, val):
+        self._position = val
+
+    @property
+    def extent(self):
+        return self._extent
+
+    @extent.setter
+    def extent(self, val):
+        self._extent = val
+
+    @property
+    def resolution(self):
+        return self._resolution
+
+    @resolution.setter
+    def resolution(self, val):
+        self._resolution = val
+
+    @property
+    def u(self):
+        return self._position[self.U]
+
+    @u.setter
+    def u(self, val):
+        self._position[self.U] = val
+
+    @property
+    def v(self):
+        return self._position[self.V]
+
+    @v.setter
+    def v(self, val):
+        self._position[self.V] = val
+
+    @property
+    def w(self):
+        return self._position[self.W]
+
+    @w.setter
+    def w(self, val):
+        self._position[self.W] = val
+
+    @property
+    def width(self):
+        return self._extent[self.X]
+
+    @property
+    def height(self):
+        return self._extent[self.Y]
+
+    @property
+    def distance(self):
+        return self._position[self.V]
+
+    @property
+    def xres(self):
+        return self._resolution[self.X]
+
+    @property
+    def yres(self):
+        return self._resolution[self.Y]
