@@ -1,7 +1,9 @@
 import numpy as np
 
+
 def apply_shading(points, normals, colours, lightsource):
     pass
+
 
 class LightSource(object):
     """
