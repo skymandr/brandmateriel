@@ -112,13 +112,15 @@ class Shader(object):
     def apply_lighting(self, positions, normals, colours):
         """
         Questions:
-            can this be explicityl done by reference?
-            should it be inner or dot?
+            this is done explicitly by reference, changing original colours;
+            is that good or annoying?
         """
+        Deltas = positions - self.light_source.position
+        Deltas /= np.sqrt((Deltas ** 2).sum(-1))[:, :, np.newaxis]
 
-        colours -= 255 * np.inner(positions - self.light_source.position,
-                                  normals)
+        scatter = 255 * (Deltas * normals).sum(-1)
+        colours -= scatter[:, :, np.newaxis]
         colours = np.where(colours > 255, 255, colours)
         colours = np.where(colours < 0, 0, colours)
 
-        return colours
+        return colours, Deltas

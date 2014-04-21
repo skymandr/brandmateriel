@@ -26,18 +26,42 @@ class Map(object):
 
     def __init__(self, filename='demodata.npy', sealevel=0):
         if filename is None:
-            z = np.zeros([10, 13])
+            self._raw_map = np.zeros([10, 13])
         else:
-            self.raw_map = np.load(filename)
+            self._raw_map = np.load(filename)
 
-        self.sealevel=sealevel
-        self.make_patches()
-        self.calc_normals()
-        self.calc_positions()
-        self.flood()
-        self.colourise()
+        self._sealevel = sealevel
+        self._make_patches()
+        self._calc_normals()
+        self._calc_positions()
+        self._flood()
+        self._colourise()
 
-    def make_patches(self):
+    @property
+    def sealevel(self):
+        return self._sealevel
+
+    @property
+    def raw_map(self):
+        return self._raw_map
+
+    @property
+    def patches(self):
+        return self._patches
+
+    @property
+    def normals(self):
+        return self._normals
+
+    @property
+    def positions(self):
+        return self._positions
+
+    @property
+    def colours(self):
+        return self._colours
+
+    def _make_patches(self):
         """
         Create patches made up of four points (corners of squares in the
         xy-plane).
@@ -57,9 +81,9 @@ class Map(object):
                 patches[x, y, :, 1] = np.array(yinds) - 0.5
                 patches[x, y, :, 2] = self.raw_map[yinds, xinds]
 
-        self.patches = patches
+        self._patches = patches
 
-    def colourise(self):
+    def _colourise(self):
         """
         Not yet fully implemented, but should assign colours (with some sort of
         noise) to patches.
@@ -69,25 +93,27 @@ class Map(object):
         colours = np.zeros([self.patches.shape[0], self.patches.shape[1], 3],
                            dtype=np.int)
 
-        RED = (204, 0, 0)
-        GREEN = (0, 204, 0)
-        BLUE =  (0, 0, 204)
+        RED = np.array((204, 0, 0))
+        GREEN = np.array((0, 204, 0))
+        BLUE = np.array((0, 0, 204))
 
         for x in xrange(colours.shape[0]):
             for y in xrange(colours.shape[1]):
                 if self.positions[x, y, 2] > self.sealevel:
-                    colours[x, y] = GREEN
+                    colours[x, y] = 0 * RED + 1 * GREEN + 0 * BLUE
                 else:
-                    colours[x, y] = BLUE
+                    colours[x, y] = 0 * RED + 0 * GREEN + 1 * BLUE
 
-    def calc_positions(self):
+        self._colours = colours
+
+    def _calc_positions(self):
         """
         Useful for sorting and the like.
         """
 
-        self.positions = self.patches.mean(2)
+        self._positions = self.patches.mean(2)
 
-    def calc_normals(self):
+    def _calc_normals(self):
         """
         This is a little bit arbitrary since the normal is not well defined
         for patches, but it is arbitrary in a very systematic way and therefore
@@ -104,15 +130,15 @@ class Map(object):
                 v2 = self.patches[x, y, 3] - self.patches[x, y, 2]
                 v3 = self.patches[x, y, 0] - self.patches[x, y, 3]
 
-                #normals[x, y] = np.cross(v0 + v1, -v0 - v3)
-                #normals[x, y] /= np.linalg.norm(normals[x, y])
+                # normals[x, y] = np.cross(v0 + v1, -v0 - v3)
+                # normals[x, y] /= np.linalg.norm(normals[x, y])
 
                 normals[x, y] = np.cross(v0, v1 + v3) + np.cross(v2, v3 - v1)
                 normals[x, y] /= np.linalg.norm(normals[x, y])
 
-        self.normals = normals
+        self._normals = normals
 
-    def flood(self):
+    def _flood(self):
         """
         Raises patch-points that are under the sealevel to the sealevel to
         ensure a flat sea.
@@ -126,5 +152,13 @@ class Map(object):
         """
 
         self.patches[:, :, :, 2] = np.where(
-                self.patches[:, :, :, 2] < self.sealevel, self.sealevel,
-                self.patches[:, :, :, 2])
+            self.patches[:, :, :, 2] < self.sealevel, self.sealevel,
+            self.patches[:, :, :, 2])
+
+    def reflood(self, sealevel):
+        self._sealevel = sealevel
+        self._make_patches()
+        self._calc_normals()
+        self._calc_positions()
+        self._flood()
+        self._colourise()
