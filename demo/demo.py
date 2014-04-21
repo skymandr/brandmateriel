@@ -1,5 +1,5 @@
 import numpy as np
-import camera as c
+import camera_old as c
 
 
 def get_scene(filename=None):
