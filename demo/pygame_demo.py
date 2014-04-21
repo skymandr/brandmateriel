@@ -43,8 +43,7 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None):
         cam = c.Camera(position=np.array([scene[:, 0].mean(),
                        -2 * np.ceil(scene[:, 2].max()) - 9.0,
                        2 * np.ceil(scene[:, 2].max()) + 6.0]),
-                       resolution=np.array(RESOLUTION),
-                       mpldebug=False)
+                       resolution=np.array(RESOLUTION))
 
     if look_at is not None:
         cam.look_at_point(look_at)
@@ -70,8 +69,7 @@ def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
     cam = c.Camera(position=np.array([scene[:, 0].mean(),
                    -2 * np.ceil(scene[:, 2].max()) - 9.0,
                    2 * np.ceil(scene[:, 2].max()) + 6.0]),
-                   resolution=np.array(RESOLUTION),
-                   mpldebug=False)
+                   resolution=np.array(RESOLUTION))
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -98,8 +96,8 @@ def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
 def main():
     pygame.init()
     # do_demo()
-    # do_live_demo()
-    do_live_demo(save_fig=True)
+    do_live_demo()
+    # do_live_demo(save_fig=True)
 
 
 if __name__ == "__main__":
