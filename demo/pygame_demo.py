@@ -8,7 +8,7 @@ import camera as c
 import mapper as m
 import shader as s
 
-RESOLUTION = (640, 480)
+RESOLUTION = (320, 240)
 
 if not pygame.font:
     print "Warning: no fonts detected; fonts disabled."
@@ -44,7 +44,7 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
         cam = c.Camera(position=np.array([scene.positions[:, 0].mean(),
                        -2 * np.ceil(scene.positions[:, 2].max()) - 9.0,
                        2 * np.ceil(scene.positions[:, 2].max()) + 6.0]),
-                       screen=c.Screen(resolution=np.array([RESOLUTION])))
+                       screen=c.Screen(resolution=np.array(RESOLUTION)))
 
     shader = s.Shader(cam)
 
@@ -57,7 +57,7 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
 
     # Use PixelArray instead:
     for n, p in enumerate(pixels):
-        screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
+        screen.set_at(np.round(p).astype(np.int), colours[n, :])
 
     pygame.display.flip()
 

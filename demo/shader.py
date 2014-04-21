@@ -116,11 +116,11 @@ class Shader(object):
             is that good or annoying?
         """
         Deltas = positions - self.light_source.position
-        Deltas /= np.sqrt((Deltas ** 2).sum(-1))[:, :, np.newaxis]
+        Deltas /= np.sqrt((Deltas ** 2).sum(-1))[:, np.newaxis]
 
         scatter = 255 * (Deltas * normals).sum(-1)
-        colours -= scatter[:, :, np.newaxis]
+        colours -= scatter[:, np.newaxis]
         colours = np.where(colours > 255, 255, colours)
         colours = np.where(colours < 0, 0, colours)
 
-        return colours, Deltas
+        return colours

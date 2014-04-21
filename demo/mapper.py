@@ -32,6 +32,7 @@ class Map(object):
 
         self._sealevel = sealevel
         self._make_patches()
+        self._size = self._patches.size / 12
         self._calc_normals()
         self._calc_positions()
         self._flood()
@@ -47,19 +48,19 @@ class Map(object):
 
     @property
     def patches(self):
-        return self._patches
+        return self._patches.reshape((self._size, 4, 3))
 
     @property
     def normals(self):
-        return self._normals
+        return self._normals.reshape((self._size, 3))
 
     @property
     def positions(self):
-        return self._positions
+        return self._positions.reshape((self._size, 3))
 
     @property
     def colours(self):
-        return self._colours
+        return self._colours.reshape((self._size, 3))
 
     def _make_patches(self):
         """
@@ -90,7 +91,7 @@ class Map(object):
 
         Currently debug wit just green and blue.
         """
-        colours = np.zeros([self.patches.shape[0], self.patches.shape[1], 3],
+        colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 3],
                            dtype=np.int)
 
         RED = np.array((204, 0, 0))
@@ -99,7 +100,7 @@ class Map(object):
 
         for x in xrange(colours.shape[0]):
             for y in xrange(colours.shape[1]):
-                if self.positions[x, y, 2] > self.sealevel:
+                if self._positions[x, y, 2] > self.sealevel:
                     colours[x, y] = 0 * RED + 1 * GREEN + 0 * BLUE
                 else:
                     colours[x, y] = 0 * RED + 0 * GREEN + 1 * BLUE
@@ -111,7 +112,7 @@ class Map(object):
         Useful for sorting and the like.
         """
 
-        self._positions = self.patches.mean(2)
+        self._positions = self._patches.mean(2)
 
     def _calc_normals(self):
         """
@@ -120,15 +121,15 @@ class Map(object):
         gives a nice noise effect (hopefully).
         """
 
-        normals = np.zeros([self.patches.shape[0], self.patches.shape[1], 3])
+        normals = np.zeros([self._patches.shape[0], self._patches.shape[1], 3])
 
         # This for-loops probably could and should be removed:
         for x in xrange(normals.shape[0]):
             for y in xrange(normals.shape[1]):
-                v0 = self.patches[x, y, 1] - self.patches[x, y, 0]
-                v1 = self.patches[x, y, 2] - self.patches[x, y, 1]
-                v2 = self.patches[x, y, 3] - self.patches[x, y, 2]
-                v3 = self.patches[x, y, 0] - self.patches[x, y, 3]
+                v0 = self._patches[x, y, 1] - self._patches[x, y, 0]
+                v1 = self._patches[x, y, 2] - self._patches[x, y, 1]
+                v2 = self._patches[x, y, 3] - self._patches[x, y, 2]
+                v3 = self._patches[x, y, 0] - self._patches[x, y, 3]
 
                 # normals[x, y] = np.cross(v0 + v1, -v0 - v3)
                 # normals[x, y] /= np.linalg.norm(normals[x, y])
@@ -151,9 +152,9 @@ class Map(object):
         on shores.
         """
 
-        self.patches[:, :, :, 2] = np.where(
-            self.patches[:, :, :, 2] < self.sealevel, self.sealevel,
-            self.patches[:, :, :, 2])
+        self._patches[:, :, :, 2] = np.where(
+            self._patches[:, :, :, 2] < self.sealevel, self.sealevel,
+            self._patches[:, :, :, 2])
 
     def reflood(self, sealevel):
         self._sealevel = sealevel
