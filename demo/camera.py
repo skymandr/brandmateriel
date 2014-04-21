@@ -57,7 +57,7 @@ class Camera(object):
                                        [0.0, 1.0, 0.0],     # v
                                        [0.0, 0.0, 1.0]]),   # w
                  extent=np.array([12.0, 9.0]), resolution=np.array([320, 240]),
-                 screen_position=np.array([0.0, 9.0, -1.5]), mpldebug=False):
+                 screen_position=np.array([0.0, 9.0, -1.5])):
 
         self.position = position
 
@@ -65,8 +65,6 @@ class Camera(object):
 
         self.screen = Screen(extent, resolution, screen_position)
         self._norms = self.screen.resolution / self.screen.extent
-
-        self._mpldebug = mpldebug
 
     @property
     def position(self):
@@ -149,24 +147,14 @@ class Camera(object):
         projections *= np.abs(self.screen.distance /
                               projections[:, np.newaxis, 1])
 
-        if self._mpldebug:
-            # Change origin to lower-left corner of screen:
-            projections += np.array([self.screen.width * 0.5 - self.screen.u,
-                                    0.0, self.screen.height * 0.5 -
-                                    self.screen.w])
+        # Change origin to upper-left corner of screen:
+        projections += np.array([self.screen.width * 0.5 - self.screen.u,
+                                0.0, -self.screen.height * 0.5 -
+                                self.screen.w])
 
-            # Convert to pixel space and return:
-            return np.array([projections[:, self.U] * self._norms[self.X],
-                             projections[:, self.W] * self._norms[self.Y]]).T
-        else:
-            # Change origin to upper-left corner of screen:
-            projections += np.array([self.screen.width * 0.5 - self.screen.u,
-                                    0.0, -self.screen.height * 0.5 -
-                                    self.screen.w])
-
-            # Convert to left-handed pixel space and return:
-            return np.array([projections[:, self.U] * self._norms[self.X],
-                             -projections[:, self.W] * self._norms[self.Y]]).T
+        # Convert to left-handed pixel space and return:
+        return np.array([projections[:, self.U] * self._norms[self.X],
+                         -projections[:, self.W] * self._norms[self.Y]]).T
 
     def look_at_point(self, point):
         roll = self.get_roll()
