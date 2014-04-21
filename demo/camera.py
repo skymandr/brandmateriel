@@ -1,6 +1,107 @@
 import numpy as np
 
 
+class Screen(object):
+    """
+    A Screen object for use with a Camera object.
+
+    The Screen is described by the following parameters:
+    * extent:
+        - the Screen's extent (width, height) in spatial units
+
+    * resolution:
+        - the Screen's resoultion in pixels (xres, yres)
+
+    * position:
+        - position of the centre of the Screen in uvw-space, using the Camera
+          position as origin.
+          The v component is the proper orthogonalvdistance to the Screen from
+          the Camera.
+    """
+
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
+    def __init__(self,
+                 extent=np.array([12.0, 9.0]), resolution=np.array([320, 240]),
+                 position=np.array([0.0, 9.0, -1.5])):
+
+        self.position = position
+
+        self.extent = extent
+
+        self.resolution = resolution
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, val):
+        self._position = val
+
+    @property
+    def extent(self):
+        return self._extent
+
+    @extent.setter
+    def extent(self, val):
+        self._extent = val
+
+    @property
+    def resolution(self):
+        return self._resolution
+
+    @resolution.setter
+    def resolution(self, val):
+        self._resolution = val
+
+    @property
+    def u(self):
+        return self._position[self.U]
+
+    @u.setter
+    def u(self, val):
+        self._position[self.U] = val
+
+    @property
+    def v(self):
+        return self._position[self.V]
+
+    @v.setter
+    def v(self, val):
+        self._position[self.V] = val
+
+    @property
+    def w(self):
+        return self._position[self.W]
+
+    @w.setter
+    def w(self, val):
+        self._position[self.W] = val
+
+    @property
+    def width(self):
+        return self._extent[self.X]
+
+    @property
+    def height(self):
+        return self._extent[self.Y]
+
+    @property
+    def distance(self):
+        return self._position[self.V]
+
+    @property
+    def xres(self):
+        return self._resolution[self.X]
+
+    @property
+    def yres(self):
+        return self._resolution[self.Y]
+
+
 class Camera(object):
     """
     A simple Camera object.
@@ -56,14 +157,13 @@ class Camera(object):
                  orientation=np.array([[1.0, 0.0, 0.0],     # u
                                        [0.0, 1.0, 0.0],     # v
                                        [0.0, 0.0, 1.0]]),   # w
-                 extent=np.array([12.0, 9.0]), resolution=np.array([320, 240]),
-                 screen_position=np.array([0.0, 9.0, -1.5])):
+                 screen=Screen()):
 
         self.position = position
 
         self.orientation = orientation
 
-        self.screen = Screen(extent, resolution, screen_position)
+        self.screen = screen
         self._norms = self.screen.resolution / self.screen.extent
 
     @property
@@ -185,104 +285,3 @@ class Camera(object):
 
     def set_roll(self, roll):
         print "Sorry! set_roll() is not yet implemented.!"
-
-
-class Screen(object):
-    """
-    A Screen object for use with a Camera object.
-
-    The Screen is described by the following parameters:
-    * extent:
-        - the Screen's extent (width, height) in spatial units
-
-    * resolution:
-        - the Screen's resoultion in pixels (xres, yres)
-
-    * position:
-        - position of the centre of the Screen in uvw-space, using the Camera
-          position as origin.
-          The v component is the proper orthogonalvdistance to the Screen from
-          the Camera.
-    """
-
-    X = U = 0
-    Y = V = 1
-    Z = W = 2
-
-    def __init__(self,
-                 extent=np.array([12.0, 9.0]), resolution=np.array([320, 240]),
-                 position=np.array([0.0, 9.0, -1.5])):
-
-        self.position = position
-
-        self.extent = extent
-
-        self.resolution = resolution
-
-    @property
-    def position(self):
-        return self._position
-
-    @position.setter
-    def position(self, val):
-        self._position = val
-
-    @property
-    def extent(self):
-        return self._extent
-
-    @extent.setter
-    def extent(self, val):
-        self._extent = val
-
-    @property
-    def resolution(self):
-        return self._resolution
-
-    @resolution.setter
-    def resolution(self, val):
-        self._resolution = val
-
-    @property
-    def u(self):
-        return self._position[self.U]
-
-    @u.setter
-    def u(self, val):
-        self._position[self.U] = val
-
-    @property
-    def v(self):
-        return self._position[self.V]
-
-    @v.setter
-    def v(self, val):
-        self._position[self.V] = val
-
-    @property
-    def w(self):
-        return self._position[self.W]
-
-    @w.setter
-    def w(self, val):
-        self._position[self.W] = val
-
-    @property
-    def width(self):
-        return self._extent[self.X]
-
-    @property
-    def height(self):
-        return self._extent[self.Y]
-
-    @property
-    def distance(self):
-        return self._position[self.V]
-
-    @property
-    def xres(self):
-        return self._resolution[self.X]
-
-    @property
-    def yres(self):
-        return self._resolution[self.Y]

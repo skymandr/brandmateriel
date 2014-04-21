@@ -1,13 +1,9 @@
 import numpy as np
 
 
-def apply_shading(points, normals, colours, lightsource):
-    pass
-
-
 class LightSource(object):
     """
-    This object has a position (and direction) for the light source.
+    This object has a position (and orientation) for the light source.
 
     For many applications, using the Camera as a light source is probably what
     is desired.
@@ -17,7 +13,11 @@ class LightSource(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, position, orientation):
+    def __init__(self,
+                 position=np.array([6.0, -9.0, 6.0]),
+                 orientation=np.array([[1.0, 0.0, 0.0],     # u
+                                       [0.0, 1.0, 0.0],     # v
+                                       [0.0, 0.0, 1.0]])):  # w
         self.position = position
 
         self.orientation = orientation
@@ -85,3 +85,40 @@ class LightSource(object):
     @w.setter
     def w(self, val):
         self._orientation[self.W] = val
+
+
+class Shader(object):
+    """
+    The Shader applies shading to patches, based on the orienation of the
+    patches' normals to the light-source.
+
+    Currently, only the position of the light source matters, but there is at
+    least a skeleton for implementing light directionality and such at a later
+    stage. The standard Camera object can be used as a light source, unless
+    a fixed light source is desired.
+    """
+
+    def __init__(self, light_source=LightSource()):
+        self.light_source = light_source
+
+    @property
+    def light_source(self):
+        return self._light_source
+
+    @light_source.setter
+    def light_source(self, val):
+        self._light_source = val
+
+    def apply_lighting(self, positions, normals, colours):
+        """
+        Questions:
+            can this be explicityl done by reference?
+            should it be inner or dot?
+        """
+
+        colours -= 255 * np.inner(positions - self.light_source.position,
+                                  normals)
+        colours = np.where(colours > 255, 255, colours)
+        colours = np.where(colours < 0, 0, colours)
+
+        return colours
