@@ -5,7 +5,8 @@ import numpy as np
 import pygame
 # import pygame.locals as pgl
 import camera as c
-# import mapper as m
+import mapper as m
+import shader as s
 
 RESOLUTION = (640, 480)
 
@@ -35,23 +36,27 @@ def get_scene(filename=None):
     return scene
 
 
-def do_demo(filename='demodata.npy', cam=None, look_at=None):
-    scene = get_scene(filename)
+def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
     screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
+    scene = m.Map(filename, sealevel)
 
     if cam is None:
-        cam = c.Camera(position=np.array([scene[:, 0].mean(),
-                       -2 * np.ceil(scene[:, 2].max()) - 9.0,
-                       2 * np.ceil(scene[:, 2].max()) + 6.0]),
-                       resolution=np.array(RESOLUTION))
+        cam = c.Camera(position=np.array([scene.positions[:, 0].mean(),
+                       -2 * np.ceil(scene.positions[:, 2].max()) - 9.0,
+                       2 * np.ceil(scene.positions[:, 2].max()) + 6.0]),
+                       screen=c.Screen(resolution=np.array([RESOLUTION])))
+
+    shader = s.Shader(cam)
 
     if look_at is not None:
         cam.look_at_point(look_at)
 
-    pixels = cam.get_screen_coordinates(scene)
+    pixels = cam.get_screen_coordinates(scene.positions)
+    colours = shader.apply_lighting(scene.positions, scene.normals,
+                                    scene.colours.copy())
 
     # Use PixelArray instead:
-    for p in pixels:
+    for n, p in enumerate(pixels):
         screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
 
     pygame.display.flip()
@@ -68,8 +73,7 @@ def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
     look_at = np.array([31, 33, 21])
     cam = c.Camera(position=np.array([scene[:, 0].mean(),
                    -2 * np.ceil(scene[:, 2].max()) - 9.0,
-                   2 * np.ceil(scene[:, 2].max()) + 6.0]),
-                   resolution=np.array(RESOLUTION))
+                   2 * np.ceil(scene[:, 2].max()) + 6.0]))
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -95,8 +99,8 @@ def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
 
 def main():
     pygame.init()
-    # do_demo()
-    do_live_demo()
+    do_demo()
+    # do_live_demo()
     # do_live_demo(save_fig=True)
 
 
