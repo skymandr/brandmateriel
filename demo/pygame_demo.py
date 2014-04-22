@@ -78,7 +78,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
     fps_clock = pygame.time.Clock()
     screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
 
-    scene = m.Map(filename, sealevel, False)
+    scene = m.Map(filename, sealevel, True)
     look_at = np.array([31, 33, 21])
     cam = c.Camera(position=np.array([scene.positions[:, 0].mean(),
                    -2 * np.ceil(scene.positions[:, 2].max()) - 9.0,
@@ -90,7 +90,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
 
-    for n, a in enumerate(angles):
+    for N, a in enumerate(angles):
         screen.fill((0, 0, 0))
         cam.position = np.array([np.sin(a) * R + 31, np.cos(a) * R + 33, 42])
         cam.look_at_point(look_at)
@@ -114,7 +114,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
 
         if save_fig:
             pygame.image.save(screen,
-                              'out/{0}.png'.format(string.zfill(str(n), 2)))
+                              'out/{0}.png'.format(string.zfill(str(N), 2)))
 
         fps_clock.tick(fps)
 
@@ -122,7 +122,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
 def main():
     pygame.init()
     # do_demo()
-    do_live_demo(save_fig=False)
+    do_live_demo(save_fig=True)
 
 
 if __name__ == "__main__":
