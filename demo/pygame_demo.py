@@ -32,19 +32,21 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
     if look_at is not None:
         cam.look_at_point(look_at)
 
-    pixels = cam.get_screen_coordinates(scene.positions)
+    # pixels = cam.get_screen_coordinates(scene.positions)
     colours = shader.apply_lighting(scene.positions, scene.normals,
                                     scene.colours.copy())
     patches = cam.get_screen_coordinates(scene.patches)
 
-    for n, p in enumerate(pixels):
+    order = np.argsort(-((scene.positions - cam.position) ** 2).mean(-1))
+
+    for n in order:
         # Use this to render point cloud in uniform colour:
-        # screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
+        # screen.set_at(np.round(pixels[n]).astype(np.int), (204, 0, 0))
 
         # Use this to render point cloud in shaded colours (not pretty):
-        # screen.set_at(np.round(p).astype(np.int), colours[n, :])
+        # screen.set_at(np.round(pixels[n]).astype(np.int), colours[n, :])
 
-        # Use this to (maybe) render patches:
+        # Use this to render patches:
         pygame.draw.polygon(screen, colours[n], patches[n * 4: n * 4 + 4])
 
     pygame.display.flip()
@@ -75,12 +77,12 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
         cam.position = np.array([np.sin(a) * R + 31, np.cos(a) * R + 33, 42])
         cam.look_at_point(look_at)
 
-        pixels = cam.get_screen_coordinates(scene.positions)
+        # pixels = cam.get_screen_coordinates(scene.positions)
         colours = shader.apply_lighting(scene.positions, scene.normals,
                                         scene.colours.copy())
         patches = cam.get_screen_coordinates(scene.patches)
 
-        order = np.argsort(pixels[:, 1])
+        order = np.argsort(-((scene.positions - cam.position) ** 2).mean(-1))
 
         for n in order:
             # Use this to render point cloud in uniform colour:
@@ -89,7 +91,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
             # Use this to render point cloud in shaded colours (not pretty):
             # screen.set_at(np.round(pixels[n]).astype(np.int), colours[n, :])
 
-            # Use this to (maybe) render patches:
+            # Use this to render patches:
             pygame.draw.polygon(screen, colours[n], patches[n * 4: n * 4 + 4])
 
         pygame.display.flip()
