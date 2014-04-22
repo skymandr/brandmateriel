@@ -36,19 +36,19 @@ class Map(object):
 
         self._make_patches()
 
-        if self._flat_sea:
-            self._flood()
-
         self._size = self._patches.size / 12
-
-        self._calc_normals()
 
         self._calc_positions()
 
-        if not self._flat_sea:
+        if self._flat_sea:
             self._flood()
 
+        self._calc_normals()
+
         self._colourise()
+
+        if not self._flat_sea:
+            self._flood()
 
     @property
     def sealevel(self):
@@ -163,7 +163,7 @@ class Map(object):
         If run after calc_normals(), this should give an interesting shading
         effect.
 
-        If run after calc_heights() it opens for the opportunity of going
+        If run after calc_positions() it opens for the opportunity of going
         under water some time in the future, and gives "breaking waves"
         on shores.
         """
@@ -179,14 +179,14 @@ class Map(object):
 
         self._make_patches()
 
+        self._calc_positions()
+
         if self.flat_sea:
             self._flood()
 
         self._calc_normals()
 
-        self._calc_positions()
+        self._colourise()
 
         if not self.flat_sea:
             self._flood()
-
-        self._colourise()

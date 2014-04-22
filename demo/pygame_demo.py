@@ -58,7 +58,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
     fps_clock = pygame.time.Clock()
     screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
 
-    scene = m.Map(filename, sealevel, False)
+    scene = m.Map(filename, sealevel, True)
     look_at = np.array([31, 33, 21])
     cam = c.Camera(position=np.array([scene.positions[:, 0].mean(),
                    -2 * np.ceil(scene.positions[:, 2].max()) - 9.0,
