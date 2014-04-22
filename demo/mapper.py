@@ -24,23 +24,39 @@ class Map(object):
           sealevel and such.
     """
 
-    def __init__(self, filename='demodata.npy', sealevel=0):
+    def __init__(self, filename='demodata.npy', sealevel=0, flat_sea=False):
         if filename is None:
             self._raw_map = np.zeros([10, 13])
         else:
             self._raw_map = np.load(filename)
 
         self._sealevel = sealevel
+
+        self._flat_sea = flat_sea
+
         self._make_patches()
+
+        if self._flat_sea:
+            self._flood()
+
         self._size = self._patches.size / 12
+
         self._calc_normals()
+
         self._calc_positions()
-        self._flood()
+
+        if not self._flat_sea:
+            self._flood()
+
         self._colourise()
 
     @property
     def sealevel(self):
         return self._sealevel
+
+    @property
+    def flat_sea(self):
+        return self._flat_sea
 
     @property
     def raw_map(self):
@@ -94,9 +110,9 @@ class Map(object):
         colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 3],
                            dtype=np.int)
 
-        RED = np.array((204, 0, 0))
-        GREEN = np.array((0, 204, 0))
-        BLUE = np.array((0, 0, 204))
+        RED = np.array((153, 0, 0))
+        GREEN = np.array((0, 153, 0))
+        BLUE = np.array((0, 0, 153))
 
         for x in xrange(colours.shape[0]):
             for y in xrange(colours.shape[1]):
@@ -156,10 +172,21 @@ class Map(object):
             self._patches[:, :, :, 2] < self.sealevel, self.sealevel,
             self._patches[:, :, :, 2])
 
-    def reflood(self, sealevel):
+    def reflood(self, sealevel, flat_sea=False):
         self._sealevel = sealevel
+
+        self._flat_sea = flat_sea
+
         self._make_patches()
+
+        if self.flat_sea:
+            self._flood()
+
         self._calc_normals()
+
         self._calc_positions()
-        self._flood()
+
+        if not self.flat_sea:
+            self._flood()
+
         self._colourise()

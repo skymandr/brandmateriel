@@ -8,7 +8,7 @@ import camera as c
 import mapper as m
 import shader as s
 
-RESOLUTION = (320, 240)
+RESOLUTION = (640, 480)
 
 if not pygame.font:
     print "Warning: no fonts detected; fonts disabled."
@@ -54,26 +54,38 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
     pixels = cam.get_screen_coordinates(scene.positions)
     colours = shader.apply_lighting(scene.positions, scene.normals,
                                     scene.colours.copy())
+    patches = cam.get_screen_coordinates(scene.patches)
 
     # Use PixelArray instead:
     for n, p in enumerate(pixels):
-        screen.set_at(np.round(p).astype(np.int), colours[n, :])
+        # Use this to render point cloud in uniform colour:
+        # screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
+
+        # Use this to render point cloud in shaded colours (not pretty):
+        # screen.set_at(np.round(p).astype(np.int), colours[n, :])
+
+        # Use this to (maybe) render patches:
+        pygame.draw.polygon(screen, colours[n], patches[n * 4: n * 4 + 4])
 
     pygame.display.flip()
 
     return scene, cam
 
 
-def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
+def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
+                 save_fig=False):
     import string
     fps_clock = pygame.time.Clock()
     screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
 
-    scene = get_scene(filename)
+    scene = m.Map(filename, sealevel, False)
     look_at = np.array([31, 33, 21])
-    cam = c.Camera(position=np.array([scene[:, 0].mean(),
-                   -2 * np.ceil(scene[:, 2].max()) - 9.0,
-                   2 * np.ceil(scene[:, 2].max()) + 6.0]))
+    cam = c.Camera(position=np.array([scene.positions[:, 0].mean(),
+                   -2 * np.ceil(scene.positions[:, 2].max()) - 9.0,
+                   2 * np.ceil(scene.positions[:, 2].max()) + 6.0]),
+                   screen=c.Screen(resolution=np.array(RESOLUTION)))
+
+    shader = s.Shader(cam)
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -82,11 +94,21 @@ def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
         screen.fill((0, 0, 0))
         cam.position = np.array([np.sin(a) * R + 31, np.cos(a) * R + 33, 42])
         cam.look_at_point(look_at)
-        pixels = cam.get_screen_coordinates(scene)
+        pixels = cam.get_screen_coordinates(scene.positions)
+        colours = shader.apply_lighting(scene.positions, scene.normals,
+                                        scene.colours.copy())
+        patches = cam.get_screen_coordinates(scene.patches)
 
         # Use PixelArray instead:
-        for p in pixels:
-            screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
+        for n, p in enumerate(pixels):
+            # Use this to render point cloud in uniform colour:
+            # screen.set_at(np.round(p).astype(np.int), (204, 0, 0))
+
+            # Use this to render point cloud in shaded colours (not pretty):
+            # screen.set_at(np.round(p).astype(np.int), colours[n, :])
+
+            # Use this to (maybe) render patches:
+            pygame.draw.polygon(screen, colours[n], patches[n * 4: n * 4 + 4])
 
         pygame.display.flip()
 
@@ -99,9 +121,8 @@ def do_live_demo(filename='demodata.npy', steps=42, fps=30, save_fig=False):
 
 def main():
     pygame.init()
-    do_demo()
-    # do_live_demo()
-    # do_live_demo(save_fig=True)
+    # do_demo()
+    do_live_demo(save_fig=False)
 
 
 if __name__ == "__main__":
