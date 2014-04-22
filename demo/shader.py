@@ -98,8 +98,10 @@ class Shader(object):
     a fixed light source is desired.
     """
 
-    def __init__(self, light_source=LightSource()):
-        self.light_source = light_source
+    def __init__(self, light_source=LightSource(),
+                 colour=np.array([255, 255, 255])):
+        self._light_source = light_source
+        self._colour = colour
 
     @property
     def light_source(self):
@@ -108,6 +110,14 @@ class Shader(object):
     @light_source.setter
     def light_source(self, val):
         self._light_source = val
+
+    @property
+    def colour(self):
+        return self._colour
+
+    @colour.setter
+    def colour(self, val):
+        self._colour = val
 
     def apply_lighting(self, positions, normals, colours):
         """
@@ -118,8 +128,8 @@ class Shader(object):
         Deltas = positions - self.light_source.position
         Deltas /= np.sqrt((Deltas ** 2).sum(-1))[:, np.newaxis]
 
-        scatter = 255 * (Deltas * normals).sum(-1)
-        colours -= scatter[:, np.newaxis]
+        scatter = (Deltas * normals).sum(-1)
+        colours -= self.colour * scatter[:, np.newaxis]
         colours = np.where(colours > 255, 255, colours)
         colours = np.where(colours < 0, 0, colours)
 
