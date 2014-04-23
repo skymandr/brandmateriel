@@ -10,7 +10,7 @@ class FireFighter(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, basecolour=np.array([0, 204, 0])):
+    def __init__(self, basecolour=np.array([0, 204, 0, 255])):
         points = np.array([[0.5, 1.0, 0],
                         [-0.5, 1.0, 0],
                         [-1.0, 0.0, 0.2],
@@ -24,19 +24,19 @@ class FireFighter(object):
             [points[2], points[3], points[5]],  # back left
             [points[3], points[4], points[5]],  # back right
             [points[4], points[0], points[5]],  # front right
-            [points[3], points[1], points[1]],  # bottom
+            [points[3], points[1], points[0]],  # bottom
             [points[3], points[2], points[1]],  # bottom left
             [points[3], points[0], points[4]]   # bottom right
             ])
 
-        self._colours = np.array([[0, 204, 0],
-                                  [0, 153, 0],
-                                  [0, 204, 0],
-                                  [0, 204, 0],
-                                  [0, 153, 0],
-                                  [0, 0, 153],
-                                  [0, 0, 240],
-                                  [0, 0, 240]
+        self._colours = np.array([[0, 204, 0, 255],
+                                  [0, 153, 0, 255],
+                                  [0, 204, 0, 255],
+                                  [0, 204, 0, 255],
+                                  [0, 153, 0, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 240, 255],
+                                  [0, 0, 240, 255]
                                   ])
 
         self._orientation = np.array([[1.0, 0.0, 0.0],  # U

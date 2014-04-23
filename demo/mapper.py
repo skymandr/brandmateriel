@@ -76,7 +76,7 @@ class Map(object):
 
     @property
     def colours(self):
-        return self._colours.reshape((self._size, 3))
+        return self._colours.reshape((self._size, 4))
 
     def _make_patches(self):
         """
@@ -108,12 +108,12 @@ class Map(object):
 
         Currently debug wit just green and blue.
         """
-        colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 3],
+        colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 4],
                            dtype=np.int)
 
-        RED = np.array((153, 0, 0))
-        GREEN = np.array((0, 153, 0))
-        BLUE = np.array((0, 0, 153))
+        RED = np.array((153, 0, 0, 255))
+        GREEN = np.array((0, 153, 0, 255))
+        BLUE = np.array((0, 0, 153, 255))
 
         for x in xrange(colours.shape[0]):
             for y in xrange(colours.shape[1]):

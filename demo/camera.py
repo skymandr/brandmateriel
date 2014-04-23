@@ -255,9 +255,8 @@ class Camera(object):
         # Convert to left-handed pixel space and return:
         return np.round(np.array(
                         [projections[:, self.U] * self._norms[self.X],
-                         -projections[:, self.W] * self._norms[self.Y],
-                         projections[:, self.V] * self._norms[self.Y]]).T
-                        ).astype(np.int)
+                         -projections[:, self.W] * self._norms[self.Y]]).T
+                        ).astype(np.int), projections[:, self.V]
 
     def look_at_point(self, point):
         roll = self.get_roll()

@@ -99,7 +99,7 @@ class Shader(object):
     """
 
     def __init__(self, light_source=LightSource(),
-                 colour=np.array([255, 255, 255])):
+                 colour=np.array([255, 255, 255, 255])):
         self._light_source = light_source
         self._colour = colour
 
@@ -132,5 +132,7 @@ class Shader(object):
         colours -= self.colour * scatter[:, np.newaxis]
         colours = np.where(colours > 255, 255, colours)
         colours = np.where(colours < 0, 0, colours)
+        colours[:, 3] = 255
+        colours[np.where(scatter > 0), 3] = 0
 
         return colours

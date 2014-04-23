@@ -36,7 +36,7 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
     # pixels = cam.get_screen_coordinates(scene.positions)
     colours = shader.apply_lighting(scene.positions, scene.normals,
                                     scene.colours.copy())
-    patches = cam.get_screen_coordinates(scene.patches)
+    patches, depth = cam.get_screen_coordinates(scene.patches)
 
     order = np.argsort(-((scene.positions - cam.position) ** 2).mean(-1))
 
@@ -81,7 +81,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
         # pixels = cam.get_screen_coordinates(scene.positions)
         colours = shader.apply_lighting(scene.positions, scene.normals,
                                         scene.colours.copy())
-        patches = cam.get_screen_coordinates(scene.patches)
+        patches, depth = cam.get_screen_coordinates(scene.patches)
 
         order = np.argsort(-((scene.positions - cam.position) ** 2).mean(-1))
 
@@ -120,7 +120,7 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
     shader = s.Shader(cam)
 
     fighter = o.FireFighter()
-    fighter.position = np.array([5.5, 4.0, 3.0])
+    fighter.position = np.array([5.5, 4.0, 8.0])
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -133,7 +133,7 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
         colours = shader.apply_lighting(scene.positions, scene.normals,
                                         scene.colours.copy())
 
-        patches = cam.get_screen_coordinates(scene.patches)
+        patches, depth = cam.get_screen_coordinates(scene.patches)
 
         order = np.argsort(-((scene.positions - cam.position) ** 2).mean(-1))
 
@@ -143,12 +143,14 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
         colours = shader.apply_lighting(fighter.positions, fighter.normals,
                                         fighter.colours.copy())
 
-        patches = cam.get_screen_coordinates(fighter.patches)
+        patches, depth = cam.get_screen_coordinates(fighter.patches)
 
         order = np.argsort(-((fighter.positions - cam.position) ** 2).mean(-1))
 
         for n in order:
-            pygame.draw.polygon(screen, colours[n], patches[n * 3: n * 3 + 3])
+            if colours[n, 3]:
+                pygame.draw.polygon(screen, colours[n],
+                                    patches[n * 3: n * 3 + 3])
 
         pygame.display.flip()
 
@@ -157,15 +159,14 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
                               'out/{0}.png'.format(string.zfill(str(N), 2)))
 
         fps_clock.tick(fps)
-    print order
-    print ((fighter.positions - cam.position) ** 2).mean(-1)
+    print colours
 
 
 def main():
     pygame.init()
     # do_demo()
-    do_live_demo(save_fig=False)
-    # do_brand_demo(save_fig=False)
+    # do_live_demo(save_fig=False)
+    do_brand_demo(save_fig=False)
 
 
 if __name__ == "__main__":
