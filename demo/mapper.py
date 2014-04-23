@@ -140,19 +140,13 @@ class Map(object):
 
         normals = np.zeros([self._patches.shape[0], self._patches.shape[1], 3])
 
-        # This for-loops probably could and should be removed:
-        for x in xrange(normals.shape[0]):
-            for y in xrange(normals.shape[1]):
-                v0 = self._patches[x, y, 1] - self._patches[x, y, 0]
-                v1 = self._patches[x, y, 2] - self._patches[x, y, 1]
-                v2 = self._patches[x, y, 3] - self._patches[x, y, 2]
-                v3 = self._patches[x, y, 0] - self._patches[x, y, 3]
+        v0s = self._patches[:, :, 1] - self._patches[:, :, 0]
+        v1s = self._patches[:, :, 2] - self._patches[:, :, 1]
+        v2s = self._patches[:, :, 3] - self._patches[:, :, 2]
+        v3s = self._patches[:, :, 0] - self._patches[:, :, 3]
 
-                # normals[x, y] = np.cross(v0 + v1, -v0 - v3)
-                # normals[x, y] /= np.linalg.norm(normals[x, y])
-
-                normals[x, y] = np.cross(v0, v1 + v3) + np.cross(v2, v3 - v1)
-                normals[x, y] /= np.linalg.norm(normals[x, y])
+        normals = np.cross(v0s, v1s + v3s) + np.cross(v2s, v3s - v1s)
+        normals /= np.sqrt((normals ** 2).sum(-1))[:, :, np.newaxis]
 
         self._normals = normals
 
