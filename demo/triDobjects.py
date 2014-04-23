@@ -29,17 +29,30 @@ class FireFighter(object):
             [points[3], points[0], points[4]]   # bottom right
             ])
 
-        self._basecolour = basecolour
+        self._colours = np.array([[0, 204, 0],
+                                  [0, 153, 0],
+                                  [0, 204, 0],
+                                  [0, 204, 0],
+                                  [0, 153, 0],
+                                  [0, 0, 153],
+                                  [0, 0, 240],
+                                  [0, 0, 240]
+                                  ])
 
         self._orientation = np.array([[1.0, 0.0, 0.0],  # U
                                       [0.0, 1.0, 0.0],  # V
                                       [0.0, 0.0, 1.0]   # W
                                       ])
+
+        self._basecolour = basecolour
+
         self._position = np.array([0.0, 0.0, 0.0])
 
         self._calc_normals()
 
         self._calc_positions()
+
+        self._colourise()
 
     @property
     def position(self):
@@ -59,7 +72,7 @@ class FireFighter(object):
 
     @property
     def positions(self):
-        return self._positions + self.position[np.newaxis, np.newaxis, :]
+        return self._positions + self.position[np.newaxis, :]
 
     @property
     def colours(self):
@@ -80,9 +93,9 @@ class FireFighter(object):
 
         Currently debug wit just green and blue.
         """
-        colours = np.zeros([self._patches.shape[0], 3], dtype=np.int)
+        # colours = np.zeros([self._patches.shape[0], 3], dtype=np.int)
 
-        self._colours = colours + self.basecolour
+        # self._colours = colours + self.basecolour
 
     def _calc_positions(self):
         """
