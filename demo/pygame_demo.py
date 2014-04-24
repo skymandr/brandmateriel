@@ -120,9 +120,12 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
     shader = s.Shader(cam)
 
     fighter = o.FireFighter()
-    fighter = o.House()
 
     fighter.position = np.array([5.5, 4.0, 6.0])
+
+    house = o.House()
+
+    house.position = np.array([6.0, 4.0, 0.0])
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -148,6 +151,17 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
         patches, depth = cam.get_screen_coordinates(fighter.patches)
 
         order = np.argsort(-((fighter.positions - cam.position) ** 2).mean(-1))
+
+        for n in order:
+            if colours[n, 3]:
+                pygame.draw.polygon(screen, colours[n], patches[n])
+
+        colours = shader.apply_lighting(house.positions, house.normals,
+                                        house.colours.copy())
+
+        patches, depth = cam.get_screen_coordinates(house.patches)
+
+        order = np.argsort(-((house.positions - cam.position) ** 2).mean(-1))
 
         for n in order:
             if colours[n, 3]:
