@@ -125,7 +125,7 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
 
     house = o.House()
 
-    house.position = np.array([6.0, 4.0, 0.0])
+    house.position = np.array([3.0, 3.0, 0.0])
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -174,10 +174,6 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
                               'out/{0}.png'.format(string.zfill(str(N), 2)))
 
         fps_clock.tick(fps)
-
-    print colours
-    print order
-    print -((fighter.positions - cam.position) ** 2).mean(-1)
 
 
 def main():
