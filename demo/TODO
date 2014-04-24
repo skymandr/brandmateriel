@@ -1,2 +1,3 @@
 Next up:
-Rudimentary movement
+* Rudimentary movement
+* fix engine draw order (divide underside into more polys?)

@@ -12,14 +12,14 @@ class FireFighter(object):
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255])):
         points = np.array([[0.5, 1.0, 0.0],     # 0
-                           [-.5, 1.0, 0.0],     # 1
+                           [-0.5, 1.0, 0.0],    # 1
                            [-1.0, 0.0, 0.2],    # 2
                            [0.0, -1.0, 0.0],    # 3
                            [1.0, 0.0, 0.2],     # 4
-                           [0.0, -.5, 0.5],     # 5
-                           [0.05, 0.1, -.01],   # 6
-                           [-.05, 0.1, -.01],   # 7
-                           [0.0, -0.1, -.01],   # 8
+                           [0.0, -0.5, 0.5],    # 5
+                           [0.10, 0.1, 0.0],    # 6
+                           [-.10, 0.1, 0.0],    # 7
+                           [0.0, -0.2, 0.0],    # 8
                            ])
 
         self._patches = np.array([
@@ -28,10 +28,19 @@ class FireFighter(object):
             [points[2], points[3], points[5]],  # 2: back left
             [points[3], points[4], points[5]],  # 3: back right
             [points[4], points[0], points[5]],  # 4: front right
-            [points[3], points[1], points[0]],  # 5: bottom
-            [points[3], points[2], points[1]],  # 6: bottom left
-            [points[3], points[0], points[4]],  # 7: bottom right
-            [points[8], points[7], points[6]],  # 8: engine
+            [(points[1] + points[0]) * 0.5,     # 5: bottom front centre
+             points[6], points[7]],
+            [(points[1] + points[0]) * 0.5,     # 6: bottom front left
+             points[7], points[1]],
+            [(points[1] + points[0]) * 0.5,     # 7: bottom front right
+             points[0], points[6]],
+            [points[1], points[7], points[3]],  # 8: bottom left front
+            [points[7], points[8], points[3]],  # 9: bottom left back
+            [points[6], points[0], points[3]],  # A: bottom right front
+            [points[8], points[6], points[3]],  # B: bottom right back
+            [points[3], points[2], points[1]],  # C: bottom left wing
+            [points[3], points[0], points[4]],  # D: bottom right wing
+            [points[8], points[7], points[6]],  # E: engine A
             ])
 
         self._colours = np.array([[0, 204, 0, 255],
@@ -40,9 +49,15 @@ class FireFighter(object):
                                   [0, 204, 0, 255],
                                   [0, 153, 0, 255],
                                   [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
                                   [0, 0, 240, 255],
                                   [0, 0, 240, 255],
-                                  [240, 240, 0, 255]
+                                  [240, 240, 0, 255],
                                   ])
 
         self._orientation = np.array([[1.0, 0.0, 0.0],  # U
