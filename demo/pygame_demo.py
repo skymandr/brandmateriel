@@ -120,6 +120,8 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
     shader = s.Shader(cam)
 
     fighter = o.FireFighter()
+    fighter = o.House()
+
     fighter.position = np.array([5.5, 4.0, 6.0])
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
