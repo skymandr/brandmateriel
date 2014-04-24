@@ -1,4 +1,6 @@
 *.pyc
 *.png
 *.gif
-.ropeproject
+.ropeproject/*
+notrack/*
+
