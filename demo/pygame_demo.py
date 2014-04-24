@@ -104,35 +104,34 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
         fps_clock.tick(fps)
 
 
-def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
+def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
                   save_fig=False):
     import string
     fps_clock = pygame.time.Clock()
     screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
 
     scene = m.Map(filename, sealevel, True)
-    look_at = np.array([5.5, 4.0, 6.0])
-    cam = c.Camera(position=np.array([scene.positions[:, 0].mean(),
-                   -2 * np.ceil(scene.positions[:, 2].max()) - 9.0,
-                   2 * np.ceil(scene.positions[:, 2].max()) + 6.0]),
+    look_at = np.array([63.5, 63.5, 6.0])
+    cam = c.Camera(position=np.array([54.5, 63.5, 6.0]),
                    screen=c.Screen(resolution=np.array(RESOLUTION)))
 
     shader = s.Shader(cam)
 
     fighter = o.FireFighter()
 
-    fighter.position = np.array([5.5, 4.0, 6.0])
+    fighter.position = np.array([63.5, 63.5, 6.0])
 
     house = o.House()
 
-    house.position = np.array([3.0, 3.0, 0.0])
+    house.position = np.array([71, 51, 1.0])
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
 
     for N, a in enumerate(angles):
         screen.fill((0, 0, 0))
-        cam.position = np.array([np.sin(a) * R + 5.5, np.cos(a) * R + 4, 6])
+        cam.position = np.array([np.sin(a) * R + 63.5,
+                                 np.cos(a) * R + 63.5, 6.0])
         cam.look_at_point(look_at)
 
         colours = shader.apply_lighting(scene.positions, scene.normals,
@@ -143,7 +142,11 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
         order = np.argsort(-((scene.positions - cam.position) ** 2).mean(-1))
 
         for n in order:
-            pygame.draw.polygon(screen, colours[n], patches[n])
+            if ((depth[n].mean() > 0 and patches[n] >= 0).any() and
+                    (patches[n, :, 0] < RESOLUTION[0]).any() and
+                    (patches[n, :, 1] < RESOLUTION[1]).any()):
+
+                pygame.draw.polygon(screen, colours[n], patches[n])
 
         colours = shader.apply_lighting(fighter.positions, fighter.normals,
                                         fighter.colours.copy())
@@ -153,7 +156,10 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
         order = np.argsort(-((fighter.positions - cam.position) ** 2).mean(-1))
 
         for n in order:
-            if colours[n, 3]:
+            if (colours[n, 3] and depth[n].mean() > 0 and
+                    (patches[n] >= 0).any() and
+                    (patches[n, :, 0] < RESOLUTION[0]).any() and
+                    (patches[n, :, 1] < RESOLUTION[1]).any()):
                 pygame.draw.polygon(screen, colours[n], patches[n])
 
         colours = shader.apply_lighting(house.positions, house.normals,
@@ -164,7 +170,10 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
         order = np.argsort(-((house.positions - cam.position) ** 2).mean(-1))
 
         for n in order:
-            if colours[n, 3]:
+            if (colours[n, 3] and depth[n].mean() > 0 and
+                    (patches[n] >= 0).any() and
+                    (patches[n, :, 0] < RESOLUTION[0]).any() and
+                    (patches[n, :, 1] < RESOLUTION[1]).any()):
                 pygame.draw.polygon(screen, colours[n], patches[n])
 
         pygame.display.flip()
@@ -180,7 +189,7 @@ def main():
     pygame.init()
     # do_demo()
     # do_live_demo(save_fig=False)
-    do_brand_demo(save_fig=False)
+    do_brand_demo(save_fig=True)
 
 
 if __name__ == "__main__":

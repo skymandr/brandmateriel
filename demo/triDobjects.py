@@ -55,9 +55,9 @@ class FireFighter(object):
                                   [0, 0, 153, 255],
                                   [0, 0, 153, 255],
                                   [0, 0, 153, 255],
-                                  [0, 0, 240, 255],
-                                  [0, 0, 240, 255],
-                                  [240, 240, 0, 255],
+                                  [0, 0, 204, 255],
+                                  [0, 0, 204, 255],
+                                  [204, 204, 0, 255],
                                   ])
 
         self._orientation = np.array([[1.0, 0.0, 0.0],  # U
@@ -72,7 +72,6 @@ class FireFighter(object):
         self._calc_normals()
 
         self._calc_positions()
-        print self.patches.shape, self.positions.shape
 
         self._colourise()
 

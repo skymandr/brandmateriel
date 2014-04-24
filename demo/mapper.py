@@ -111,16 +111,12 @@ class Map(object):
         colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 4],
                            dtype=np.int)
 
-        RED = np.array((153, 0, 0, 255))
-        GREEN = np.array((0, 153, 0, 255))
-        BLUE = np.array((0, 0, 153, 255))
-
         for x in xrange(colours.shape[0]):
             for y in xrange(colours.shape[1]):
                 if self._positions[x, y, 2] > self.sealevel:
-                    colours[x, y] = 0 * RED + 1 * GREEN + 0 * BLUE
+                    colours[x, y] = np.array([102, 153, 0, 255])
                 else:
-                    colours[x, y] = 0 * RED + 0 * GREEN + 1 * BLUE
+                    colours[x, y] = np.array([0, 0, 77, 255])
 
         self._colours = colours
 
