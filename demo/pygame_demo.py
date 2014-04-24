@@ -3,7 +3,7 @@
 import sys
 import numpy as np
 import pygame
-# import pygame.locals as pgl
+# import pygame.locals as l
 import camera as c
 import mapper as m
 import shader as s

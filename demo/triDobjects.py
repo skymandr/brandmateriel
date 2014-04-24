@@ -11,12 +11,16 @@ class FireFighter(object):
     Z = W = 2
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255])):
-        points = np.array([[0.5, 1.0, 0],
-                        [-0.5, 1.0, 0],
-                        [-1.0, 0.0, 0.2],
-                        [0.0, -1.0, 0.0],
-                        [1.0, 0.0, 0.2],
-                        [0.0, -0.5, 0.5]])
+        points = np.array([[0.5, 1.0, 0.0],     # 0
+                           [-.5, 1.0, 0.0],     # 1
+                           [-1.0, 0.0, 0.2],    # 2
+                           [0.0, -1.0, 0.0],    # 3
+                           [1.0, 0.0, 0.2],     # 4
+                           [0.0, -.5, 0.5],     # 5
+                           [0.05, 0.1, -.01],   # 6
+                           [-.05, 0.1, -.01],   # 7
+                           [0.0, -0.1, -0.01],  # 8
+                           ])
 
         self._patches = np.array([
             [points[0], points[1], points[5]],  # front
@@ -27,6 +31,7 @@ class FireFighter(object):
             [points[3], points[1], points[0]],  # bottom
             [points[3], points[2], points[1]],  # bottom left
             [points[3], points[0], points[4]]   # bottom right
+            [points[8], points[7], points[6]],  # engine
             ])
 
         self._colours = np.array([[0, 204, 0, 255],
@@ -36,7 +41,8 @@ class FireFighter(object):
                                   [0, 153, 0, 255],
                                   [0, 0, 153, 255],
                                   [0, 0, 240, 255],
-                                  [0, 0, 240, 255]
+                                  [0, 0, 240, 255],
+                                  [240, 240, 0, 255]
                                   ])
 
         self._orientation = np.array([[1.0, 0.0, 0.0],  # U
