@@ -123,7 +123,7 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
 
     house = o.House()
 
-    house.position = np.array([71, 51, 1.0])
+    house.position = np.array([58.5, 67, 2.23])
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -189,7 +189,7 @@ def main():
     pygame.init()
     # do_demo()
     # do_live_demo(save_fig=False)
-    do_brand_demo(save_fig=True)
+    do_brand_demo(save_fig=False)
 
 
 if __name__ == "__main__":

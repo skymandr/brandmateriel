@@ -204,7 +204,6 @@ class House(object):
         self._calc_normals()
 
         self._calc_positions()
-        print self.patches.shape, self.positions.shape
 
         self._colourise()
 
