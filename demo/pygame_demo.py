@@ -48,7 +48,7 @@ def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
         # screen.set_at(np.round(pixels[n]).astype(np.int), colours[n, :])
 
         # Use this to render patches:
-        pygame.draw.polygon(screen, colours[n], patches[n * 4: n * 4 + 4])
+        pygame.draw.polygon(screen, colours[n], patches[n])
 
     pygame.display.flip()
 
@@ -163,8 +163,8 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
 
 def main():
     pygame.init()
-    # do_demo()
-    do_live_demo(save_fig=False)
+    do_demo()
+    # do_live_demo(save_fig=False)
     # do_brand_demo(save_fig=False)
 
 

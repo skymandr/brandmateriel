@@ -240,23 +240,28 @@ class Camera(object):
 
     def get_screen_coordinates(self, points):
         # Perform projections:
-        projections = np.inner(points.reshape(points.size / 3, 3) -
-                               self.position, self.orientation)
+        # projections = np.inner(points.reshape(points.size / 3, 3) -
+        #                        self.position, self.orientation)
+
+        projections = np.inner(points - self.position, self.orientation)
 
         # Rescale to screen distance:
         projections *= np.abs(self.screen.distance /
-                              projections[:, np.newaxis, 1])
+                              projections[:, :, np.newaxis, 1])
 
         # Change origin to upper-left corner of screen:
-        projections += np.array([self.screen.width * 0.5 - self.screen.u,
-                                0.0, -self.screen.height * 0.5 -
-                                self.screen.w])
+        projections += np.array([self.screen.width * 0.5 - self.screen.u, 0.0,
+                                 -self.screen.height * 0.5 - self.screen.w])
 
         # Convert to left-handed pixel space and return:
+        return np.round(projections[:, :, (self.U, self.W)] * self._norms *
+                        np.array([1, -1])
+                        ).astype(np.int), projections[:, :, self.V]
+
         return np.round(np.array(
-                        [projections[:, self.U] * self._norms[self.X],
-                         -projections[:, self.W] * self._norms[self.Y]]).T
-                        ).astype(np.int), projections[:, self.V]
+            [projections[:, :, self.U] * self._norms[self.X],
+             -projections[:, :, self.W] * self._norms[self.Y]]).T
+            ).astype(np.int), projections[:, :, self.V]
 
     def look_at_point(self, point):
         roll = self.get_roll()
