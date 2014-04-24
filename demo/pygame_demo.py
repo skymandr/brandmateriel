@@ -120,7 +120,7 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
     shader = s.Shader(cam)
 
     fighter = o.FireFighter()
-    fighter.position = np.array([5.5, 4.0, 5.0])
+    fighter.position = np.array([5.5, 4.0, 6.0])
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
@@ -138,7 +138,7 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
         order = np.argsort(-((scene.positions - cam.position) ** 2).mean(-1))
 
         for n in order:
-            pygame.draw.polygon(screen, colours[n], patches[n * 4: n * 4 + 4])
+            pygame.draw.polygon(screen, colours[n], patches[n])
 
         colours = shader.apply_lighting(fighter.positions, fighter.normals,
                                         fighter.colours.copy())
@@ -149,8 +149,7 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
 
         for n in order:
             if colours[n, 3]:
-                pygame.draw.polygon(screen, colours[n],
-                                    patches[n * 3: n * 3 + 3])
+                pygame.draw.polygon(screen, colours[n], patches[n])
 
         pygame.display.flip()
 
@@ -160,12 +159,16 @@ def do_brand_demo(filename=None, sealevel=0.0, steps=42, fps=30,
 
         fps_clock.tick(fps)
 
+    print colours
+    print order
+    print -((fighter.positions - cam.position) ** 2).mean(-1)
+
 
 def main():
     pygame.init()
     # do_demo()
-    do_live_demo(save_fig=False)
-    # do_brand_demo(save_fig=False)
+    # do_live_demo(save_fig=False)
+    do_brand_demo(save_fig=False)
 
 
 if __name__ == "__main__":
