@@ -296,4 +296,5 @@ class Camera(object):
                           np.dot(u, self.u))
 
     def set_roll(self, roll):
-        print "Sorry! set_roll() is not yet implemented.!"
+        # print "Sorry! set_roll() is not yet implemented.!"
+        pass

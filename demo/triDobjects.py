@@ -86,15 +86,17 @@ class TriD(object):
 
     @property
     def patches(self):
-        return self._patches + self.position[np.newaxis, np.newaxis, :]
+        return (self._apply_rotation(self._patches) +
+                self.position[np.newaxis, np.newaxis, :])
 
     @property
     def normals(self):
-        return self._normals
+        return self._apply_rotation(self._normals)
 
     @property
     def positions(self):
-        return self._positions + self.position[np.newaxis, :]
+        return (self._apply_rotation(self._positions) +
+                self.position[np.newaxis, :])
 
     @property
     def colours(self):
@@ -164,6 +166,25 @@ class TriD(object):
 
         self._normals = normals
 
+    def _apply_rotation(self, positions):
+        y = self.yaw
+        p = self.pitch
+        r = self.roll
+
+        Rx = np.array([[1, 0, 0],
+                       [0, np.cos(p), - np.sin(p)],
+                       [0, np.sin(p), np.cos(p)]])
+
+        Ry = np.array([[np.cos(r), 0, np.sin(r)],
+                       [0, 1, 0],
+                       [-np.sin(r), 0, np.cos(r)]])
+
+        Rz = np.array([[np.cos(y), np.sin(y), 0],
+                       [-np.sin(y), np.cos(y), 0],
+                       [0, 0, 1]])
+
+        return np.inner(positions, np.dot(Ry, np.dot(Rx, Rz)).T)
+
 
 class FireFighter(TriD):
     """
@@ -172,7 +193,7 @@ class FireFighter(TriD):
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
-                 yaw=0.0, pitch=0.0, roll=0.0):
+                 yaw=0, pitch=0, roll=0):
         points = np.array([[0.5, 1.0, 0.0],     # 0
                            [-0.5, 1.0, 0.0],    # 1
                            [-1.0, 0.0, 0.2],    # 2

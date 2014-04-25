@@ -165,6 +165,8 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
 
     house.position = np.array([58.5, 67, 2.23])
 
+    house.yaw = np.pi / 6
+
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
 
@@ -187,6 +189,12 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
                     (patches[n, :, 1] < RESOLUTION[1]).any()):
 
                 pygame.draw.polygon(screen, colours[n], patches[n])
+
+        fighter.yaw = a
+
+        fighter.pitch = a
+
+        fighter.roll = a
 
         colours = shader.apply_lighting(fighter.positions, fighter.normals,
                                         fighter.colours.copy())
