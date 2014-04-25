@@ -17,10 +17,13 @@ class LightSource(object):
                  position=np.array([6.0, -9.0, 6.0]),
                  orientation=np.array([[1.0, 0.0, 0.0],     # u
                                        [0.0, 1.0, 0.0],     # v
-                                       [0.0, 0.0, 1.0]])):  # w
-        self.position = position
+                                       [0.0, 0.0, 1.0]]),   # w
+                 distance=9):
+        self._position = position
 
-        self.orientation = orientation
+        self._orientation = orientation
+
+        self._distance = distance
 
     @property
     def position(self):
@@ -37,6 +40,14 @@ class LightSource(object):
     @orientation.setter
     def orientation(self, val):
         self._orientation = val
+
+    @property
+    def distance(self):
+        return self._distance
+
+    @distance.setter
+    def distance(self, val):
+        self._distance = val
 
     @property
     def x(self):
@@ -98,10 +109,23 @@ class Shader(object):
     a fixed light source is desired.
     """
 
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
     def __init__(self, light_source=LightSource(),
-                 colour=np.array([255, 255, 255, 255])):
+                 colour=np.array([255, 204, 204, 255]),
+                 distance_shading=True, cutoff_distance=None):
         self._light_source = light_source
+
         self._colour = colour
+
+        self._distance_shading = distance_shading
+
+        if cutoff_distance is None:
+            self._cutoff_distance = self.light_source.distance
+        else:
+            self._cutoff_distance = cutoff_distance
 
     @property
     def light_source(self):
@@ -119,17 +143,49 @@ class Shader(object):
     def colour(self, val):
         self._colour = val
 
+    @property
+    def distance_shading(self):
+        return self._distance_shading
+
+    @distance_shading.setter
+    def distance_shading(self, val):
+        self._distance_shading = val
+
+    @property
+    def cutoff_distance(self):
+        return self._cutoff_distance
+
+    @cutoff_distance.setter
+    def cutoff_distance(self, val):
+        self._cutoff_distance = val
+
     def apply_lighting(self, positions, normals, colours):
         """
         Questions:
             this is done explicitly by reference, changing original colours;
             is that good or annoying?
         """
-        Deltas = positions - self.light_source.position
-        Deltas /= np.sqrt((Deltas ** 2).sum(-1))[:, np.newaxis]
+        deltas = positions - self.light_source.position
+        dists = np.sqrt((deltas ** 2).sum(-1))[:, np.newaxis]
+        deltas /= dists
 
-        scatter = (Deltas * normals).sum(-1)
+        # Apply scatter:
+        scatter = (deltas * normals).sum(-1)
         colours -= self.colour * scatter[:, np.newaxis]
+
+        # Apply distance shading:
+        if self.distance_shading:
+            # Gauss:
+            colours *= np.exp(-(dists - self.cutoff_distance) ** 2 /
+                               (4 * self.cutoff_distance ** 2))
+            # Logistic:
+            # colours /= 1 + 0.5 * np.exp(dists - 2 * self.cutoff_distance)
+            # Linear with cut-off:
+            # colours *= np.where(2 * self.cutoff_distance > dists, 1,
+            #                     (3 * self.cutoff_distance - dists) /
+            #                     (1 * self.cutoff_distance))
+
+        # Renormalise to allowed colour values:
         colours = np.where(colours > 255, 255, colours)
         colours = np.where(colours < 0, 0, colours)
         colours[:, 3] = 255

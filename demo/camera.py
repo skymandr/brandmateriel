@@ -15,7 +15,7 @@ class Screen(object):
     * position:
         - position of the centre of the Screen in uvw-space, using the Camera
           position as origin.
-          The v component is the proper orthogonalvdistance to the Screen from
+          The v component is the proper orthogonal distance to the Screen from
           the Camera.
     """
 
@@ -164,6 +164,7 @@ class Camera(object):
         self.orientation = orientation
 
         self.screen = screen
+
         self._norms = self.screen.resolution / self.screen.extent
 
     @property
@@ -189,6 +190,10 @@ class Camera(object):
     @screen.setter
     def screen(self, val):
         self._screen = val
+
+    @property
+    def distance(self):
+        return self.screen.distance
 
     @property
     def x(self):
@@ -246,7 +251,7 @@ class Camera(object):
         projections = np.inner(points - self.position, self.orientation)
 
         # Rescale to screen distance:
-        projections *= np.abs(self.screen.distance /
+        projections *= np.abs(self.distance /
                               projections[:, :, np.newaxis, 1])
 
         # Change origin to upper-left corner of screen:
