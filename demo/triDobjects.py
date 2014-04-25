@@ -33,7 +33,9 @@ class TriD(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, basecolour=np.array([0, 204, 0, 255])):
+    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 yaw=0.0, pitch=0.0, roll=0.0):
         points = np.array([[1.0, 0.0, -1.0 / np.sqrt(2)],   # 0
                            [-1.0, 0.0, -1.0 / np.sqrt(2)],  # 1
                            [0.0, -1.0, 1.0 / np.sqrt(2)],   # 2
@@ -60,7 +62,13 @@ class TriD(object):
 
         self._basecolour = basecolour
 
-        self._position = np.array([0.0, 0.0, 0.0])
+        self._position = position
+
+        self._yaw = yaw
+
+        self._pitch = pitch
+
+        self._roll = roll
 
         self._calc_normals()
 
@@ -101,8 +109,32 @@ class TriD(object):
         self._basecolour = val
 
     @property
+    def yaw(self):
+        return self._yaw
+
+    @yaw.setter
+    def yaw(self, val):
+        self._yaw = val
+
+    @property
+    def pitch(self):
+        return self._pitch
+
+    @pitch.setter
+    def pitch(self, val):
+        self._pitch = val
+
+    @property
+    def roll(self):
+        return self._roll
+
+    @roll.setter
+    def roll(self, val):
+        self._roll = val
+
+    @property
     def bounding_box(self):
-        return np.r_[self.positions.min(0), self.positions.max(0)]
+        return np.c_[self.positions.min(0), self.positions.max(0)].T
 
     def _colourise(self):
         """
@@ -138,7 +170,9 @@ class FireFighter(TriD):
     Patches for FireFighter.
     """
 
-    def __init__(self, basecolour=np.array([0, 204, 0, 255])):
+    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 yaw=0.0, pitch=0.0, roll=0.0):
         points = np.array([[0.5, 1.0, 0.0],     # 0
                            [-0.5, 1.0, 0.0],    # 1
                            [-1.0, 0.0, 0.2],    # 2
@@ -195,7 +229,13 @@ class FireFighter(TriD):
 
         self._basecolour = basecolour
 
-        self._position = np.array([0.0, 0.0, 0.0])
+        self._position = position
+
+        self._yaw = yaw
+
+        self._pitch = pitch
+
+        self._roll = roll
 
         self._calc_normals()
 
@@ -209,7 +249,9 @@ class House(TriD):
     Patches for House.
     """
 
-    def __init__(self, basecolour=np.array([0, 204, 0, 255])):
+    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 yaw=0.0, pitch=0.0, roll=0.0):
         points = np.array([[0.7, 1.25, 0.0],       # 0
                            [-0.7, 1.25, 0.0],      # 1
                            [-0.7, -1.25, 0.0],     # 2
@@ -262,7 +304,13 @@ class House(TriD):
 
         self._basecolour = basecolour
 
-        self._position = np.array([0.0, 0.0, 0.0])
+        self._position = position
+
+        self._yaw = yaw
+
+        self._pitch = pitch
+
+        self._roll = roll
 
         self._calc_normals()
 
