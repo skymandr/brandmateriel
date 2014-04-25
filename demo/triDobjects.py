@@ -18,18 +18,125 @@
 #   - Firestarter
 #   - Hunter-seeker
 #   - Noch Less
+#   - Fire
+#   - Particles
 
 import numpy as np
 
 
-class FireFighter(object):
+class TriD(object):
     """
-    Patches for FireFighter.
+    Parent class for TriD-objects.
     """
 
     X = U = 0
     Y = V = 1
     Z = W = 2
+
+    def __init__(self, basecolour=np.array([0, 204, 0, 255])):
+        points = np.array([[1.0, 0.0, -1.0 / np.sqrt(2)],   # 0
+                           [-1.0, 0.0, -1.0 / np.sqrt(2)],  # 1
+                           [0.0, -1.0, 1.0 / np.sqrt(2)],   # 2
+                           [0.0, 1.0, 1.0 / np.sqrt(2)],    # 3
+                           ])
+
+        self._patches = np.array([
+            [points[1], points[2], points[3]],  # left side
+            [points[1], points[0], points[2]],  # back side
+            [points[0], points[3], points[2]],  # right side
+            [points[0], points[1], points[3]],  # front side
+            ])
+
+        self._colours = np.array([[204, 0, 255],
+                                  [0, 204, 0, 255],
+                                  [0, 0, 204, 255],
+                                  [204, 204, 204, 255],
+                                  ])
+
+        self._orientation = np.array([[1.0, 0.0, 0.0],  # U
+                                      [0.0, 1.0, 0.0],  # V
+                                      [0.0, 0.0, 1.0]   # W
+                                      ])
+
+        self._basecolour = basecolour
+
+        self._position = np.array([0.0, 0.0, 0.0])
+
+        self._calc_normals()
+
+        self._calc_positions()
+
+        self._colourise()
+
+    @property
+    def position(self):
+        return self._position
+
+    @position.setter
+    def position(self, val):
+        self._position = val
+
+    @property
+    def patches(self):
+        return self._patches + self.position[np.newaxis, np.newaxis, :]
+
+    @property
+    def normals(self):
+        return self._normals
+
+    @property
+    def positions(self):
+        return self._positions + self.position[np.newaxis, :]
+
+    @property
+    def colours(self):
+        return self._colours
+
+    @property
+    def basecolour(self):
+        return self._basecolour
+
+    @basecolour.setter
+    def basecolour(self, val):
+        self._basecolour = val
+
+    @property
+    def bounding_box(self):
+        return np.r_[self.positions.min(0), self.positions.max(0)]
+
+    def _colourise(self):
+        """
+        Not yet fully implemented, but should assign colours...
+        """
+        # colours = np.zeros([self._patches.shape[0], 3], dtype=np.int)
+
+        # self._colours = colours + self.basecolour
+
+        pass
+
+    def _calc_positions(self):
+        """
+        Useful for sorting and the like, maybe.
+        """
+
+        self._positions = self._patches.mean(1)
+
+    def _calc_normals(self):
+        normals = np.zeros([self._patches.shape[0], 3])
+
+        v0s = self._patches[:, 1] - self._patches[:, 0]
+        v1s = self._patches[:, 2] - self._patches[:, 1]
+
+        normals = np.cross(v0s, v1s)
+        normals /= np.sqrt((normals ** 2).sum(-1))[:, np.newaxis]
+
+        self._normals = normals
+
+
+class FireFighter(TriD):
+    """
+    Patches for FireFighter.
+    """
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255])):
         points = np.array([[0.5, 1.0, 0.0],     # 0
@@ -96,76 +203,11 @@ class FireFighter(object):
 
         self._colourise()
 
-    @property
-    def position(self):
-        return self._position
 
-    @position.setter
-    def position(self, val):
-        self._position = val
-
-    @property
-    def patches(self):
-        return self._patches + self.position[np.newaxis, np.newaxis, :]
-
-    @property
-    def normals(self):
-        return self._normals
-
-    @property
-    def positions(self):
-        return self._positions + self.position[np.newaxis, :]
-
-    @property
-    def colours(self):
-        return self._colours
-
-    @property
-    def basecolour(self):
-        return self._basecolour
-
-    @basecolour.setter
-    def basecolour(self, val):
-        self._basecolour = val
-
-    def _colourise(self):
-        """
-        Not yet fully implemented, but should assign colours (with some sort of
-        noise) to patches.
-
-        Currently debug wit just green and blue.
-        """
-        # colours = np.zeros([self._patches.shape[0], 3], dtype=np.int)
-
-        # self._colours = colours + self.basecolour
-
-    def _calc_positions(self):
-        """
-        Useful for sorting and the like, maybe.
-        """
-
-        self._positions = self._patches.mean(1)
-
-    def _calc_normals(self):
-        normals = np.zeros([self._patches.shape[0], 3])
-
-        v0s = self._patches[:, 1] - self._patches[:, 0]
-        v1s = self._patches[:, 2] - self._patches[:, 1]
-
-        normals = np.cross(v0s, v1s)
-        normals /= np.sqrt((normals ** 2).sum(-1))[:, np.newaxis]
-
-        self._normals = normals
-
-
-class House(object):
+class House(TriD):
     """
     Patches for House.
     """
-
-    X = U = 0
-    Y = V = 1
-    Z = W = 2
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255])):
         points = np.array([[0.7, 1.25, 0.0],       # 0
@@ -227,64 +269,3 @@ class House(object):
         self._calc_positions()
 
         self._colourise()
-
-    @property
-    def position(self):
-        return self._position
-
-    @position.setter
-    def position(self, val):
-        self._position = val
-
-    @property
-    def patches(self):
-        return self._patches + self.position[np.newaxis, np.newaxis, :]
-
-    @property
-    def normals(self):
-        return self._normals
-
-    @property
-    def positions(self):
-        return self._positions + self.position[np.newaxis, :]
-
-    @property
-    def colours(self):
-        return self._colours
-
-    @property
-    def basecolour(self):
-        return self._basecolour
-
-    @basecolour.setter
-    def basecolour(self, val):
-        self._basecolour = val
-
-    def _colourise(self):
-        """
-        Not yet fully implemented, but should assign colours (with some sort of
-        noise) to patches.
-
-        Currently debug wit just green and blue.
-        """
-        # colours = np.zeros([self._patches.shape[0], 3], dtype=np.int)
-
-        # self._colours = colours + self.basecolour
-
-    def _calc_positions(self):
-        """
-        Useful for sorting and the like, maybe.
-        """
-
-        self._positions = self._patches.mean(1)
-
-    def _calc_normals(self):
-        normals = np.zeros([self._patches.shape[0], 3])
-
-        v0s = self._patches[:, 1] - self._patches[:, 0]
-        v1s = self._patches[:, 2] - self._patches[:, 1]
-
-        normals = np.cross(v0s, v1s)
-        normals /= np.sqrt((normals ** 2).sum(-1))[:, np.newaxis]
-
-        self._normals = normals
