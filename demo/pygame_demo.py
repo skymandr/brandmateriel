@@ -222,14 +222,14 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
             pygame.image.save(screen,
                               'out/{0}.png'.format(string.zfill(str(N), 2)))
 
-        fps_clock.tick(fps)
+        print "Frame upate time: {0} ms".format(fps_clock.tick(fps))
 
 
 def main():
     pygame.init()
-    do_demo()
+    # do_demo()
     # do_live_demo(save_fig=False)
-    # do_brand_demo(save_fig=False)
+    do_brand_demo(save_fig=False)
 
     pygame.mouse.set_visible(False)
     while(handle_inputs()):
