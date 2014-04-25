@@ -165,7 +165,7 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
 
     house.position = np.array([58.5, 67, 2.23])
 
-    house.yaw = np.pi / 6
+    house.yaw = np.pi / 8
 
     angles = np.linspace(0, 2 * np.pi, steps + 1)
     R = np.linalg.norm(cam.position[: 2] - look_at[: 2])
