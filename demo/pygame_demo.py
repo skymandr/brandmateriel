@@ -1,21 +1,61 @@
-#! /usr/env python
+#! /usr/bin/env python
 
 import sys
 import numpy as np
 import pygame
-# import pygame.locals as l
+import pygame.locals as l
 import camera as c
 import mapper as m
 import shader as s
 import triDobjects as o
 
-RESOLUTION = (640, 480)
+RESOLUTION = np.array([640, 480])
+KEYBOARD = {l.K_UP: 'up', l.K_k: 'up',
+            l.K_DOWN: 'down', l.K_j: 'down',
+            l.K_LEFT: 'left', l.K_h: 'left',
+            l.K_RIGHT: 'right', l.K_l: 'right',
+            l.K_a: 'a', l.K_s: 'b', l.K_d: 'c',
+            l.K_RETURN: 'start', l.K_SPACE: 'start',
+            l.K_ESCAPE: 'quit', l.K_F1: 'help'}
 
 if not pygame.font:
     print "Warning: no fonts detected; fonts disabled."
 
 if not pygame.mixer:
     print "Warning: no sound detected; sound disabled."
+
+
+def handle_inputs():
+    """ Should later handle inputs from user. """
+    flag = True
+    for event in pygame.event.get():
+        if event.type == l.QUIT:
+            flag = close() and flag
+        elif event.type == l.KEYDOWN:
+            flag = relay_input(event.key) and flag
+        else:
+            print "Unknown event: \n{0}\n({1})".format(event, event.type)
+
+    return flag
+
+
+def relay_input(event_key):
+    if event_key in KEYBOARD.keys():
+        print "Key pressed: {0} ({1})".format(KEYBOARD[event_key],
+                                              str(event_key))
+        if KEYBOARD[event_key] == 'quit':
+            return close()
+    else:
+        print "Unknown key pressed. ({0})".format(str(event_key))
+
+    return True
+
+
+def close():
+    """ Close game. """
+    print "Quitting game..."
+    pygame.quit()
+    return False
 
 
 def do_demo(filename='demodata.npy', cam=None, look_at=None, sealevel=0):
@@ -187,9 +227,16 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
 
 def main():
     pygame.init()
-    # do_demo()
+    do_demo()
     # do_live_demo(save_fig=False)
-    do_brand_demo(save_fig=False)
+    # do_brand_demo(save_fig=False)
+
+    pygame.mouse.set_visible(False)
+    while(handle_inputs()):
+        pygame.event.set_grab(False)
+        if pygame.mouse.get_focused():
+            pygame.event.set_grab(True)
+            pygame.mouse.set_pos(RESOLUTION / 2)
 
 
 if __name__ == "__main__":
