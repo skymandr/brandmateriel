@@ -176,14 +176,14 @@ class Shader(object):
         # Apply distance shading:
         if self.distance_shading:
             # Gauss:
-            colours *= np.exp(-(dists - self.cutoff_distance) ** 2 /
-                               (4 * self.cutoff_distance ** 2))
+            # colours *= np.exp(-(dists - self.cutoff_distance) ** 2 /
+            #                  (4 * self.cutoff_distance ** 2))
             # Logistic:
             # colours /= 1 + 0.5 * np.exp(dists - 2 * self.cutoff_distance)
-            # Linear with cut-off:
-            # colours *= np.where(2 * self.cutoff_distance > dists, 1,
-            #                     (3 * self.cutoff_distance - dists) /
-            #                     (1 * self.cutoff_distance))
+            # Linear with cut-off: (LinRange - dists + ConstRange) / LinRange
+            colours *= np.fmin(1, np.fmax(0,
+                                          (4 * self.cutoff_distance - dists)
+                                          / (2 * self.cutoff_distance)))
 
         # Renormalise to allowed colour values:
         colours = np.where(colours > 255, 255, colours)
