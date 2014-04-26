@@ -8,6 +8,8 @@ import camera as c
 import mapper as m
 import shader as s
 import triDobjects as o
+import contextlib
+import cStringIO
 
 RESOLUTION = np.array([640, 480])
 KEYBOARD = {l.K_UP: 'up', l.K_k: 'up',
@@ -23,6 +25,17 @@ if not pygame.font:
 
 if not pygame.mixer:
     print "Warning: no sound detected; sound disabled."
+
+
+@contextlib.contextmanager
+def silence():
+    """
+    Ye olde silencer
+    """
+    save_stdout = sys.stdout
+    sys.stdout = cStringIO.StringIO()
+    yield
+    sys.stdout = save_stdout
 
 
 def handle_inputs():
@@ -145,7 +158,7 @@ def do_live_demo(filename='demodata.npy', sealevel=7.0, steps=42, fps=30,
 
 
 def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
-                  save_fig=False):
+                  save_fig=False, frames=None):
     import string
     fps_clock = pygame.time.Clock()
     screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
@@ -230,13 +243,60 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
             pygame.image.save(screen,
                               'out/{0}.png'.format(string.zfill(str(N), 2)))
 
-        print "Frame upate time: {0} ms".format(fps_clock.tick(fps))
+        the_tick = fps_clock.tick(fps)
+        print "Frame upate time: {0} ms".format(the_tick)
+
+        if not frames is None:
+            frames.append(the_tick/1000.0)
+
+
+def print_cpu_model():
+    """
+    get cpu model, in a very hacky way
+    """
+
+    from subprocess import check_output
+
+    command = "cat /proc/cpuinfo"
+    cpuinfo = check_output(command, shell=True).strip()
+
+    for ln in cpuinfo.split("\n"):
+        if "model name" in ln:
+            print "Cpu Model:", ln.split(":")[1]
+            return
+
+def benchmark_demo():
+    """
+    run do_brand_demo and benchmark fps
+    """
+    print "Running Benchmarks, silent, virtualdisplay"
+    print "Don't Panic! This will take a moment.\n\n"
+
+    from pyvirtualdisplay import Display
+    display = Display(visible=0, size=(1440, 900))
+    display.start()
+
+    pygame.init()
+    fps = []
+    with silence():
+        do_brand_demo(save_fig=False, frames=fps)
+
+    print "Benchmarking On"
+    print_cpu_model()
+
+    print "fps stats"
+    print "Mean: %0.4f\nMedian: %0.4f\nVariance: %0.4f" % \
+        (np.average(fps), np.median(fps), np.var(fps))
+    print "Min: %0.4f\nMax: %0.4f" % \
+        (min(fps), max(fps))
+    print "Total Frames:", len(fps)
+
+    return 0
 
 
 def main():
     pygame.init()
-    # do_demo()
-    # do_live_demo(save_fig=False)
+    frames = []
     do_brand_demo(save_fig=False)
 
     pygame.mouse.set_visible(False)
@@ -248,4 +308,14 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    import argparse
+    parser = argparse.ArgumentParser(description='Shady Pretty Doings.')
+    parser.add_argument(
+        '-b', '--benchmark',
+        help="Run benchmark", action="store_true")
+    args = parser.parse_args()
+
+    if args.benchmark:
+        sys.exit(benchmark_demo())
+    else:
+        sys.exit(main())
