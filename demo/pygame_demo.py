@@ -164,7 +164,9 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
     screen = pygame.display.set_mode(RESOLUTION, pygame.DOUBLEBUF)
 
     scene = m.Map(filename, sealevel, True)
+
     look_at = np.array([63.5, 63.5, 6.0])
+
     cam = c.Camera(position=np.array([54.5, 63.5, 6.0]),
                    screen=c.Screen(resolution=np.array(RESOLUTION)))
 
@@ -185,8 +187,10 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
 
     for N, a in enumerate(angles):
         screen.fill((0, 0, 0))
+
         cam.position = np.array([np.sin(a) * R + 63.5,
                                  np.cos(a) * R + 63.5, 6.0])
+
         cam.look_at_point(look_at)
 
         colours = shader.apply_lighting(scene.positions, scene.normals,
