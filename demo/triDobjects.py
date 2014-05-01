@@ -190,7 +190,84 @@ class FireFighter(TriD):
     """
     Patches for FireFighter.
     """
+    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 yaw=0, pitch=0, roll=0):
+        points = np.array([[0.5, 1.0, 0.0],     # 0
+                           [-0.5, 1.0, 0.0],    # 1
+                           [-1.0, 0.0, 0.2],    # 2
+                           [0.0, -1.0, 0.0],    # 3
+                           [1.0, 0.0, 0.2],     # 4
+                           [0.0, -0.5, 0.5],    # 5
+                           [0.10, 0.1, 0.0],    # 6
+                           [-.10, 0.1, 0.0],    # 7
+                           [0.0, -0.2, 0.0],    # 8
+                           ])
 
+        self._patches = np.array([
+            [points[0], points[1], points[5]],  # 0: front
+            [points[1], points[2], points[5]],  # 1: front left
+            [points[2], points[3], points[5]],  # 2: back left
+            [points[3], points[4], points[5]],  # 3: back right
+            [points[4], points[0], points[5]],  # 4: front right
+            [(points[1] + points[0]) * 0.5,     # 5: bottom front centre
+             points[6], points[7]],
+            [(points[1] + points[0]) * 0.5,     # 6: bottom front left
+             points[7], points[1]],
+            [(points[1] + points[0]) * 0.5,     # 7: bottom front right
+             points[0], points[6]],
+            [points[1], points[7], points[3]],  # 8: bottom left front
+            [points[7], points[8], points[3]],  # 9: bottom left back
+            [points[6], points[0], points[3]],  # A: bottom right front
+            [points[8], points[6], points[3]],  # B: bottom right back
+            [points[3], points[2], points[1]],  # C: bottom left wing
+            [points[3], points[0], points[4]],  # D: bottom right wing
+            [points[8], points[7], points[6]],  # E: engine A
+            ])
+
+        self._colours = np.array([[0, 204, 0, 255],
+                                  [0, 153, 0, 255],
+                                  [0, 204, 0, 255],
+                                  [0, 204, 0, 255],
+                                  [0, 153, 0, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 153, 255],
+                                  [0, 0, 204, 255],
+                                  [0, 0, 204, 255],
+                                  [204, 204, 0, 255],
+                                  ])
+
+        self._orientation = np.array([[1.0, 0.0, 0.0],  # U
+                                      [0.0, 1.0, 0.0],  # V
+                                      [0.0, 0.0, 1.0]   # W
+                                      ])
+
+        self._basecolour = basecolour
+
+        self._position = position
+
+        self._yaw = yaw
+
+        self._pitch = pitch
+
+        self._roll = roll
+
+        self._calc_normals()
+
+        self._calc_positions()
+
+        self._colourise()
+
+
+class Lander(TriD):
+    """
+    Patches for Lander.
+    """
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
                  yaw=0, pitch=0, roll=0):
@@ -267,7 +344,114 @@ class FireFighter(TriD):
 
 class House(TriD):
     """
-    Patches for House.
+    Patches for House with nicer shading and sorting properties than
+    SimpleHouse, though twice as complex...
+    """
+
+    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 yaw=0.0, pitch=0.0, roll=0.0):
+        points = np.array([[0.7, 1.2, 0.0],       # 0
+                           [-0.7, 1.2, 0.0],      # 1
+                           [-0.7, -1.2, 0.0],     # 2
+                           [0.7, -1.2, 0.0],      # 3
+                           [0.7, 1.2, 0.7],      # 4
+                           [-0.7, 1.2, 0.7],     # 5
+                           [-0.7, -1.2, 0.7],    # 6
+                           [0.7, -1.2, 0.7],     # 7
+                           [0.0, 1.2, 1.0],       # 8
+                           [0.0, -1.2, 1.0],      # 9
+                           ])
+
+        self._patches = np.array([
+            # North side:
+            [points[0], points[1], points[(0, 1, 4, 5), :].mean(0)],  # bottom
+            [points[5], points[4], points[(0, 1, 4, 5), :].mean(0)],  # middle
+            [points[1], points[5], points[(0, 1, 4, 5), :].mean(0)],  # west
+            [points[4], points[0], points[(0, 1, 4, 5), :].mean(0)],  # east
+            [points[4], points[5], points[8]],                        # top
+            # South side:
+            [points[2], points[3], points[(2, 3, 6, 7), :].mean(0)],  # lower
+            [points[7], points[6], points[(2, 3, 6, 7), :].mean(0)],  # middle
+            [points[6], points[2], points[(2, 3, 6, 7), :].mean(0)],  # west
+            [points[3], points[7], points[(2, 3, 6, 7), :].mean(0)],  # east
+            [points[6], points[7], points[9]],                        # top
+            # West side:
+            [points[1], points[2], points[(1, 2, 5, 6), :].mean(0)],  # bottom
+            [points[6], points[5], points[(1, 2, 5, 6), :].mean(0)],  # top
+            [points[5], points[1], points[(1, 2, 5, 6), :].mean(0)],  # north
+            [points[2], points[6], points[(1, 2, 5, 6), :].mean(0)],  # south
+            # East side:
+            [points[3], points[0], points[(0, 3, 4, 7), :].mean(0)],  # bottom
+            [points[4], points[7], points[(0, 3, 4, 7), :].mean(0)],  # top
+            [points[0], points[4], points[(0, 3, 4, 7), :].mean(0)],  # north
+            [points[7], points[3], points[(0, 3, 4, 7), :].mean(0)],  # south
+            # West roof:
+            [points[5], points[6], points[(5, 6, 8, 9), :].mean(0)],  # bottom
+            [points[9], points[8], points[(5, 6, 8, 9), :].mean(0)],  # top
+            [points[8], points[5], points[(5, 6, 8, 9), :].mean(0)],  # north
+            [points[6], points[9], points[(5, 6, 8, 9), :].mean(0)],  # south
+            # East roof:
+            [points[7], points[4], points[(4, 7, 8, 9), :].mean(0)],  # bottom
+            [points[8], points[9], points[(4, 7, 8, 9), :].mean(0)],  # top
+            [points[4], points[8], points[(4, 7, 8, 9), :].mean(0)],  # north
+            [points[9], points[7], points[(4, 7, 8, 9), :].mean(0)],  # south
+            ])
+
+        self._colours = np.array([[153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [153, 153, 102, 255],
+                                  [102, 102, 102, 255],
+                                  [102, 102, 102, 255],
+                                  [102, 102, 102, 255],
+                                  [102, 102, 102, 255],
+                                  [0, 102, 0, 255],
+                                  [0, 102, 0, 255],
+                                  [0, 102, 0, 255],
+                                  [0, 102, 0, 255],
+                                  [0, 102, 0, 255],
+                                  [0, 102, 0, 255],
+                                  [0, 102, 0, 255],
+                                  [0, 102, 0, 255],
+                                  ])
+
+        self._orientation = np.array([[1.0, 0.0, 0.0],  # U
+                                      [0.0, 1.0, 0.0],  # V
+                                      [0.0, 0.0, 1.0]   # W
+                                      ])
+
+        self._basecolour = basecolour
+
+        self._position = position
+
+        self._yaw = yaw
+
+        self._pitch = pitch
+
+        self._roll = roll
+
+        self._calc_normals()
+
+        self._calc_positions()
+
+        self._colourise()
+
+
+class SimpleHouse(TriD):
+    """
+    Patches for SimpleHouse with reduced triangle count. Probably a tiny bit
+    faster to render than House.
     """
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
