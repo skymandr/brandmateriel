@@ -193,52 +193,210 @@ class FireFighter(TriD):
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
                  yaw=0, pitch=0, roll=0):
-        points = np.array([[0.5, 1.0, 0.0],     # 0
-                           [-0.5, 1.0, 0.0],    # 1
-                           [-1.0, 0.0, 0.2],    # 2
-                           [0.0, -1.0, 0.0],    # 3
-                           [1.0, 0.0, 0.2],     # 4
-                           [0.0, -0.5, 0.5],    # 5
-                           [0.10, 0.1, 0.0],    # 6
-                           [-.10, 0.1, 0.0],    # 7
-                           [0.0, -0.2, 0.0],    # 8
-                           ])
-
-        self._patches = np.array([
-            [points[0], points[1], points[5]],  # 0: front
-            [points[1], points[2], points[5]],  # 1: front left
-            [points[2], points[3], points[5]],  # 2: back left
-            [points[3], points[4], points[5]],  # 3: back right
-            [points[4], points[0], points[5]],  # 4: front right
-            [(points[1] + points[0]) * 0.5,     # 5: bottom front centre
-             points[6], points[7]],
-            [(points[1] + points[0]) * 0.5,     # 6: bottom front left
-             points[7], points[1]],
-            [(points[1] + points[0]) * 0.5,     # 7: bottom front right
-             points[0], points[6]],
-            [points[1], points[7], points[3]],  # 8: bottom left front
-            [points[7], points[8], points[3]],  # 9: bottom left back
-            [points[6], points[0], points[3]],  # A: bottom right front
-            [points[8], points[6], points[3]],  # B: bottom right back
-            [points[3], points[2], points[1]],  # C: bottom left wing
-            [points[3], points[0], points[4]],  # D: bottom right wing
-            [points[8], points[7], points[6]],  # E: engine A
+        points = np.array([
+            # Bottom:
+            [0, 0.5, 0],          # 0
+            [-0.5, -.25, 0],      # 1
+            [0.5, -.25, 0],       # 2
+            # Middle:
+            [0.17, 0.75, 0.17],   # 3
+            [-0.17, 0.75, 0.17],  # 4
+            [-0.7, 0.0, 0.1],     # 5
+            [0.0, -0.5, 0.1],     # 6
+            [0.7, 0.0, 0.1],      # 7
+            [0.0, 0.25, 0.3],     # 8
+            [0.0, 0.0, 0.2],      # 9
             ])
 
-        self._colours = np.array([[0, 204, 0, 255],
-                                  [0, 153, 0, 255],
+        es = 0.17
+
+        self._patches = np.array([
+            # Bottom:
+            [points[1], points[0], points[0] * es],                       # FP
+            [points[1], points[0] * es, points[1] * es],                  # MP
+            [points[1], points[1] * es, points[(1, 2), :].mean(0)],       # BP
+            [points[2], points[0] * es, points[0]],                       # FS
+            [points[2], points[2] * es, points[0] * es],                  # MS
+            [points[2], points[(1, 2), :].mean(0), points[2] * es],       # BS
+            [points[(1, 2), :].mean(0), points[1] * es, points[2] * es],  # B
+            # Engine:
+            [points[0] * es, points[2] * es, points[1] * es],
+            # Bow:
+            [points[0], points[4], points[3]],                  # Front
+            [points[0], points[(0, 1), :].mean(0), points[4]],  # F Port
+            [points[0], points[3], points[(0, 2), :].mean(0)],  # F Starboard
+            # Bottom Stern:
+            [points[6], points[1], points[2]],
+            # Bottom Port:
+            [points[1], points[5], points[(0, 1), :].mean(0)],
+            # Bottom Starboard:
+            [points[7], points[2], points[(0, 2), :].mean(0)],
+            # Cockpit:
+            [points[3], points[4], points[8]],                  # Glass
+            [points[4], points[(0, 1), :].mean(0), points[8]],  # F Port
+            [points[8], points[(0, 2), :].mean(0), points[3]],  # F Starboard
+            [points[8], points[(0, 1), :].mean(0), points[9]],  # B Port
+            [points[9], points[(0, 2), :].mean(0), points[8]],  # B Starboard
+            # Stern:
+            [points[1], points[6], points[9]],  # Port
+            [points[6], points[2], points[9]],  # Starboard
+            # Wings:
+            [points[5], points[9], points[(0, 1), :].mean(0)],  # P Front
+            [points[5], points[1], points[9]],                  # P Back
+            [points[7], points[(0, 2), :].mean(0), points[9]],  # S Front
+            [points[7], points[9], points[2]],                  # S Back
+            ])
+
+        points[:, 1] *= np.sqrt(3) / 2.0
+
+        self._colours = np.array([[51, 51, 102, 255],   # Bottom:
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [204, 102, 0, 255],   # Engine
+                                  [0, 0, 51, 255],    # Bow:
+                                  [0, 0, 102, 255],
+                                  [0, 0, 102, 255],
+                                  [0, 0, 102, 255],     # Stern
+                                  [51, 0, 51, 255],     # Bottom Port
+                                  [0, 51, 51, 255],     # Bottom Starboard
+                                  [51, 153, 153, 255],  # Cockpit:
+                                  [153, 0, 0, 255],
+                                  [153, 0, 0, 255],
+                                  [153, 0, 0, 255],
+                                  [153, 0, 0, 255],
+                                  [153, 0, 0, 255],  # Stern:
+                                  [153, 0, 0, 255],
+                                  [153, 0, 0, 255],  # Wings:
+                                  [153, 0, 0, 255],
+                                  [153, 0, 0, 255],
+                                  [153, 0, 0, 255],
+                                  ])
+
+        self._orientation = np.array([[1.0, 0.0, 0.0],  # U
+                                      [0.0, 1.0, 0.0],  # V
+                                      [0.0, 0.0, 1.0]   # W
+                                      ])
+
+        self._basecolour = basecolour
+
+        self._position = position
+
+        self._yaw = yaw
+
+        self._pitch = pitch
+
+        self._roll = roll
+
+        self._calc_normals()
+
+        self._calc_positions()
+
+        self._colourise()
+
+
+class FireFighterStripes(TriD):
+    """
+    Patches for FireFighter.
+    """
+    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 yaw=0, pitch=0, roll=0):
+        points = np.array([
+            # Bottom:
+            [0, 0.5, 0],          # 0
+            [-0.5, -.25, 0],      # 1
+            [0.5, -.25, 0],       # 2
+            # Middle:
+            [0.17, 0.75, 0.17],   # 3
+            [-0.17, 0.75, 0.17],  # 4
+            [-0.7, 0.0, 0.1],     # 5
+            [0.0, -0.5, 0.1],     # 6
+            [0.7, 0.0, 0.1],      # 7
+            [0.0, 0.25, 0.3],     # 8
+            [0.0, 0.0, 0.2],      # 9
+            [-0.5875, 0.03125, 0.075],  # 10
+            [-0.65, -0.0625, 0.075],    # 11
+            [0.65, -0.0625, 0.075],     # 12
+            [0.5875, 0.03125, 0.075],   # 13
+            ])
+
+        es = 0.17
+
+        self._patches = np.array([
+            # Bottom:
+            [points[1], points[0], points[0] * es],                       # FP
+            [points[1], points[0] * es, points[1] * es],                  # MP
+            [points[1], points[1] * es, points[(1, 2), :].mean(0)],       # BP
+            [points[2], points[0] * es, points[0]],                       # FS
+            [points[2], points[2] * es, points[0] * es],                  # MS
+            [points[2], points[(1, 2), :].mean(0), points[2] * es],       # BS
+            [points[(1, 2), :].mean(0), points[1] * es, points[2] * es],  # B
+            # Engine:
+            [points[0] * es, points[2] * es, points[1] * es],
+            # Bow:
+            [points[0], points[4], points[3]],                  # Front
+            [points[0], points[(0, 1), :].mean(0), points[4]],  # F Port
+            [points[0], points[3], points[(0, 2), :].mean(0)],  # F Starboard
+            # Bottom Stern:
+            [points[6], points[1], points[2]],
+            # Bottom Port:
+            [points[1], points[5], points[(0, 1), :].mean(0)],
+            # Bottom Starboard:
+            [points[7], points[2], points[(0, 2), :].mean(0)],
+            # Cockpit:
+            [points[3], points[4], points[8]],                  # Glass
+            [points[4], points[(0, 1), :].mean(0), points[8]],  # F Port
+            [points[8], points[(0, 2), :].mean(0), points[3]],  # F Starboard
+            [points[8], points[(0, 1), :].mean(0), points[9]],  # B Port
+            [points[9], points[(0, 2), :].mean(0), points[8]],  # B Starboard
+            # Stern:
+            [points[1], points[6], points[9]],  # Port
+            [points[6], points[2], points[9]],  # Starboard
+            # Wings:
+            [points[10], points[9], points[(0, 1), :].mean(0)],  # P Front
+            [points[11], points[1], points[9]],                  # P Back
+            [points[13], points[(0, 2), :].mean(0), points[9]],  # S Front
+            [points[12], points[9], points[2]],                  # S Back
+            [points[11], points[10], points[5]],                 # P Light
+            [points[13], points[12], points[7]],                 # S Light
+            [points[11], points[9], points[10]],                 # P Stripe
+            [points[13], points[9], points[12]],                 # S Stripe
+            ])
+
+        points[:, 1] *= np.sqrt(3) / 2.0
+
+        self._colours = np.array([[51, 51, 102, 255],   # Bottom:
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [51, 51, 102, 255],
+                                  [204, 102, 0, 255],   # Engine
+                                  [0, 0, 102, 255],     # Stern:
+                                  [0, 0, 102, 255],
+                                  [0, 0, 102, 255],
+                                  [0, 0, 102, 255],     # Bow
+                                  [51, 0, 102, 255],    # Bottom Port
+                                  [0, 51, 102, 255],    # Bottom Starboard
+                                  [51, 153, 153, 255],  # Cockpit:
+                                  [102, 0, 0, 255],
+                                  [102, 0, 0, 255],
+                                  [102, 0, 0, 255],
+                                  [102, 0, 0, 255],
+                                  [102, 0, 0, 255],  # Stern:
+                                  [102, 0, 0, 255],
+                                  [102, 0, 0, 255],  # Wings:
+                                  [102, 0, 0, 255],
+                                  [102, 0, 0, 255],
+                                  [102, 0, 0, 255],
+                                  [204, 0, 0, 255],
                                   [0, 204, 0, 255],
-                                  [0, 204, 0, 255],
-                                  [0, 153, 0, 255],
-                                  [0, 0, 153, 255],
-                                  [0, 0, 153, 255],
-                                  [0, 0, 153, 255],
-                                  [0, 0, 153, 255],
-                                  [0, 0, 153, 255],
-                                  [0, 0, 153, 255],
-                                  [0, 0, 153, 255],
-                                  [0, 0, 204, 255],
-                                  [0, 0, 204, 255],
+                                  [204, 204, 0, 255],
                                   [204, 204, 0, 255],
                                   ])
 
