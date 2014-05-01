@@ -244,10 +244,10 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
                               'out/{0}.png'.format(string.zfill(str(N), 2)))
 
         the_tick = fps_clock.tick(fps)
-        print "Frame upate time: {0} ms".format(the_tick)
+        print "Frame update time: {0} ms".format(the_tick)
 
-        if not frames is None:
-            frames.append(the_tick/1000.0)
+        if frames is not None:
+            frames.append(the_tick / 1000.0)
 
 
 def print_cpu_model():
@@ -264,6 +264,7 @@ def print_cpu_model():
         if "model name" in ln:
             print "Cpu Model:", ln.split(":")[1]
             return
+
 
 def benchmark_demo():
     """
@@ -296,7 +297,7 @@ def benchmark_demo():
 
 def main():
     pygame.init()
-    frames = []
+    # frames = []
     do_brand_demo(save_fig=False)
 
     pygame.mouse.set_visible(False)
