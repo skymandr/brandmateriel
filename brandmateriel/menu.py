@@ -16,6 +16,7 @@
 # * Read options from file and parse correctly
 # * Save options on exit and/or start
 # * exit dialog
+# * remove print statements
 # * Fancy background stuff.
 
 import sys
@@ -124,23 +125,43 @@ class Menu(object):
 
                     pass
 
+                elif self.item[1][0] == 'gallery':
+
+                    print "gallery not implemented yet."
+
+                elif self.item[1][0] == 'credits':
+
+                    print "credits not implemented yet."
+
                 elif self.item[1][0] == 'menu':
 
                     self.menu = self.item[1][1]
                     self._item = 0
 
-                if self.item[1][0] == "toggle":
+                elif self.item[1][0] == "toggle":
                     self.item[1][1] = (self.item[1][1] + 1) % 2
+
+                elif self.item[1][0] == "list":
+                    self.item[1][1] = ((self.item[1][1] + 1) %
+                                       len(self.item[1][2]))
 
             elif KEYBOARD[event_key] == 'left':
 
                 if self.item[1][0] == "toggle":
                     self.item[1][1] = (self.item[1][1] - 1) % 2
 
+                elif self.item[1][0] == "list":
+                    self.item[1][1] = ((self.item[1][1] - 1) %
+                                       len(self.item[1][2]))
+
             elif KEYBOARD[event_key] == 'right':
 
                 if self.item[1][0] == "toggle":
                     self.item[1][1] = (self.item[1][1] + 1) % 2
+
+                elif self.item[1][0] == "list":
+                    self.item[1][1] = ((self.item[1][1] + 1) %
+                                       len(self.item[1][2]))
 
         else:
 
