@@ -44,38 +44,91 @@ class Menu(object):
     A simple menu class, configured using JSON.
     """
 
-    def __init__(self, structure='menu.conf', options='user.conf'):
+    def __init__(self, _structure='menu.conf', options='user.conf'):
         self._item = 0
         self.menu = "main menu"
 
-        with open(structure, 'r') as f:
-            self.structure = json.load(f)
+        with open(_structure, 'r') as f:
+            self._structure = json.load(f)
 
-        with open(options, 'r') as f:
-            self.options = json.load(f)
+        try:
+            with open(options, 'r') as f:
+                self.options = json.load(f)
+        except IOError:
+            print "Loading default settings..."
+            with open("default.conf", 'r') as f:
+                self.options = json.load(f)
 
         self._set_options()
 
     @property
     def _items(self):
-        return len(self.structure[self.menu]['items'])
+        return len(self._structure[self.menu]['items'])
 
     @property
     def item(self):
-        return self.structure[self.menu]["items"][self._item]
+        return self._structure[self.menu]["items"][self._item]
 
     def _set_options(self):
+
         for o in self.options.keys():
-            pass
+
+            for n, item in enumerate(self._structure["options"]["items"]):
+
+                if item[0] == o:
+
+                    break
+
+            if self._structure["options"]["items"][n][1][0] == "toggle":
+
+                self._structure["options"]["items"][n][1][1] = int(
+                    self.options[o])
+
+            elif self._structure["options"]["items"][n][1][0] == "list":
+
+                for m, l in enumerate(self._structure["options"
+                                                      ]["items"][n][1][2]):
+                    if l == self.options[o]:
+
+                        self._structure["options"]["items"][n][1][1] = m
 
     def _save_settings(self):
-        pass
+
+        for o in self.options.keys():
+
+            for n, item in enumerate(self._structure["options"]["items"]):
+
+                if item[0] == o:
+
+                    break
+
+            if self._structure["options"]["items"][n][1][0] == "toggle":
+                print o, "toggle"
+
+                self.options[o] = (1 == self._structure["options"
+                                                        ]["items"][n][1][1])
+
+            elif self._structure["options"]["items"][n][1][0] == "list":
+                print o, "list"
+
+                self.options[o] = self._structure["options"]["items"][n][1][2][
+                    self._structure["options"]["items"][n][1][1]]
+
+            else:
+                print o
+
+        with open("user.conf", 'w') as f:
+            json.dump(self.options, f)
 
     def close(self):
         """ Close game. """
+
         print "Quitting game..."
+
         self._save_settings()
+
         pygame.quit()
+
         return False
 
     def menu_navigation(self):
@@ -124,6 +177,10 @@ class Menu(object):
                 elif self.item[1][0] == 'quit':
 
                     pass
+
+                elif self.item[1][0] == 'hiscore':
+
+                    print "hiscore not implemented yet."
 
                 elif self.item[1][0] == 'gallery':
 
