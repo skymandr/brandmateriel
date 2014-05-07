@@ -5,16 +5,19 @@
 # DONE Extendable menu items.
 # DONE navigate between submenus
 # * Let menu do something:
-#   - cameratype: fixed or follow
-#   - resolution: 320x240(256), 640x480(512), 800x600(640)
-#   - view
-#   - mixer levels
-#   - map
+#   - DONE cameratype: fixed or follow
+#   - DONE resolution: 320x240(256), 640x480(512), 800x600(640)
+#   - DONE view
+#   - DONE (well... sort of) mixer levels
+#   - DONE map
 #   - show models
+#   - show credits
+#   - show high-scores
 #   - start
-#   - exit
+#   - DONE exit
+# * DONE Resize window based on resolution.
 # * Read options from file and parse correctly
-# * Save options on exit and/or start
+# * DONE Save options on exit and/or start
 # * exit dialog
 # * remove print statements
 # * Fancy background stuff.
@@ -68,6 +71,10 @@ class Menu(object):
     @property
     def item(self):
         return self._structure[self.menu]["items"][self._item]
+
+    @property
+    def resolution(self):
+        return tuple(self.options["resolution"])
 
     def _set_options(self):
 
@@ -220,6 +227,8 @@ class Menu(object):
                     self.item[1][1] = ((self.item[1][1] + 1) %
                                        len(self.item[1][2]))
 
+            self._save_settings()
+
         else:
 
             print "Unknown key pressed. ({0})".format(str(event_key))
@@ -234,6 +243,8 @@ def main():
     fps = 30
     window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
     while(gui.menu_navigation()):
+        if gui.resolution != window.get_size():
+            window = pygame.display.set_mode(gui.resolution, pygame.DOUBLEBUF)
         pygame.display.flip()
         fps_clock.tick(fps)
 
