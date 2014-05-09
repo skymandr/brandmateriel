@@ -21,7 +21,6 @@
 # DONE remove print statements
 # * Fancy background stuff.
 
-import sys
 import json
 import pygame
 import pygame.locals as l
@@ -46,12 +45,16 @@ class Menu(object):
     A simple menu class, configured using JSON.
     """
 
-    def __init__(self, _structure='menu.conf', options='user.conf'):
+    def __init__(self, _structure='menu.conf', options='user.conf',
+                 default='default.conf'):
         self._item = 0
         self.menu = "main menu"
 
         with open(_structure, 'r') as f:
             self._structure = json.load(f)
+
+        self._default = default
+        self._config = options
 
         self._load_options(options)
 
@@ -81,7 +84,7 @@ class Menu(object):
                 self.options = json.load(f)
         except IOError:
             print "Loading default settings..."
-            with open("default.conf", 'r') as f:
+            with open(self._default, 'r') as f:
                 self.options = json.load(f)
 
         self._set_options()
@@ -132,7 +135,7 @@ class Menu(object):
             else:
                 print o
 
-        with open("user.conf", 'w') as f:
+        with open(self._config, 'w') as f:
             json.dump(self.options, f)
 
     def close(self):
@@ -212,7 +215,7 @@ class Menu(object):
 
             elif self.item[1][0] == "default":
 
-                self._load_options("default.conf")
+                self._load_options(self._default)
 
         elif KEYBOARD[event_key] == 'left':
 
@@ -288,5 +291,3 @@ def draw_menu(menu, surface):
                                     (1 + fontsize) * (len(menu.items) - n))
 
         surface.blit(text, textpos)
-
-
