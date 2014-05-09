@@ -1,25 +1,26 @@
 #! /usr/bin/env python
 
 # Meny TODO:
-# * Simple cursor movement in pygame
+# DONE Simple cursor movement in pygame
 # DONE Extendable menu items.
 # DONE navigate between submenus
 # * Let menu do something:
-#   - DONE cameratype: fixed or follow
-#   - DONE resolution: 320x240(256), 640x480(512), 800x600(640)
-#   - DONE view
-#   - DONE (well... sort of) mixer levels
-#   - DONE map
+#   DONE cameratype: fixed or follow
+#   DONE resolution: 320x240(256), 640x480(512), 800x600(640)
+#   DONE view
+#   DONE (well... sort of) mixer levels
+#   DONE map
 #   - show models
 #   - show credits
 #   - show high-scores
 #   - start
-#   - DONE exit
+#   DONE exit
+#   DONE default settings
 # * DONE Resize window based on resolution.
-# * Read options from file and parse correctly
+# * DONE Read options from file and parse correctly
 # * DONE Save options on exit and/or start
 # * exit dialog
-# * remove print statements
+# DONE remove print statements
 # * Fancy background stuff.
 
 import sys
@@ -54,19 +55,19 @@ class Menu(object):
         with open(_structure, 'r') as f:
             self._structure = json.load(f)
 
-        try:
-            with open(options, 'r') as f:
-                self.options = json.load(f)
-        except IOError:
-            print "Loading default settings..."
-            with open("default.conf", 'r') as f:
-                self.options = json.load(f)
+        self._load_options(options)
 
-        self._set_options()
+    @property
+    def setup(self):
+        return self._structure["setup"]
+
+    @property
+    def items(self):
+        return self._structure[self.menu]['items']
 
     @property
     def _items(self):
-        return len(self._structure[self.menu]['items'])
+        return len(self.items)
 
     @property
     def item(self):
@@ -75,6 +76,17 @@ class Menu(object):
     @property
     def resolution(self):
         return tuple(self.options["resolution"])
+
+    def _load_options(self, filename):
+        try:
+            with open(filename, 'r') as f:
+                self.options = json.load(f)
+        except IOError:
+            print "Loading default settings..."
+            with open("default.conf", 'r') as f:
+                self.options = json.load(f)
+
+        self._set_options()
 
     def _set_options(self):
 
@@ -110,13 +122,11 @@ class Menu(object):
                     break
 
             if self._structure["options"]["items"][n][1][0] == "toggle":
-                print o, "toggle"
 
                 self.options[o] = (1 == self._structure["options"
                                                         ]["items"][n][1][1])
 
             elif self._structure["options"]["items"][n][1][0] == "list":
-                print o, "list"
 
                 self.options[o] = self._structure["options"]["items"][n][1][2][
                     self._structure["options"]["items"][n][1][1]]
@@ -128,31 +138,27 @@ class Menu(object):
             json.dump(self.options, f)
 
     def close(self):
-        """ Close game. """
-
-        print "Quitting game..."
+        """ Close menu. """
 
         self._save_settings()
 
-        pygame.quit()
-
-        return False
+        return "quit"
 
     def menu_navigation(self):
         """ Should later handle inputs from user. """
-        flag = True
+        flag = "menu"
 
         for event in pygame.event.get():
 
             if event.type == l.QUIT:
 
-                flag = self.close() and flag
+                flag = self.close()
 
-            elif event.type == l.KEYDOWN:
+            elif event.type == l.KEYDOWN and event.key in KEYBOARD.keys():
 
                 if KEYBOARD[event.key] == 'quit':
 
-                    flag = self.close() and flag
+                    flag = self.close()
 
                 elif KEYBOARD[event.key] == 'up':
 
@@ -164,89 +170,171 @@ class Menu(object):
 
                 else:
 
-                    self._relay_input(event.key)
-
-                print "{0}: {1} {2}".format(self.menu, self._item, self.item)
+                    flag = self._relay_input(event.key)
 
         return flag
 
     def _relay_input(self, event_key):
-        if event_key in KEYBOARD.keys():
 
-            print "Key pressed: {0} ({1})".format(KEYBOARD[event_key],
-                                                  str(event_key))
-            if KEYBOARD[event_key] == 'start':
+        if KEYBOARD[event_key] == 'start':
 
-                if self.item[1][0] == 'start':
+            if self.item[1][0] == 'start':
 
-                    pass
+                return "game"
 
-                elif self.item[1][0] == 'quit':
+            elif self.item[1][0] == 'quit':
 
-                    pass
+                return "quit"
 
-                elif self.item[1][0] == 'hiscore':
+            elif self.item[1][0] == 'hiscore':
 
-                    print "hiscore not implemented yet."
+                return "hiscore"
 
-                elif self.item[1][0] == 'gallery':
+            elif self.item[1][0] == 'gallery':
 
-                    print "gallery not implemented yet."
+                return "gallery"
 
-                elif self.item[1][0] == 'credits':
+            elif self.item[1][0] == 'credits':
 
-                    print "credits not implemented yet."
+                return "credits"
 
-                elif self.item[1][0] == 'menu':
+            elif self.item[1][0] == 'menu':
 
-                    self.menu = self.item[1][1]
-                    self._item = 0
+                self.menu = self.item[1][1]
+                self._item = 0
 
-                elif self.item[1][0] == "toggle":
-                    self.item[1][1] = (self.item[1][1] + 1) % 2
+            elif self.item[1][0] == "toggle":
 
-                elif self.item[1][0] == "list":
-                    self.item[1][1] = ((self.item[1][1] + 1) %
-                                       len(self.item[1][2]))
+                self.item[1][1] = (self.item[1][1] + 1) % 2
 
-            elif KEYBOARD[event_key] == 'left':
+            elif self.item[1][0] == "list":
 
-                if self.item[1][0] == "toggle":
-                    self.item[1][1] = (self.item[1][1] - 1) % 2
+                self.item[1][1] = ((self.item[1][1] + 1) %
+                                   len(self.item[1][2]))
 
-                elif self.item[1][0] == "list":
-                    self.item[1][1] = ((self.item[1][1] - 1) %
-                                       len(self.item[1][2]))
+            elif self.item[1][0] == "default":
 
-            elif KEYBOARD[event_key] == 'right':
+                self._load_options("default.conf")
 
-                if self.item[1][0] == "toggle":
-                    self.item[1][1] = (self.item[1][1] + 1) % 2
+        elif KEYBOARD[event_key] == 'left':
 
-                elif self.item[1][0] == "list":
-                    self.item[1][1] = ((self.item[1][1] + 1) %
-                                       len(self.item[1][2]))
+            if self.item[1][0] == "toggle":
 
-            self._save_settings()
+                self.item[1][1] = (self.item[1][1] - 1) % 2
+
+            elif self.item[1][0] == "list":
+
+                self.item[1][1] = ((self.item[1][1] - 1) %
+                                   len(self.item[1][2]))
+
+            elif self.item[1][0] == 'menu':
+
+                self.menu = self.item[1][1]
+                self._item = 0
+
+        elif KEYBOARD[event_key] == 'right':
+
+            if self.item[1][0] == "toggle":
+
+                self.item[1][1] = (self.item[1][1] + 1) % 2
+
+            elif self.item[1][0] == "list":
+
+                self.item[1][1] = ((self.item[1][1] + 1) %
+                                   len(self.item[1][2]))
+
+            elif self.item[1][0] == 'menu':
+
+                self.menu = self.item[1][1]
+                self._item = 0
+
+        self._save_settings()
+
+        return "menu"
+
+
+def draw_menu(menu, surface):
+    centre = menu.setup["centre"]
+    resolution = menu.options["resolution"]
+    fontsize = menu.setup["fontsize"] * resolution[0] / 320
+    font = pygame.font.Font(menu.setup["font"], fontsize)
+
+    for n, i in enumerate(menu.items):
+
+        if i == menu.item:
+
+            colour = menu.setup["selected"]
 
         else:
 
-            print "Unknown key pressed. ({0})".format(str(event_key))
+            colour = menu.setup["colour"]
 
-        return True
+        if i[1][0] in ("list", "toggle"):
+
+            text = font.render("{0}: {1}".format(i[0], i[1][2][i[1][1]]), True,
+                               colour)
+
+        else:
+
+            text = font.render("{0}".format(i[0]), True, colour)
+
+        if centre:
+
+            textpos = text.get_rect(center=(resolution[0] / 2, resolution[1] -
+                                            (1 + fontsize) *
+                                            (len(menu.items) - n)))
+
+        else:
+
+            textpos = text.get_rect(centery=resolution[1] -
+                                    (1 + fontsize) * (len(menu.items) - n))
+
+        surface.blit(text, textpos)
 
 
 def main():
-    gui = Menu('menu.conf', 'user.conf')
+    menu = Menu('menu.conf', 'user.conf')
     pygame.init()
     fps_clock = pygame.time.Clock()
     fps = 30
     window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
-    while(gui.menu_navigation()):
-        if gui.resolution != window.get_size():
-            window = pygame.display.set_mode(gui.resolution, pygame.DOUBLEBUF)
-        pygame.display.flip()
-        fps_clock.tick(fps)
+    mode = "menu"
+
+    while(mode):
+
+        while(mode == "menu"):
+
+            if menu.resolution != window.get_size():
+
+                window = pygame.display.set_mode(menu.resolution,
+                                                 pygame.DOUBLEBUF)
+            window.fill((0, 0, 0))
+            draw_menu(menu, window)
+            pygame.display.flip()
+            fps_clock.tick(fps)
+
+            mode = menu.menu_navigation()
+
+        while(mode == "game"):
+            print "game is not implemented. returning to menu..."
+            mode = "menu"
+
+        while(mode == "hiscore"):
+            print "high-score list is not implemented. returning to menu..."
+            mode = "menu"
+
+        while(mode == "gallery"):
+            print "gallery is not implemented. returning to menu..."
+            mode = "menu"
+
+        while(mode == "credits"):
+            print "game is not implemented. returning to menu..."
+            mode = "menu"
+
+        while(mode == "quit"):
+            print "Quitting game..."
+            pygame.quit()
+            mode = False
 
 if __name__ == "__main__":
     sys.exit(main())
