@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 # Meny TODO:
 # DONE Simple cursor movement in pygame
 # DONE Extendable menu items.
@@ -292,49 +290,3 @@ def draw_menu(menu, surface):
         surface.blit(text, textpos)
 
 
-def main():
-    menu = Menu('menu.conf', 'user.conf')
-    pygame.init()
-    fps_clock = pygame.time.Clock()
-    fps = 30
-    window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
-    mode = "menu"
-
-    while(mode):
-
-        while(mode == "menu"):
-
-            if menu.resolution != window.get_size():
-
-                window = pygame.display.set_mode(menu.resolution,
-                                                 pygame.DOUBLEBUF)
-            window.fill((0, 0, 0))
-            draw_menu(menu, window)
-            pygame.display.flip()
-            fps_clock.tick(fps)
-
-            mode = menu.menu_navigation()
-
-        while(mode == "game"):
-            print "game is not implemented. returning to menu..."
-            mode = "menu"
-
-        while(mode == "hiscore"):
-            print "high-score list is not implemented. returning to menu..."
-            mode = "menu"
-
-        while(mode == "gallery"):
-            print "gallery is not implemented. returning to menu..."
-            mode = "menu"
-
-        while(mode == "credits"):
-            print "game is not implemented. returning to menu..."
-            mode = "menu"
-
-        while(mode == "quit"):
-            print "Quitting game..."
-            pygame.quit()
-            mode = False
-
-if __name__ == "__main__":
-    sys.exit(main())
