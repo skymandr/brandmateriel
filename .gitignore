@@ -3,4 +3,5 @@
 *.gif
 *ropeproject*
 notrack/*
+user.conf
 
