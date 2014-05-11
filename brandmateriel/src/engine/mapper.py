@@ -55,6 +55,10 @@ class Map(object):
         return self._sealevel
 
     @property
+    def shape(self):
+        return (self._raw_map.shape[1] - 1, self._raw_map.shape[0] - 1)
+
+    @property
     def flat_sea(self):
         return self._flat_sea
 
@@ -64,7 +68,19 @@ class Map(object):
 
     @property
     def patches(self):
+        """
+        Returns patches as a list for use in Camera etc.
+        """
+
         return self._patches.reshape((self._size, 4, 3))
+
+    @property
+    def patches_array(self):
+        """
+        Returns patches as an array for use in selecting map_view etc.
+        """
+
+        return self._patches
 
     @property
     def normals(self):
@@ -72,7 +88,19 @@ class Map(object):
 
     @property
     def positions(self):
+        """
+        Returns positions as a list for use in Camera etc.
+        """
+
         return self._positions.reshape((self._size, 3))
+
+    @property
+    def positions_array(self):
+        """
+        Returns positions as an array for use in selecting map view etc.
+        """
+
+        return self._positions
 
     @property
     def colours(self):
