@@ -272,12 +272,12 @@ def draw_menu(menu, surface):
 
         if i[1][0] in ("list", "toggle"):
 
-            text = font.render("{0}: {1}".format(i[0], i[1][2][i[1][1]]), True,
+            text = font.render("  {0}: {1}  ".format(i[0], i[1][2][i[1][1]]), True,
                                colour)
 
         else:
 
-            text = font.render("{0}".format(i[0]), True, colour)
+            text = font.render("  {0}  ".format(i[0]), True, colour)
 
         if centre:
 
@@ -288,6 +288,6 @@ def draw_menu(menu, surface):
         else:
 
             textpos = text.get_rect(centery=resolution[1] -
-                                    (1 + fontsize) * (len(menu.items) - n))
+                                    (1 + fontsize) * (len(menu.items) - n + 1))
 
         surface.blit(text, textpos)
