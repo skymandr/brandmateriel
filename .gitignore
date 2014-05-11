@@ -1,7 +1,7 @@
 *.pyc
 *.png
 *.gif
+*.swp
 *ropeproject*
 notrack/*
 user.conf
-
