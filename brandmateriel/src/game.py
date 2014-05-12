@@ -46,6 +46,14 @@ class Game(object):
         self.update_camera()
 
     @property
+    def config(self):
+        return self._config
+
+    @config.setter
+    def config(self, val):
+        self._config = val
+
+    @property
     def focus_position(self):
         return self.player.position
 
