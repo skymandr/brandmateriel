@@ -65,25 +65,25 @@ class Game(object):
 
     def update_fixed_camera(self):
         # Something is missing here for Z value:
-        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, -1.5])
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, -0.0])
 
         self.camera.position = self.focus_position - offset
 
         self.camera.position[self.Z] = max(self.camera.position[self.Z], 6.0)
 
-        self.light_source.position = self.camera.position + np.array([0, 0, 3])
+        self.light_source.position = self.camera.position + np.array([0, 0, 0])
 
     def update_rear_camera(self):
         # Something is missing here for Z value:
         look_at = self.focus_position.copy()
         look_at[self.Z] = max(look_at[self.Z], 6.0)
-        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, -1.5])
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, -0.0])
 
         self.camera.position = self.focus_position - offset
 
         self.camera.look_at_point(look_at)
 
-        self.light_source.position = self.camera.position + np.array([0, 0, 3])
+        self.light_source.position = self.camera.position + np.array([0, 0, 0])
 
     def _populate_world(self):
         pass
