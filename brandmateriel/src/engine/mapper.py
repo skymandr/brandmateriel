@@ -83,16 +83,6 @@ class Map(object):
 
         return X, Y
 
-    def positions_slice(self, position, view):
-        """
-        Returns a slice of the map positions centered on position, with
-        dimensions decided by view.
-        """
-
-        X, Y = self.slice(position, view)
-
-        return self._positions[X, Y, :]
-
     def patches_slice(self, position, view):
         """
         Returns a slice of the map patches centered on position, with
@@ -102,6 +92,16 @@ class Map(object):
         X, Y = self.slice(position, view)
 
         return self._patches[X, Y, :]
+
+    def positions_slice(self, position, view):
+        """
+        Returns a slice of the map positions centered on position, with
+        dimensions decided by view.
+        """
+
+        X, Y = self.slice(position, view)
+
+        return self._positions[X, Y, :]
 
     def normals_slice(self, position, view):
         """
@@ -124,7 +124,7 @@ class Map(object):
         return self._colours[X, Y, :]
 
     @property
-    def patches(self):
+    def patches_list(self):
         """
         Returns patches as a list for use in Camera etc.
         """
@@ -132,11 +132,7 @@ class Map(object):
         return self._patches.reshape((self._size, 4, 3))
 
     @property
-    def normals(self):
-        return self._normals.reshape((self._size, 3))
-
-    @property
-    def positions(self):
+    def positions_list(self):
         """
         Returns positions as a list for use in Camera etc.
         """
@@ -144,8 +140,48 @@ class Map(object):
         return self._positions.reshape((self._size, 3))
 
     @property
-    def colours(self):
+    def normals_list(self):
+        """
+        Returns normals as a list for use in Camera etc.
+        """
+        return self._normals.reshape((self._size, 3))
+
+    @property
+    def colours_list(self):
+        """
+        Returns colours as a list for use in Camera etc.
+        """
         return self._colours.reshape((self._size, 4))
+
+    @property
+    def patches(self):
+        """
+        Returns patches in native shape.
+        """
+
+        return self._patches
+
+    @property
+    def positions(self):
+        """
+        Returns positions in native shape.
+        """
+
+        return self._positions
+
+    @property
+    def normals(self):
+        """
+        Returns normals in native shape.
+        """
+        return self._normals
+
+    @property
+    def colours(self):
+        """
+        Returns colours in native shape.
+        """
+        return self._colours
 
     def _make_patches(self):
         """
