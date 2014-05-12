@@ -129,7 +129,7 @@ class Game(object):
         return flag
         pass
 
-    def do_step(self):
+    def do_step(self, surface):
         self.handle_inputs()
 
         self.player.move()
@@ -138,16 +138,43 @@ class Game(object):
 
         self.update_camera()
 
-        # get view:
-        map_positions = self.world.positions_slice(self.position, self.view)
-        map_patches = self.world.patches_slice(self.position, self.view)
-        map_normals = self.world.normals_slice(self.position, self.view)
-        map_colours = self.world.colours_slice(self.position, self.view)
+        # get map in view:
+        map_positions = self.world.positions_list(self.position, self.view)
+        map_normals = self.world.normals_list(self.position, self.view)
+        map_colours = self.world.colours_list(self.position, self.view)
+        map_patches = self.camera.get_screen_coordinates(
+            self.world.patches_list(self.position, self.view))
 
-        # impose view boundaries
-        # sort patches
+        # get ojects in view:
+        pass
+
+        # get player:
+        player_positions = self.player.positions
+        player_normals = self.player.normals
+        player_colours = self.player.colours
+        player_patches, player_depth = self.camera.get_screen_coordinates(
+            self.player.patches)
+
+        # aggregate object data:
+        positions = np.r_[map_positions, player_positions]
+        patches = list(map_patches[:])
+        patches.extend(list(player_patches[:]))
+        normals = np.r_[map_normals, player_normals]
+        colours = np.r_[map_colours, player_colours]
+
+        # impose view boundaries:
+        pass
+
         # apply shading
-        # get camerapositions
+        colours = self.shader.apply_lighting(positions, normals, colours)
+
+        # sort patches
+        order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
+
         # draw
+        surface.fill((0, 0, 0))
+
+        for n in order:
+            pygame.draw.polygon(surface, colours[n], patches[n])
 
         return "game"
