@@ -110,7 +110,7 @@ class Movable(object):
     def friction(self, val):
         self._friction = val
 
-    def move(self, dt):
+    def move(self, dt=0.03125):
         self.position += self.velocity * dt
         self.velocity += self.acceleration * dt
 
