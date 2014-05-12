@@ -33,12 +33,6 @@ KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_RETURN: 'start', l.K_SPACE: 'start',
             l.K_ESCAPE: 'quit', l.K_F1: 'help'}
 
-if not pygame.font:
-    print "Warning: no fonts detected; fonts disabled."
-
-if not pygame.mixer:
-    print "Warning: no sound detected; sound disabled."
-
 
 class Menu(object):
     """
@@ -61,6 +55,10 @@ class Menu(object):
     @property
     def setup(self):
         return self._structure["setup"]
+
+    @property
+    def config(self):
+        return self._config
 
     @property
     def items(self):
