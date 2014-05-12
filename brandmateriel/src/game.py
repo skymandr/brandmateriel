@@ -28,7 +28,7 @@ class Game(object):
 
         self.world = e.mapper.Map(world)
 
-        self.player = e.mobs.Movable(e.triDobjects.FireFighter(scale=3.0))
+        self.player = e.mobs.Movable(e.triDobjects.FireFighter(scale=2.0))
         self.player.position = (np.array([64, 64, 3]))
 
         self._populate_world()
@@ -143,7 +143,7 @@ class Game(object):
         pass
 
     def do_step(self, surface):
-        self.handle_inputs()
+        flag = self.handle_inputs()
 
         self.player.move()
 
@@ -194,4 +194,4 @@ class Game(object):
 
         self.handle_inputs()
 
-        return "game"
+        return flag

@@ -224,6 +224,8 @@ class FireFighter(TriD):
             ])
 
         es = 0.17
+        offset = np.array([0.0, 0.0, 0.0])
+        points += offset
 
         self._patches = np.array([
             # Bottom:
