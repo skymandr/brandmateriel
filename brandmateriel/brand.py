@@ -24,8 +24,6 @@ def main():
     menu = m.Menu('config/menu.conf', 'config/user.conf',
                   'config/default.conf')
 
-    game = g.Game(menu.config)
-
     pygame.init()
     fps_clock = pygame.time.Clock()
     fps = 32
@@ -46,9 +44,8 @@ def main():
             fps_clock.tick(fps)
 
             mode = menu.menu_navigation()
-            config = menu.config
 
-        game.config = config
+        game = g.Game(menu.config, 'assets/maps/zdata.npy')
 
         while(mode == "game"):
             mode = game.do_step(window)

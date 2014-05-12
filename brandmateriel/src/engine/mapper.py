@@ -120,7 +120,6 @@ class Map(object):
 
         return self._colours[X, Y, :]
 
-    @property
     def patches_list(self, position, view):
         """
         Returns patches as a list for use in Camera etc.
@@ -131,7 +130,6 @@ class Map(object):
 
         return the_slice.reshape((size, 4, 3))
 
-    @property
     def positions_list(self, position, view):
         """
         Returns positions as a list for use in Camera etc.
@@ -142,7 +140,6 @@ class Map(object):
 
         return the_slice.reshape((size, 3))
 
-    @property
     def normals_list(self, position, view):
         """
         Returns normals as a list for use in Camera etc.
@@ -152,7 +149,6 @@ class Map(object):
 
         return the_slice.reshape((size, 3))
 
-    @property
     def colours_list(self, position, view):
         """
         Returns colours as a list for use in Camera etc.

@@ -123,8 +123,9 @@ class Movable(object):
     def impose_boundary_conditions(self, map):
         self.position[self.X] %= map.shape[self.X]
         self.position[self.Y] %= map.shape[self.Y]
-        height = map.positions[self.position[self.X],  self.position[self.Y]]
+        height = map.positions[self.position[self.X],
+                               self.position[self.Y], self.Z]
 
         if self.position[self.Z] <= height:
-            self.positions[self.Z] = height
+            self.position[self.Z] = height
             self.bounce()

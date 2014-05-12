@@ -23,16 +23,18 @@ class Game(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, config):
+    def __init__(self, config, world):
         self._config = config
 
-        self.world = e.mapper.Map()
+        self.world = e.mapper.Map(world)
 
         self.player = e.mobs.Movable(e.triDobjects.FireFighter())
+        self.player.position = (np.array([64, 64, 6]))
 
         self._populate_world()
 
-        self.camera = e.camera.Camera()
+        self.camera = e.camera.Camera(screen=
+                                      e.camera.Screen(config["resolution"]))
 
         if config["camera"] == "rear":
             self.update_camera = self.update_rear_camera
@@ -41,7 +43,7 @@ class Game(object):
 
         self.light_source = e.shader.LightSource()
 
-        self.shader = e.shader.shader(self.light_source)
+        self.shader = e.shader.Shader(self.light_source)
 
         self.update_camera()
 
@@ -62,17 +64,20 @@ class Game(object):
         return self._config["view"]
 
     def update_fixed_camera(self):
-        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0,
-                           max(self.focus_position[self.Z], 6.0)])
+        # Something is missing here for Z value:
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, 0])
 
         self.camera.position = self.focus_position - offset
+
+        self.camera.position[self.Z] = max(self.camera.position[self.Z], 6.0)
 
         self.light_source.position = self.camera.position + np.array([0, 0, 3])
 
     def update_rear_camera(self):
+        # Something is missing here for Z value:
         look_at = self.focus_position.copy()
         look_at[self.Z] = max(look_at[self.Z], 6.0)
-        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, look_at[self.Z]])
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, 0])
 
         self.camera.position = self.focus_position - offset
 
@@ -142,26 +147,27 @@ class Game(object):
 
         self.player.move()
 
-        self.player.impose_boundary_conditions()
+        self.player.impose_boundary_conditions(self.world)
 
         self.update_camera()
 
         # get map in view:
-        map_positions = self.world.positions_list(self.position, self.view)
-        map_normals = self.world.normals_list(self.position, self.view)
-        map_colours = self.world.colours_list(self.position, self.view)
-        map_patches = self.camera.get_screen_coordinates(
-            self.world.patches_list(self.position, self.view))
+        map_positions = self.world.positions_list(self.focus_position,
+                                                  self._view)
+        map_normals = self.world.normals_list(self.focus_position, self._view)
+        map_colours = self.world.colours_list(self.focus_position, self._view)
+        map_patches, map_depths = self.camera.get_screen_coordinates(
+            self.world.patches_list(self.focus_position, self._view))
 
-        # get ojects in view:
+        # get objects in view:
         pass
 
         # get player:
-        player_positions = self.player.positions
-        player_normals = self.player.normals
-        player_colours = self.player.colours
+        player_positions = self.player.model.positions
+        player_normals = self.player.model.normals
+        player_colours = self.player.model.colours
         player_patches, player_depth = self.camera.get_screen_coordinates(
-            self.player.patches)
+            self.player.model.patches)
 
         # aggregate object data:
         positions = np.r_[map_positions, player_positions]
