@@ -146,7 +146,7 @@ class Menu(object):
         return "quit"
 
     def menu_navigation(self):
-        """ Should later handle inputs from user. """
+        """ Handles inputs from user. """
         flag = "menu"
 
         for event in pygame.event.get():
@@ -272,8 +272,8 @@ def draw_menu(menu, surface):
 
         if i[1][0] in ("list", "toggle"):
 
-            text = font.render("  {0}: {1}  ".format(i[0], i[1][2][i[1][1]]), True,
-                               colour)
+            text = font.render("  {0}: {1}  ".format(i[0], i[1][2][i[1][1]]),
+                               True, colour)
 
         else:
 
