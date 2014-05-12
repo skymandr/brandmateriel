@@ -79,6 +79,10 @@ class TriD(object):
         self._scale = scale
 
     @property
+    def orientation(self):
+        return self._apply_rotation(self._orientation)
+
+    @property
     def centre_of_mass(self):
         return self.patches.mean(0).mean(0)
 
