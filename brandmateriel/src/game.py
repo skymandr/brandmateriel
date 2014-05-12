@@ -2,7 +2,7 @@
 # A lot of things can be stolen from pygame_demo.py, but implemented in better
 # ways...
 import numpy as np
-import pygame as pg
+import pygame
 from pygame import locals as l
 import engine as e
 
@@ -34,13 +34,104 @@ class Game(object):
 
         self.camera = e.camera.Camera()
 
+        if config["camera"] == "rear":
+            self.update_camera = self.update_rear_camera
+        else:
+            self.update_camera = self.update_fixed_camera
+
     @property
-    def _position(self):
-        return player.position
+    def focus_position(self):
+        return self.player.position
 
     @property
     def _view(self):
         return self._config["view"]
 
+    def update_fixed_camera(self):
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0,
+                           max(self.focus_position[self.Z], 6.0)])
+
+        self.camera.position = self.focus_position - offset
+
+    def update_rear_camera(self):
+        look_at = self.focus_position.copy()
+        look_at[self.Z] = max(look_at[self.Z], 6.0)
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, look_at[self.Z]])
+
+        self.camera.position = self.focus_position - offset
+
+        self.camera.look_at(look_at)
+
     def _populate_world(self):
         pass
+
+    def close_game(self):
+        """ Close game. """
+
+        return "quit"
+
+    def return_to_menu(self):
+        """ Close game. """
+
+        return "menu"
+
+    def handle_inputs(self):
+        """ Should later handle inputs from user. """
+        flag = "game"
+
+        for event in pygame.event.get():
+
+            if event.type == l.QUIT:
+
+                flag = self.close_game()
+
+            elif event.type == l.KEYDOWN and event.key in KEYBOARD.keys():
+
+                if KEYBOARD[event.key] == 'quit':
+
+                    flag = self.return_to_menu()
+
+                elif KEYBOARD[event.key] == 'up':
+
+                    self.player.pitch = min(self.player.pitch + np.pi / 24,
+                                            np.pi / 2)
+
+                elif KEYBOARD[event.key] == 'down':
+
+                    self.player.pitch = max(self.player.pitch - np.pi / 24,
+                                            -np.pi / 2)
+
+                elif KEYBOARD[event.key] == 'left':
+
+                    self.player.yaw = ((self.player.yaw + np.pi / 24) %
+                                       2 * np.pi)
+
+                elif KEYBOARD[event.key] == 'right':
+
+                    self.player.yaw = ((self.player.yaw - np.pi / 24) %
+                                       2 * np.pi)
+
+                else:
+
+                    pass
+                    # flag = self._relay_input(event.key)
+
+        return flag
+        pass
+
+    def do_step(self):
+        self.handle_inputs()
+
+        self.player.move()
+
+        self.player.impose_boundary_conditions()
+
+        self.update_camera()
+
+        # get view
+        # impose view boundaries
+        # sort patches
+        # get camerapositions
+        # draw
+
+        return "game"
