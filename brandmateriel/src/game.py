@@ -65,7 +65,7 @@ class Game(object):
 
     def update_fixed_camera(self):
         # Something is missing here for Z value:
-        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, 0])
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, -1.5])
 
         self.camera.position = self.focus_position - offset
 
@@ -77,7 +77,7 @@ class Game(object):
         # Something is missing here for Z value:
         look_at = self.focus_position.copy()
         look_at[self.Z] = max(look_at[self.Z], 6.0)
-        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, 0])
+        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, -1.5])
 
         self.camera.position = self.focus_position - offset
 
@@ -189,7 +189,8 @@ class Game(object):
         surface.fill((0, 0, 0))
 
         for n in order:
-            pygame.draw.polygon(surface, colours[n], patches[n])
+            if colours[n, 3]:
+                pygame.draw.polygon(surface, colours[n], patches[n])
 
         self.handle_inputs()
 
