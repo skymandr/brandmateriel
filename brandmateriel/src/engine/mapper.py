@@ -73,7 +73,7 @@ class Map(object):
     def slice(self, position, view):
         position = np.round(position).astype(np.int)
 
-        X, Y = np.mgrid[position[self.Y] - view[self.Y] / 2 - 1:
+        Y, X = np.mgrid[position[self.Y] - view[self.Y] / 2 - 1:
                         position[self.Y] + view[self.Y] / 2 + 1,
                         position[self.X] - view[self.X] / 2 - 1:
                         position[self.X] + view[self.X] / 2 + 1]
