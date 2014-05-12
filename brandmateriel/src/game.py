@@ -127,12 +127,12 @@ class Game(object):
                 elif KEYBOARD[event.key] == 'left':
 
                     self.player.yaw = ((self.player.yaw + np.pi / 24) %
-                                       2 * np.pi)
+                                       (2 * np.pi))
 
                 elif KEYBOARD[event.key] == 'right':
 
                     self.player.yaw = ((self.player.yaw - np.pi / 24) %
-                                       2 * np.pi)
+                                       (2 * np.pi))
 
                 else:
 
