@@ -5,7 +5,6 @@ import numpy as np
 import pygame as pg
 from pygame import locals as l
 import engine as e
-from .assets import triD
 
 KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_DOWN: 'down', l.K_j: 'down', l.K_s: 'down',
@@ -29,13 +28,15 @@ class Game(object):
 
         self.map = e.mapper.Map()
 
-        self.player = e.mobs.Movable()
+        self.player = e.mobs.Movable(e.triDobjects.FireFighter())
 
         self._populate_world()
 
+        self.camera = e.camera.Camera()
+
     @property
     def _position(self):
-        return None
+        return player.position
 
     @property
     def _view(self):
