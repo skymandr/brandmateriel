@@ -24,6 +24,10 @@ class Map(object):
           sealevel and such.
     """
 
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
     def __init__(self, filename='demodata.npy', sealevel=0, flat_sea=False):
         if filename is None:
             self._raw_map = np.zeros([10, 13])
@@ -66,6 +70,59 @@ class Map(object):
     def raw_map(self):
         return self._raw_map
 
+    def slice(self, position, view):
+        position = np.round(position).astype(np.int)
+
+        X, Y = np.mgrid[position[self.Y] - view[self.Y] / 2 - 1:
+                        position[self.Y] + view[self.Y] / 2 + 1,
+                        position[self.X] - view[self.X] / 2 - 1:
+                        position[self.X] + view[self.X] / 2 + 1]
+
+        X, Y = (X % self._positions.shape[self.X],
+                Y % self._positions.shape[self.Y])
+
+        return X, Y
+
+    def positions_slice(self, position, view):
+        """
+        Returns a slice of the map positions centered on position, with
+        dimensions decided by view.
+        """
+
+        X, Y = self.slice(position, view)
+
+        return self._positions[X, Y, :]
+
+    def patches_slice(self, position, view):
+        """
+        Returns a slice of the map patches centered on position, with
+        dimensions decided by view.
+        """
+
+        X, Y = self.slice(position, view)
+
+        return self._patches[X, Y, :]
+
+    def normals_slice(self, position, view):
+        """
+        Returns a slice of the map normals centered on position, with
+        dimensions decided by view.
+        """
+
+        X, Y = self.slice(position, view)
+
+        return self._normals[X, Y, :]
+
+    def colours_slice(self, position, view):
+        """
+        Returns a slice of the map colours centered on position, with
+        dimensions decided by view.
+        """
+
+        X, Y = self.slice(position, view)
+
+        return self._colours[X, Y, :]
+
     @property
     def patches(self):
         """
@@ -73,14 +130,6 @@ class Map(object):
         """
 
         return self._patches.reshape((self._size, 4, 3))
-
-    @property
-    def patches_array(self):
-        """
-        Returns patches as an array for use in selecting map_view etc.
-        """
-
-        return self._patches
 
     @property
     def normals(self):
@@ -93,14 +142,6 @@ class Map(object):
         """
 
         return self._positions.reshape((self._size, 3))
-
-    @property
-    def positions_array(self):
-        """
-        Returns positions as an array for use in selecting map view etc.
-        """
-
-        return self._positions
 
     @property
     def colours(self):

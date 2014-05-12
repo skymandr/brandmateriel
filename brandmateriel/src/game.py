@@ -1,3 +1,6 @@
+# TODO:
+# A lot of things can be stolen from pygame_demo.py, but implemented in better
+# ways...
 import numpy as np
 import pygame as pg
 from pygame import locals as l
@@ -23,6 +26,8 @@ class Game(object):
     def __init__(self, config):
         self._config = config
 
+        self.map = e.mapper.Map()
+
         self._populate_world()
 
     @property
@@ -32,18 +37,6 @@ class Game(object):
     @property
     def _view(self):
         return self._config["view"]
-
-    @property
-    def map_view(self):
-        position = np.round(self._position).astype(np.int)
-        view = self._view
-        X, Y = np.mgrid[position[self.Y] - view[self.Y] / 2 - 1:
-                        position[self.Y] + view[self.Y] / 2 + 1,
-                        position[self.X] - view[self.X] / 2 - 1:
-                        position[self.X] + view[self.X] / 2 + 1]
-        X, Y = X % self.world.shape[self.X], Y % self.world.shape[self.Y]
-
-        return self.world.positions_array[(Y, X), :]
 
     def _populate_world(self):
         pass
