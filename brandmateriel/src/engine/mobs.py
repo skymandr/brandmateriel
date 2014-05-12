@@ -10,17 +10,24 @@ class Movable(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, inertia=1.0, gravity=1.0, friction=1.0,
+    def __init__(self, model, inertia=1.0, gravity=1.0, friction=1.0,
                  position=np.array([0, 0, 0]),
                  velocity=np.array([0, 0, 0]),
-                 acceleration=np.array([0, 0, 0])):
+                 acceleration=np.array([0, 0, 0]),
+                 yaw=0.0, pitch=0.0, roll=0.0):
 
+        self._model = model
         self._inertia = inertia
         self._gravity = gravity
         self._friction = friction
         self._position = position
         self._velocity = velocity
         self._acceleration = acceleration
+
+        self._model.position = position
+        self._model.yaw = yaw
+        self._model.pitch = pitch
+        self._model.roll = roll
 
     @property
     def position(self):
@@ -29,6 +36,35 @@ class Movable(object):
     @position.setter
     def position(self, val):
         self._position = val
+        self._model.position = val
+
+    @property
+    def yaw(self):
+        return self._model.yaw
+
+    @yaw.setter
+    def yaw(self, val):
+        self._model.yaw = val
+
+    @property
+    def pitch(self):
+        return self._model.pitch
+
+    @pitch.setter
+    def pitch(self, val):
+        self._model.pitch = val
+
+    @property
+    def roll(self):
+        return self._model.roll
+
+    @roll.setter
+    def roll(self, val):
+        self._model.roll = val
+
+    @property
+    def bounding_box(self):
+        return self._model.bounding_box
 
     @property
     def velocity(self):
