@@ -78,9 +78,6 @@ class Map(object):
                         position[self.X] - view[self.X] / 2 - 1:
                         position[self.X] + view[self.X] / 2 + 1]
 
-        X, Y = (X % self._positions.shape[self.X],
-                Y % self._positions.shape[self.Y])
-
         return X, Y
 
     def patches_slice(self, position, view):
