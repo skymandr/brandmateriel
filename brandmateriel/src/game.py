@@ -11,7 +11,8 @@ KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_LEFT: 'left', l.K_h: 'left', l.K_a: 'left',
             l.K_RIGHT: 'right', l.K_l: 'right', l.K_d: 'right',
             l.K_RETURN: 'start', l.K_SPACE: 'start',
-            l.K_ESCAPE: 'quit', l.K_F1: 'help'}
+            l.K_ESCAPE: 'quit', l.K_F1: 'help',
+            }
 
 
 class Game(object):
@@ -159,8 +160,31 @@ class Game(object):
 
             elif event.type == l.MOUSEBUTTONDOWN:
 
-                pass
-                # flag = self._relay_input(l.K_SPACE)
+                if event.button == 1:
+
+                    self.player.fire = True
+
+                elif event.button == 2:
+
+                    self.player.rocket = True
+
+                elif event.button == 3:
+
+                    self.player.thrust = True
+
+            elif event.type == l.MOUSEBUTTONUP:
+
+                if event.button == 1:
+
+                    self.player.fire = False
+
+                elif event.button == 2:
+
+                    self.player.rocket = False
+
+                elif event.button == 3:
+
+                    self.player.thrust = False
 
         return flag
 
