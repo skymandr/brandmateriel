@@ -114,7 +114,7 @@ class Shader(object):
     Z = W = 2
 
     def __init__(self, light_source=LightSource(),
-                 colour=np.array([255, 204, 204, 255]),
+                 colour=np.array([204, 153, 153, 255]),
                  distance_shading=True, cutoff_distance=None):
         self._light_source = light_source
 
@@ -182,8 +182,8 @@ class Shader(object):
             # colours /= 1 + 0.5 * np.exp(dists - 2 * self.cutoff_distance)
             # Linear with cut-off: (LinRange - dists + ConstRange) / LinRange
             colours *= np.fmin(1, np.fmax(0,
-                                          (4 * self.cutoff_distance - dists)
-                                          / (2 * self.cutoff_distance)))
+                                          (2 * self.cutoff_distance - dists)
+                                          / (1 * self.cutoff_distance)))
 
         # Renormalise to allowed colour values:
         colours = np.where(colours > 255, 255, colours)
