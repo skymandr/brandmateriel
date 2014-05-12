@@ -121,34 +121,46 @@ class Map(object):
         return self._colours[X, Y, :]
 
     @property
-    def patches_list(self):
+    def patches_list(self, position, view):
         """
         Returns patches as a list for use in Camera etc.
         """
 
-        return self._patches.reshape((self._size, 4, 3))
+        the_slice = self.patches_slice(position, view)
+        size = the_slice.shape[0] * the_slice.shape[1]
+
+        return the_slice.reshape((size, 4, 3))
 
     @property
-    def positions_list(self):
+    def positions_list(self, position, view):
         """
         Returns positions as a list for use in Camera etc.
         """
 
-        return self._positions.reshape((self._size, 3))
+        the_slice = self.positions_slice(position, view)
+        size = the_slice.shape[0] * the_slice.shape[1]
+
+        return the_slice.reshape((size, 3))
 
     @property
-    def normals_list(self):
+    def normals_list(self, position, view):
         """
         Returns normals as a list for use in Camera etc.
         """
-        return self._normals.reshape((self._size, 3))
+        the_slice = self.normals_slice(position, view)
+        size = the_slice.shape[0] * the_slice.shape[1]
+
+        return the_slice.reshape((size, 3))
 
     @property
-    def colours_list(self):
+    def colours_list(self, position, view):
         """
         Returns colours as a list for use in Camera etc.
         """
-        return self._colours.reshape((self._size, 4))
+        the_slice = self.colours_slice(position, view)
+        size = the_slice.shape[0] * the_slice.shape[1]
+
+        return the_slice.reshape((size, 4))
 
     @property
     def patches(self):
