@@ -260,6 +260,8 @@ def draw_menu(menu, surface):
     fontsize = menu.setup["fontsize"] * resolution[0] / 320
     font = pygame.font.Font(menu.setup["font"], fontsize)
 
+    surface.fill((0, 0, 0))
+
     for n, i in enumerate(menu.items):
 
         if i == menu.item:
