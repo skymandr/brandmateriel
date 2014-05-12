@@ -39,6 +39,10 @@ class Menu(object):
     A simple menu class, configured using JSON.
     """
 
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
     def __init__(self, _structure='menu.conf', options='user.conf',
                  default='default.conf'):
         self._item = 0
@@ -146,6 +150,7 @@ class Menu(object):
     def menu_navigation(self):
         """ Handles inputs from user. """
         flag = "menu"
+        pygame.event.set_grab(True)
 
         for event in pygame.event.get():
 
@@ -170,6 +175,21 @@ class Menu(object):
                 else:
 
                     flag = self._relay_input(event.key)
+
+            elif event.type == l.MOUSEMOTION:
+                motion = pygame.mouse.get_rel()
+
+                if motion[self.Y] > 0:
+
+                    self._item = (self._item + 1) % self._items
+
+                elif motion[self.Y] < 0:
+
+                    self._item = (self._item - 1) % self._items
+
+            elif event.type == l.MOUSEBUTTONDOWN:
+
+                flag = self._relay_input(l.K_SPACE)
 
         return flag
 
