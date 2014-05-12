@@ -5,6 +5,7 @@ import numpy as np
 import pygame as pg
 from pygame import locals as l
 import engine as e
+from .assets import triD
 
 KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_DOWN: 'down', l.K_j: 'down', l.K_s: 'down',
@@ -27,6 +28,8 @@ class Game(object):
         self._config = config
 
         self.map = e.mapper.Map()
+
+        self.player = e.mobs.Movable()
 
         self._populate_world()
 
