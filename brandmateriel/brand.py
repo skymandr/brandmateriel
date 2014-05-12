@@ -36,7 +36,7 @@ def main():
 
                 window = pygame.display.set_mode(menu.resolution,
                                                  pygame.DOUBLEBUF)
-            window.fill((0, 0, 0))
+
             m.draw_menu(menu, window)
             pygame.display.flip()
             fps_clock.tick(fps)
