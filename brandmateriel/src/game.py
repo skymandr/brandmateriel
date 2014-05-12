@@ -114,16 +114,6 @@ class Game(object):
 
                     flag = self.return_to_menu()
 
-                elif KEYBOARD[event.key] == 'up':
-
-                    self.player.pitch = min(self.player.pitch + np.pi / 24,
-                                            np.pi / 2)
-
-                elif KEYBOARD[event.key] == 'down':
-
-                    self.player.pitch = max(self.player.pitch - np.pi / 24,
-                                            -np.pi / 2)
-
                 elif KEYBOARD[event.key] == 'left':
 
                     self.player.yaw = ((self.player.yaw + np.pi / 24) %
@@ -134,13 +124,45 @@ class Game(object):
                     self.player.yaw = ((self.player.yaw - np.pi / 24) %
                                        (2 * np.pi))
 
+                elif KEYBOARD[event.key] == 'up':
+
+                    self.player.pitch = min(self.player.pitch + np.pi / 24,
+                                            np.pi * 0.5)
+
+                elif KEYBOARD[event.key] == 'down':
+
+                    self.player.pitch = max(self.player.pitch - np.pi / 24,
+                                            -np.pi * 0.5)
+
                 else:
 
                     pass
                     # flag = self._relay_input(event.key)
 
+            elif event.type == l.MOUSEMOTION:
+
+                motion = np.array(pygame.mouse.get_rel())
+
+                self.player.yaw = (self.player.yaw - motion[self.X] *
+                                   np.pi / 360) % (2 * np.pi)
+
+                self.player.pitch = (self.player.pitch - motion[self.Y] *
+                                     np.pi / 360)
+
+                if self.player.pitch < -np.pi * 0.6082:
+
+                    self.player.pitch = -np.pi * 0.6082
+
+                elif self.player.pitch > np.pi * 0.6082:
+
+                    self.player.pitch = np.pi * 0.6082
+
+            elif event.type == l.MOUSEBUTTONDOWN:
+
+                pass
+                # flag = self._relay_input(l.K_SPACE)
+
         return flag
-        pass
 
     def do_step(self, surface):
         flag = self.handle_inputs()

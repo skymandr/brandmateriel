@@ -29,6 +29,7 @@ def main():
     fps = 32
     window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
     mode = "menu"
+    pygame.mouse.set_visible(False)
 
     while(mode):
 
