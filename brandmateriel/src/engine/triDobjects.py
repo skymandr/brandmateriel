@@ -79,6 +79,10 @@ class TriD(object):
         self._scale = scale
 
     @property
+    def centre_of_mass(self):
+        return self.patches.mean(0).mean(0)
+
+    @property
     def position(self):
         return self._position
 
@@ -88,7 +92,7 @@ class TriD(object):
 
     @property
     def patches(self):
-        return (self._apply_rotation(self._patches) +
+        return (self._scale * self._apply_rotation(self._patches) +
                 self.position[np.newaxis, np.newaxis, :])
 
     @property
