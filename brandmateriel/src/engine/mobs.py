@@ -11,9 +11,9 @@ class Movable(object):
     Z = W = 2
 
     def __init__(self, model, inertia=1.0, gravity=1.0, friction=1.0,
-                 position=np.array([0, 0, 0]),
-                 velocity=np.array([0, 0, 0]),
-                 acceleration=np.array([0, 0, 0]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 velocity=np.array([0.0, 0.0, 0.0]),
+                 acceleration=np.array([0.0, 0.0, 0.0]),
                  yaw=0.0, pitch=0.0, roll=0.0):
 
         self._model = model
@@ -113,9 +113,12 @@ class Movable(object):
     def move(self, dt=0.03125):
         self.position += self.velocity * dt
         self.velocity += self.acceleration * dt
+        self.apply_forces()
 
-    def apply_force(self, force):
-        self.acceleration += force / self.inertia
+    def apply_forces(self):
+        force = self.friction + self.gravity
+        self.acceleration = force / self.inertia
+
 
     def bounce(self):
         self._velocity[self.Z] = np.abs(self._velocity[self.Z])
@@ -136,10 +139,10 @@ class Player(Movable):
     Player object has health, fuel etc.
     """
 
-    def __init__(self, model, inertia=1.0, gravity=1.0, friction=1.0,
-                 position=np.array([0, 0, 0]),
-                 velocity=np.array([0, 0, 0]),
-                 acceleration=np.array([0, 0, 0]),
+    def __init__(self, model, inertia=10.0, gravity=0.5, friction=0.1,
+                 position=np.array([0.0, 0.0, 0.0]),
+                 velocity=np.array([0.0, 0.0, 0.0]),
+                 acceleration=np.array([0.0, 0.0, 0.0]),
                  yaw=0.0, pitch=0.0, roll=0.0,
                  fuel=255, rockets=3, health=255, bombs=3):
 
@@ -265,3 +268,10 @@ class Player(Movable):
     @bomb.setter
     def bomb(self, val):
         self._bomb = val and True
+
+    def apply_forces(self):
+        force = (self.friction + self.gravity +
+                 2 * self.thrust * self.model.orientation[self.Z])
+
+        self.acceleration = force / self.inertia
+        print self.position, self.velocity, self.acceleration
