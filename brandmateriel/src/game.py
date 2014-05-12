@@ -73,8 +73,6 @@ class Game(object):
 
         self.light_source.position = self.camera.position + np.array([0, 0, 0])
 
-        print self.camera.position
-
     def update_rear_camera(self):
         look_at = self.focus_position.copy()
         look_at[self.Z] = max(look_at[self.Z], 6.0)
@@ -85,8 +83,6 @@ class Game(object):
         self.camera.look_at_point(look_at)
 
         self.light_source.position = self.camera.position + np.array([0, 0, 0])
-
-        print self.camera.position
 
     def _populate_world(self):
         pass
