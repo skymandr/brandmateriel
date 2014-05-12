@@ -24,7 +24,7 @@ def main():
                   'config/default.conf')
     pygame.init()
     fps_clock = pygame.time.Clock()
-    fps = 30
+    fps = 32
     window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
     mode = "menu"
 
