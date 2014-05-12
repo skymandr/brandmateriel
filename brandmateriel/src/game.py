@@ -26,7 +26,7 @@ class Game(object):
     def __init__(self, config):
         self._config = config
 
-        self.map = e.mapper.Map()
+        self.world = e.mapper.Map()
 
         self.player = e.mobs.Movable(e.triDobjects.FireFighter())
 
@@ -38,6 +38,12 @@ class Game(object):
             self.update_camera = self.update_rear_camera
         else:
             self.update_camera = self.update_fixed_camera
+
+        self.light_source = e.shader.LightSource()
+
+        self.shader = e.shader.shader(self.light_source)
+
+        self.update_camera()
 
     @property
     def focus_position(self):
@@ -53,6 +59,8 @@ class Game(object):
 
         self.camera.position = self.focus_position - offset
 
+        self.light_source.position = self.camera.position + np.array([0, 0, 3])
+
     def update_rear_camera(self):
         look_at = self.focus_position.copy()
         look_at[self.Z] = max(look_at[self.Z], 6.0)
@@ -61,6 +69,8 @@ class Game(object):
         self.camera.position = self.focus_position - offset
 
         self.camera.look_at(look_at)
+
+        self.light_source.position = self.camera.position + np.array([0, 0, 3])
 
     def _populate_world(self):
         pass
@@ -128,9 +138,15 @@ class Game(object):
 
         self.update_camera()
 
-        # get view
+        # get view:
+        map_positions = self.world.positions_slice(self.position, self.view)
+        map_patches = self.world.patches_slice(self.position, self.view)
+        map_normals = self.world.normals_slice(self.position, self.view)
+        map_colours = self.world.colours_slice(self.position, self.view)
+
         # impose view boundaries
         # sort patches
+        # apply shading
         # get camerapositions
         # draw
 
