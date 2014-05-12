@@ -35,7 +35,7 @@ class TriD(object):
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
-                 yaw=0.0, pitch=0.0, roll=0.0):
+                 yaw=0.0, pitch=0.0, roll=0.0, scale=1.0):
         points = np.array([[1.0, 0.0, -1.0 / np.sqrt(2)],   # 0
                            [-1.0, 0.0, -1.0 / np.sqrt(2)],  # 1
                            [0.0, -1.0, 1.0 / np.sqrt(2)],   # 2
@@ -76,6 +76,8 @@ class TriD(object):
 
         self._colourise()
 
+        self._scale = scale
+
     @property
     def position(self):
         return self._position
@@ -95,7 +97,7 @@ class TriD(object):
 
     @property
     def positions(self):
-        return (self._apply_rotation(self._positions) +
+        return (self._scale * self._apply_rotation(self._positions) +
                 self.position[np.newaxis, :])
 
     @property
@@ -133,6 +135,14 @@ class TriD(object):
     @roll.setter
     def roll(self, val):
         self._roll = val
+
+    @property
+    def scale(self):
+        return self._scale
+
+    @scale.setter
+    def scale(self, val):
+        self._scale = val
 
     @property
     def bounding_box(self):
@@ -192,7 +202,7 @@ class FireFighter(TriD):
     """
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
-                 yaw=0, pitch=0, roll=0):
+                 yaw=0, pitch=0, roll=0, scale=1.0):
         points = np.array([
             # Bottom:
             [0, 0.5, 0],         # 0
@@ -298,6 +308,8 @@ class FireFighter(TriD):
 
         self._colourise()
 
+        self._scale = scale
+
 
 class FireFighterStripes(TriD):
     """
@@ -305,7 +317,7 @@ class FireFighterStripes(TriD):
     """
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
-                 yaw=0, pitch=0, roll=0):
+                 yaw=0, pitch=0, roll=0, scale=1.0):
         points = np.array([
             # Bottom:
             [0, 0.5, 0],         # 0
@@ -424,6 +436,8 @@ class FireFighterStripes(TriD):
 
         self._colourise()
 
+        self._scale = scale
+
 
 class Lander(TriD):
     """
@@ -431,7 +445,7 @@ class Lander(TriD):
     """
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
-                 yaw=0, pitch=0, roll=0):
+                 yaw=0, pitch=0, roll=0, scale=1.0):
         points = np.array([[0.5, 1.0, 0.0],     # 0
                            [-0.5, 1.0, 0.0],    # 1
                            [-1.2, -0.1, 0.2],   # 2
@@ -502,6 +516,8 @@ class Lander(TriD):
 
         self._colourise()
 
+        self._scale = scale
+
 
 class House(TriD):
     """
@@ -511,7 +527,7 @@ class House(TriD):
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
-                 yaw=0.0, pitch=0.0, roll=0.0):
+                 yaw=0.0, pitch=0.0, roll=0.0, scale=1.0):
         points = np.array([[0.7, 1.2, 0.0],       # 0
                            [-0.7, 1.2, 0.0],      # 1
                            [-0.7, -1.2, 0.0],     # 2
@@ -608,6 +624,8 @@ class House(TriD):
 
         self._colourise()
 
+        self._scale = scale
+
 
 class SimpleHouse(TriD):
     """
@@ -617,7 +635,7 @@ class SimpleHouse(TriD):
 
     def __init__(self, basecolour=np.array([0, 204, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
-                 yaw=0.0, pitch=0.0, roll=0.0):
+                 yaw=0.0, pitch=0.0, roll=0.0, scale=1.0):
         points = np.array([[0.7, 1.2, 0.0],       # 0
                            [-0.7, 1.2, 0.0],      # 1
                            [-0.7, -1.2, 0.0],     # 2
@@ -683,3 +701,5 @@ class SimpleHouse(TriD):
         self._calc_positions()
 
         self._colourise()
+
+        self._scale = scale
