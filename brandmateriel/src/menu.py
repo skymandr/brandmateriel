@@ -58,7 +58,7 @@ class Menu(object):
 
     @property
     def config(self):
-        return self._config
+        return self.options
 
     @property
     def items(self):
