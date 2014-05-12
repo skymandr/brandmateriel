@@ -30,6 +30,10 @@ class Movable(object):
         self._model.roll = roll
 
     @property
+    def model(self):
+        return self._model
+
+    @property
     def position(self):
         return self._position
 
@@ -114,4 +118,13 @@ class Movable(object):
         self.acceleration += force / self.inertia
 
     def bounce(self):
-        self._velocity[self.Z] *= -1
+        self._velocity[self.Z] = np.abs(self._velocity[self.Z])
+
+    def impose_boundary_conditions(self, map):
+        self.position[self.X] %= map.shape[self.X]
+        self.position[self.Y] %= map.shape[self.Y]
+        height = map.positions[self.position[self.X],  self.position[self.Y]]
+
+        if self.position[self.Z] <= height:
+            self.positions[self.Z] = height
+            self.bounce()
