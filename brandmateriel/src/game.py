@@ -29,12 +29,12 @@ class Game(object):
         self.world = e.mapper.Map(world)
 
         self.player = e.mobs.Movable(e.triDobjects.FireFighter())
-        self.player.position = (np.array([64, 64, 6]))
+        self.player.position = (np.array([64, 64, 3]))
 
         self._populate_world()
 
         self.camera = e.camera.Camera(screen=
-                                      e.camera.Screen(config["resolution"]))
+            e.camera.Screen(resolution=config["resolution"]))
 
         if config["camera"] == "rear":
             self.update_camera = self.update_rear_camera
@@ -81,7 +81,7 @@ class Game(object):
 
         self.camera.position = self.focus_position - offset
 
-        self.camera.look_at(look_at)
+        self.camera.look_at_point(look_at)
 
         self.light_source.position = self.camera.position + np.array([0, 0, 3])
 
@@ -190,5 +190,7 @@ class Game(object):
 
         for n in order:
             pygame.draw.polygon(surface, colours[n], patches[n])
+
+        self.handle_inputs()
 
         return "game"
