@@ -1,2 +1,7 @@
 Next up:
-* Rudimentary movement
+DONE Rudimentary movement
+* Boundary conditions for map
+* View culling
+* Shadow
+* Random houses
+* Tweak movement
