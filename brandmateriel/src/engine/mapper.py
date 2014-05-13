@@ -105,12 +105,32 @@ class Map(object):
 
         the_slice = self._patches[X, Y, :]
 
-        # the_slice[:, 0, (3, 0), self.Z] += ((the_slice[:, 0, (2, 1), self.Z] -
-        #                                      the_slice[:, 0, (3, 0), self.Z]) *
-        #                                     (ymin - the_slice[:, 0, (3, 0),
-        #                                                       self.X]))
+        the_slice[:, 0, (3, 0), self.Z] += ((the_slice[:, 0, (2, 1), self.Z] -
+                                            the_slice[:, 0, (3, 0), self.Z])
+                                            * (xmin - the_slice[:, 0, (3, 0),
+                                                                self.X]))
 
-        # the_slice[:, 0, (0, 3), self.X] = xmin
+        the_slice[:, -1, (2, 1), self.Z] += ((the_slice[:, -1, (2, 1), self.Z]
+                                              - the_slice[:, -1, (3, 0),
+                                                          self.Z]) *
+                                             (xmax - the_slice[:, -1, (2, 1),
+                                                               self.X]))
+
+        the_slice[0, :, (0, 1), self.Z] += ((the_slice[0, :, (3, 2), self.Z] -
+                                             the_slice[0, :, (0, 1), self.Z])
+                                            * (ymin - the_slice[0, :, (0, 1),
+                                                                self.Y]))
+
+        the_slice[-1, :, (3, 2), self.Z] += ((the_slice[-1, :, (3, 2), self.Z]
+                                              - the_slice[-1, :, (0, 1),
+                                                          self.Z]) *
+                                             (ymax - the_slice[-1, :, (3, 2),
+                                                               self.Y]))
+
+        the_slice[:, 0, (3, 0), self.X] = xmin
+        the_slice[:, -1, (1, 2), self.X] = xmax
+        the_slice[0, :, (0, 1), self.Y] = ymin
+        the_slice[-1, :, (2, 3), self.Y] = ymax
 
         return the_slice
 
