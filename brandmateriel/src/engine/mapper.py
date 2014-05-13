@@ -71,12 +71,19 @@ class Map(object):
         return self._raw_map
 
     def slice(self, position, view):
-        the_position = np.round(position).astype(np.int)
+        xmin = np.round(position[self.X] - view[self.X] * 0.5).astype(np.int)
+        xmax = np.round(position[self.X] + view[self.X] * 0.5).astype(np.int)
+        ymin = np.round(position[self.Y] - view[self.Y] * 0.5).astype(np.int)
+        ymax = np.round(position[self.Y] + view[self.Y] * 0.5).astype(np.int)
 
-        Y, X = np.mgrid[the_position[self.Y] - view[self.Y] / 2 - 1:
-                        the_position[self.Y] + view[self.Y] / 2 + 1,
-                        the_position[self.X] - view[self.X] / 2 - 1:
-                        the_position[self.X] + view[self.X] / 2 + 1]
+        Y, X = np.mgrid[ymin: ymax + 1, xmin: xmax + 1]
+
+        # the_position = np.round(position).astype(np.int)
+
+        # Y, X = np.mgrid[the_position[self.Y] - view[self.Y] / 2 - 1:
+        #                 the_position[self.Y] + view[self.Y] / 2 + 1,
+        #                 the_position[self.X] - view[self.X] / 2 - 1:
+        #                 the_position[self.X] + view[self.X] / 2 + 1]
 
         X %= self.shape[self.X]
         Y %= self.shape[self.Y]
@@ -91,7 +98,21 @@ class Map(object):
 
         X, Y = self.slice(position, view)
 
-        return self._patches[X, Y, :]
+        xmin = position[self.X] - view[self.X] * 0.5
+        xmax = position[self.X] + view[self.X] * 0.5
+        ymin = position[self.Y] - view[self.Y] * 0.5
+        ymax = position[self.Y] + view[self.Y] * 0.5
+
+        the_slice = self._patches[X, Y, :]
+
+        # the_slice[:, 0, (3, 0), self.Z] += ((the_slice[:, 0, (2, 1), self.Z] -
+        #                                      the_slice[:, 0, (3, 0), self.Z]) *
+        #                                     (ymin - the_slice[:, 0, (3, 0),
+        #                                                       self.X]))
+
+        # the_slice[:, 0, (0, 3), self.X] = xmin
+
+        return the_slice
 
     def map_positions_slice(self, position, view):
         """
