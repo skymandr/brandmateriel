@@ -190,6 +190,6 @@ class Shader(object):
         colours = np.where(colours < 0, 0, colours)
         colours[:, 3] = 255
         if culling:
-            colours[np.where(scatter > 0), 3] = 0
+            colours[np.where(scatter > 0)] = 0
 
         return colours

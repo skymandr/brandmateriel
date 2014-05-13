@@ -125,8 +125,9 @@ class Movable(object):
     def impose_boundary_conditions(self, map):
         self.position[self.X] %= map.shape[self.X]
         self.position[self.Y] %= map.shape[self.Y]
-        height = max(0, map.positions[self.position[self.X],
-                                      self.position[self.Y], self.Z])
+        height = max(0, map.patch_positions[self.position[self.X],
+                                            self.position[self.Y],
+                                            self.Z].max())
 
         if self.position[self.Z] <= height:
             self.position[self.Z] = height + 0.0

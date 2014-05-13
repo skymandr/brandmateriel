@@ -52,7 +52,7 @@ class Game(object):
             d = self.camera.distance
 
         self._culling_height = np.ceil((h * (D / d + 1.0) + np.ceil(
-            self.world.positions[:, :, 2].max())))
+            self.world.patch_positions[:, :, 2].max())))
 
         self.light_source = e.shader.LightSource()
 
@@ -209,8 +209,8 @@ class Game(object):
         self.update_camera()
 
         # get map in view:
-        map_positions = self.world.positions_list(self.focus_position,
-                                                  self._view)
+        map_positions = self.world.patch_positions_list(self.focus_position,
+                                                        self._view)
         map_normals = self.world.normals_list(self.focus_position, self._view)
         map_patches, map_depths = self.camera.get_screen_coordinates(
             self.world.patches_list(self.focus_position, self._view))
