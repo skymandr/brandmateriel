@@ -222,6 +222,12 @@ class Game(object):
                                                      map_normals,
                                                      map_colours,
                                                      culling=False)
+        else:
+            map_positions = np.empty((0, 3))
+            map_normals = np.empty((0, 3))
+            map_patches = np.empty((0, 4, 2))
+            map_depths = np.empty((0, 4))
+            map_colours = np.empty((0, 4))
 
         # get objects in view:
         pass

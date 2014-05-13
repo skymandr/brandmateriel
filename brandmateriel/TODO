@@ -1,9 +1,9 @@
 Next up:
 DONE Rudimentary movement
 * Boundary conditions for map
-* View culling:
-    DONE sides
-    - height
+DONE View culling:
+        DONE sides
+        DONE height
 * Shadow
 * Random houses
 * Tweak movement
