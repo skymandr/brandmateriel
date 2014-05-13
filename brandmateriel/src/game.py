@@ -51,8 +51,8 @@ class Game(object):
                  self.camera.screen.position[self.Z])
             d = self.camera.distance
 
-        self._culling_height = (h * (D / d + 1.0) +
-                                self.world.positions[:, :, 2].max())
+        self._culling_height = np.ceil((h * (D / d + 1.0) + np.ceil(
+            self.world.positions[:, :, 2].max())))
 
         self.light_source = e.shader.LightSource()
 
