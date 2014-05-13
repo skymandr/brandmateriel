@@ -201,9 +201,11 @@ class Game(object):
         map_positions = self.world.positions_list(self.focus_position,
                                                   self._view)
         map_normals = self.world.normals_list(self.focus_position, self._view)
-        map_colours = self.world.colours_list(self.focus_position, self._view)
         map_patches, map_depths = self.camera.get_screen_coordinates(
             self.world.patches_list(self.focus_position, self._view))
+        map_colours = self.world.colours_list(self.focus_position, self._view)
+        map_colours = self.shader.apply_lighting(map_positions, map_normals,
+                                                 map_colours, culling=False)
 
         # get objects in view:
         pass
@@ -211,22 +213,25 @@ class Game(object):
         # get player:
         player_positions = self.player.model.positions
         player_normals = self.player.model.normals
-        player_colours = self.player.model.colours
         player_patches, player_depth = self.camera.get_screen_coordinates(
             self.player.model.patches)
+        player_colours = self.player.model.colours.copy()
+        player_colours = self.shader.apply_lighting(player_positions,
+                                                    player_normals,
+                                                    player_colours)
 
         # aggregate object data:
         positions = np.r_[map_positions, player_positions]
         patches = list(map_patches[:])
         patches.extend(list(player_patches[:]))
-        normals = np.r_[map_normals, player_normals]
+        # normals = np.r_[map_normals, player_normals]
         colours = np.r_[map_colours, player_colours]
 
         # impose view boundaries:
         pass
 
-        # apply shading
-        colours = self.shader.apply_lighting(positions, normals, colours)
+        # # apply shading
+        # colours = self.shader.apply_lighting(positions, normals, colours)
 
         # sort patches
         order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))

@@ -159,7 +159,7 @@ class Shader(object):
     def cutoff_distance(self, val):
         self._cutoff_distance = val
 
-    def apply_lighting(self, positions, normals, colours):
+    def apply_lighting(self, positions, normals, colours, culling=True):
         """
         Questions:
             this is done explicitly by reference, changing original colours;
@@ -189,6 +189,7 @@ class Shader(object):
         colours = np.where(colours > 255, 255, colours)
         colours = np.where(colours < 0, 0, colours)
         colours[:, 3] = 255
-        colours[np.where(scatter > 0), 3] = 0
+        if culling:
+            colours[np.where(scatter > 0), 3] = 0
 
         return colours
