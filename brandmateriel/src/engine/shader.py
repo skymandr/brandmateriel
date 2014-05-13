@@ -182,8 +182,8 @@ class Shader(object):
             # colours /= 1 + 0.5 * np.exp(dists - 2 * self.cutoff_distance)
             # Linear with cut-off: (LinRange - dists + ConstRange) / LinRange
             colours *= np.fmin(1, np.fmax(0,
-                                          (2 * self.cutoff_distance - dists)
-                                          / (1 * self.cutoff_distance)))
+                                          (2.50 * self.cutoff_distance - dists)
+                                          / (1.25 * self.cutoff_distance)))
 
         # Renormalise to allowed colour values:
         colours = np.where(colours > 255, 255, colours)
