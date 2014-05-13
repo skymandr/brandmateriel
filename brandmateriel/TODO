@@ -1,7 +1,10 @@
 Next up:
 DONE Rudimentary movement
 * Boundary conditions for map
-* View culling
+* View culling:
+    - sides
+    - height
 * Shadow
 * Random houses
 * Tweak movement
+* Tweak lighting

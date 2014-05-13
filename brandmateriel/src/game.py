@@ -40,13 +40,24 @@ class Game(object):
         if config["camera"] == "rear":
             self.update_camera = self.update_rear_camera
             self.config["view"] = (self._view[0], self._view[0])
+            D = self._view[self.Y] * (1 + np.sqrt(2)) * 0.5
+            h = (self.camera.screen.extent[self.Y] * 0.5 -
+                 self.camera.screen.position[self.Z])
+            d = self.camera.distance
         else:
             self.update_camera = self.update_fixed_camera
+            D = self._view[self.Y]
+            h = (self.camera.screen.extent[self.Y] * 0.5 -
+                 self.camera.screen.position[self.Z])
+            d = self.camera.distance
+
+        self._culling_height = (h * (D / d + 1.0) +
+                                self.world.positions[:, :, 2].max())
 
         self.light_source = e.shader.LightSource()
 
         self.shader = e.shader.Shader(self.light_source,
-                                      cutoff_distance=self._view[1])
+                                      cutoff_distance=self._view[self.Y])
 
         self.update_camera()
 
