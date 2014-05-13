@@ -6,5 +6,13 @@ DONE View culling:
         DONE height
 * Shadow
 * Random houses
-* Tweak movement
-* Tweak lighting
+* Tweak movement:
+    - thrust
+    - friction
+    - gravity
+    - pitch-angles
+    - max height
+* Tweak lighting:
+    - colour
+    - intensity
+    - cutoffs
