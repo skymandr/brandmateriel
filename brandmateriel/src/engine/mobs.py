@@ -132,6 +132,8 @@ class Movable(object):
         if self.position[self.Z] <= height:
             self.position[self.Z] = height + 0.0
             self.bounce()
+        elif self.position[self.Z] > 42.0:
+            self.position.Z = 42.0
 
 
 class Player(Movable):
