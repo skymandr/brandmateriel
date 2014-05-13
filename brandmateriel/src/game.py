@@ -30,7 +30,7 @@ class Game(object):
         self.world = e.mapper.Map(world)
 
         self.player = e.mobs.Player(e.triDobjects.FireFighter(scale=2.0))
-        self.player.position = (np.array([64, 64, 5]))
+        self.player.position = (np.array([64.0, 64.0, 5.0]))
 
         self._populate_world()
 

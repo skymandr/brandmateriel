@@ -111,14 +111,13 @@ class Movable(object):
         self._friction = val
 
     def move(self, dt=0.03125):
-        self.position += self.velocity * dt
-        self.velocity += self.acceleration * dt
         self.apply_forces()
+        self.velocity += self.acceleration * dt
+        self.position += self.velocity * dt
 
     def apply_forces(self):
         force = self.friction + self.gravity
         self.acceleration = force / self.inertia
-
 
     def bounce(self):
         self._velocity[self.Z] = np.abs(self._velocity[self.Z])
@@ -139,7 +138,7 @@ class Player(Movable):
     Player object has health, fuel etc.
     """
 
-    def __init__(self, model, inertia=10.0, gravity=0.5, friction=0.1,
+    def __init__(self, model, inertia=1.0, gravity=1.0, friction=1.0,
                  position=np.array([0.0, 0.0, 0.0]),
                  velocity=np.array([0.0, 0.0, 0.0]),
                  acceleration=np.array([0.0, 0.0, 0.0]),
@@ -271,7 +270,6 @@ class Player(Movable):
 
     def apply_forces(self):
         force = (self.friction + self.gravity +
-                 2 * self.thrust * self.model.orientation[self.Z])
+                 4 * self.thrust * self.model.orientation[self.W])
 
         self.acceleration = force / self.inertia
-        print self.position, self.velocity, self.acceleration
