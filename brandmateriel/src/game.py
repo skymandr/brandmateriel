@@ -209,14 +209,19 @@ class Game(object):
         self.update_camera()
 
         # get map in view:
-        map_positions = self.world.patch_positions_list(self.focus_position,
-                                                        self._view)
-        map_normals = self.world.normals_list(self.focus_position, self._view)
-        map_patches, map_depths = self.camera.get_screen_coordinates(
-            self.world.patches_list(self.focus_position, self._view))
-        map_colours = self.world.colours_list(self.focus_position, self._view)
-        map_colours = self.shader.apply_lighting(map_positions, map_normals,
-                                                 map_colours, culling=False)
+        if self.camera.position[self.Z] < self._culling_height:
+            map_positions = self.world.patch_positions_list(
+                self.focus_position, self._view)
+            map_normals = self.world.normals_list(self.focus_position,
+                                                  self._view)
+            map_patches, map_depths = self.camera.get_screen_coordinates(
+                self.world.patches_list(self.focus_position, self._view))
+            map_colours = self.world.colours_list(self.focus_position,
+                                                  self._view)
+            map_colours = self.shader.apply_lighting(map_positions,
+                                                     map_normals,
+                                                     map_colours,
+                                                     culling=False)
 
         # get objects in view:
         pass
