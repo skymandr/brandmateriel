@@ -138,7 +138,7 @@ class Player(Movable):
     Player object has health, fuel etc.
     """
 
-    def __init__(self, model, inertia=1.0, gravity=1.0, friction=1.0,
+    def __init__(self, model, inertia=1.0, gravity=1.0, friction=0.1,
                  position=np.array([0.0, 0.0, 0.0]),
                  velocity=np.array([0.0, 0.0, 0.0]),
                  acceleration=np.array([0.0, 0.0, 0.0]),

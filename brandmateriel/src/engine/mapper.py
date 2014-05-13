@@ -28,7 +28,7 @@ class Map(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, filename='demodata.npy', sealevel=0, flat_sea=False):
+    def __init__(self, filename='demodata.npy', sealevel=0, flat_sea=True):
         if filename is None:
             self._raw_map = np.zeros([10, 13])
         else:
