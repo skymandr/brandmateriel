@@ -98,6 +98,26 @@ class Map(object):
 
         the_slice = self._patches[X, Y, :]
 
+        # Fix periodicity:
+        """
+        the_slice[:, :, :, self.X] = ((the_slice[:, :, :, self.X] +
+                                       view[self.X] * 0.5) % self.shape[self.X]
+                                      - view[self.X] * 0.5)
+
+        the_slice[:, :, :, self.X] = ((the_slice[:, :, :, self.X] -
+                                       view[self.X] * 0.5) % self.shape[self.X]
+                                      + view[self.X] * 0.5)
+
+        the_slice[:, :, :, self.Y] = ((the_slice[:, :, :, self.Y] +
+                                       view[self.Y] * 0.5) % self.shape[self.Y]
+                                      - view[self.Y] * 0.5)
+
+        the_slice[:, :, :, self.Y] = ((the_slice[:, :, :, self.Y] -
+                                       view[self.Y] * 0.5) % self.shape[self.Y]
+                                      + view[self.Y] * 0.5)
+        """
+
+        # Impose view limits:
         the_slice[:, 0, (3, 0), self.Z] += ((the_slice[:, 0, (2, 1), self.Z] -
                                             the_slice[:, 0, (3, 0), self.Z])
                                             * (xmin - the_slice[:, 0, (3, 0),
@@ -135,7 +155,28 @@ class Map(object):
 
         X, Y = self.slice(position, view)
 
-        return self._positions[X, Y, :]
+        the_slice = self._positions[X, Y, :]
+
+        # Fix periodicity:
+        """
+        the_slice[:, :, self.X] = ((the_slice[:, :, :, self.X] +
+                                    view[self.X] * 0.5) % self.shape[self.X]
+                                   - view[self.X] * 0.5)
+
+        the_slice[:, :, self.X] = ((the_slice[:, :, :, self.X] -
+                                    view[self.X] * 0.5) % self.shape[self.X]
+                                   + view[self.X] * 0.5)
+
+        the_slice[:, :, self.Y] = ((the_slice[:, :, :, self.Y] +
+                                    view[self.Y] * 0.5) % self.shape[self.Y]
+                                   - view[self.Y] * 0.5)
+
+        the_slice[:, :, self.Y] = ((the_slice[:, :, :, self.Y] -
+                                    view[self.Y] * 0.5) % self.shape[self.Y]
+                                   + view[self.Y] * 0.5)
+        """
+
+        return the_slice
 
     def patch_positions_slice(self, position, view):
         """
