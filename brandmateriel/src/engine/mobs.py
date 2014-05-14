@@ -116,7 +116,7 @@ class Movable(object):
         self.position += self.velocity * dt
 
     def apply_forces(self):
-        force = self.friction + self.gravity
+        force = self.friction + self.gravity * self.inertia
         self.acceleration = force / self.inertia
 
     def bounce(self):
@@ -141,7 +141,7 @@ class Player(Movable):
     Player object has health, fuel etc.
     """
 
-    def __init__(self, model, inertia=1.0, gravity=1.0, friction=0.1,
+    def __init__(self, model, inertia=1.0, gravity=10.0, friction=1.0,
                  position=np.array([0.0, 0.0, 0.0]),
                  velocity=np.array([0.0, 0.0, 0.0]),
                  acceleration=np.array([0.0, 0.0, 0.0]),
@@ -272,7 +272,7 @@ class Player(Movable):
         self._bomb = val and True
 
     def apply_forces(self):
-        force = (self.friction + self.gravity +
-                 4 * self.thrust * self.model.orientation[self.W])
+        force = (self.friction + self.gravity * self.inertia +
+                 20 * self.thrust * self.model.orientation[self.W])
 
         self.acceleration = force / self.inertia
