@@ -69,6 +69,10 @@ class Menu(object):
         return self._structure[self.menu]['items']
 
     @property
+    def text(self):
+        return self._structure[self.menu]['text']
+
+    @property
     def _items(self):
         return len(self.items)
 
@@ -162,7 +166,7 @@ class Menu(object):
 
                 if KEYBOARD[event.key] == 'quit':
 
-                    flag = self.close()
+                    self.menu = "main menu"
 
                 elif KEYBOARD[event.key] == 'up':
 
@@ -280,6 +284,23 @@ def draw_menu(menu, surface):
 
     surface.fill((0, 0, 0))
 
+    for n, i in enumerate(menu.text):
+
+        colour = menu.setup["colour"]
+
+        text = font.render("  {0}  ".format(i[0]), True, colour)
+
+        if centre:
+
+            textpos = text.get_rect(center=(resolution[0] / 2,
+                                            (2 + n) * (fontsize + 1)))
+
+        else:
+
+            textpos = text.get_rect(centery=(2 + n) * (fontsize + 1))
+
+        surface.blit(text, textpos)
+
     for n, i in enumerate(menu.items):
 
         if i == menu.item:
@@ -303,7 +324,7 @@ def draw_menu(menu, surface):
 
             textpos = text.get_rect(center=(resolution[0] / 2, resolution[1] -
                                             (1 + fontsize) *
-                                            (len(menu.items) - n)))
+                                            (len(menu.items) - n + 1)))
 
         else:
 
