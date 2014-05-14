@@ -16,7 +16,9 @@ DONE View culling:
     - colour
     - intensity
     - cutoffs
-* Help in Menu
-* Button for releasing mouse, re-grabbing on click.
+* Tweak landscape colours
+* Credits in Menu
+DONE Help in Menu
+* Button for releasing mouse, re-grabbing on click?
 * Migrate TODOs to Trello (?)
 * Anti-aliasing
