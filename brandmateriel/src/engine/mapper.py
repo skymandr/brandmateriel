@@ -78,13 +78,6 @@ class Map(object):
 
         Y, X = np.mgrid[ymin: ymax + 1, xmin: xmax + 1]
 
-        # the_position = np.round(position).astype(np.int)
-
-        # Y, X = np.mgrid[the_position[self.Y] - view[self.Y] / 2 - 1:
-        #                 the_position[self.Y] + view[self.Y] / 2 + 1,
-        #                 the_position[self.X] - view[self.X] / 2 - 1:
-        #                 the_position[self.X] + view[self.X] / 2 + 1]
-
         X %= self.shape[self.X]
         Y %= self.shape[self.Y]
 
