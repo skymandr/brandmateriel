@@ -134,6 +134,7 @@ class Movable(object):
             self.bounce()
         elif self.position[self.Z] > 42.0:
             self.position[self.Z] = 42.0
+            self.velocity[self.Z] = 0.0
 
 
 class Player(Movable):
