@@ -17,3 +17,4 @@ DONE View culling:
     - intensity
     - cutoffs
 * Help in Menu
+* Button for releasing mouse, re-grabbing on click.
