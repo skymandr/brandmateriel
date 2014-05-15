@@ -1,6 +1,3 @@
-# TODO:
-# A lot of things can be stolen from pygame_demo.py, but implemented in better
-# ways...
 import numpy as np
 import pygame
 from pygame import locals as l
