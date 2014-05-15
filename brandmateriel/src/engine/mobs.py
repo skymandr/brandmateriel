@@ -119,19 +119,20 @@ class Movable(object):
         force = self.friction + self.gravity * self.inertia
         self.acceleration = force / self.inertia
 
-    def bounce(self):
+    def bounce(self, world):
         self._velocity[self.Z] = np.abs(self._velocity[self.Z])
 
-    def impose_boundary_conditions(self, map):
-        self.position[self.X] %= map.shape[self.X]
-        self.position[self.Y] %= map.shape[self.Y]
-        height = max(0, map.patches[self.position[self.X],
-                                    self.position[self.Y],
-                                    :, self.Z].max())
+    def impose_boundary_conditions(self, world):
+        self.position[self.X] %= world.shape[self.X]
+        self.position[self.Y] %= world.shape[self.Y]
+        height = max(0, world.patches[self.position[self.X],
+                                      self.position[self.Y],
+                                      :, self.Z].max())
 
-        if self.position[self.Z] <= height:
-            self.position[self.Z] = height + 0.0
-            self.bounce()
+        if self.model.bounding_box[0, self.Z] < height:
+            self.position[self.Z] += (height -
+                                      self.model.bounding_box[0, self.Z])
+            self.bounce(world)
         elif self.position[self.Z] > 42.0:
             self.position[self.Z] = 42.0
             self.velocity[self.Z] = 0.0
