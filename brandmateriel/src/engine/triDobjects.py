@@ -1,26 +1,3 @@
-# TODO:
-# * Vegetation:
-#   - spruce
-#   - tall tree
-#   - lower tree
-#   - birch (kill!)
-#   - shrub
-#
-# * Buildings:
-#   - Simple house (DONE)
-#   - Nicer roofed house (very simple)
-#   - Cottage (quite simple)
-#   - Tent (quite simple)
-#   - Radar (animated?)
-#
-# * Stuff:
-#   - Rocket
-#   - Firestarter
-#   - Hunter-seeker
-#   - Noch Less
-#   - Fire
-#   - Particles
-
 import numpy as np
 
 
