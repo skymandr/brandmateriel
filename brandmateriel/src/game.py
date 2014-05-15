@@ -252,13 +252,10 @@ class Game(object):
         # impose view boundaries:
         pass
 
-        # # apply shading
-        # colours = self.shader.apply_lighting(positions, normals, colours)
-
-        # sort patches
+        # sort patches:
         order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
 
-        # draw
+        # draw:
         surface.fill((0, 0, 0))
 
         for n in order:
