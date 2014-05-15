@@ -8,7 +8,7 @@ KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_LEFT: 'left', l.K_h: 'left', l.K_a: 'left',
             l.K_RIGHT: 'right', l.K_l: 'right', l.K_d: 'right',
             l.K_RETURN: 'start', l.K_SPACE: 'start',
-            l.K_ESCAPE: 'quit', l.K_F1: 'help'}
+            l.K_ESCAPE: 'quit', l.K_F1: 'help', l.K_TAB: 'pause'}
 
 
 class Menu(object):
@@ -32,6 +32,9 @@ class Menu(object):
         self._config = options
 
         self._load_options(options)
+
+        pygame.event.set_grab(True)
+        pygame.mouse.set_visible(False)
 
     @property
     def setup(self):
@@ -133,7 +136,6 @@ class Menu(object):
     def menu_navigation(self):
         """ Handles inputs from user. """
         flag = "menu"
-        pygame.event.set_grab(True)
 
         for event in pygame.event.get():
 
@@ -156,11 +158,22 @@ class Menu(object):
 
                     self._item = (self._item + 1) % self._items
 
+                elif KEYBOARD[event.key] == 'help':
+
+                    flag = "help"
+                    self._item = 0
+
+                elif KEYBOARD[event.key] == 'pause':
+
+                    pygame.event.set_grab(False)
+                    pygame.mouse.set_visible(True)
+
                 else:
 
                     flag = self._relay_input(event.key)
 
-            elif event.type == l.MOUSEMOTION:
+            elif event.type == l.MOUSEMOTION and pygame.event.get_grab():
+
                 motion = pygame.mouse.get_rel()
 
                 if motion[self.Y] > 0:
@@ -173,7 +186,14 @@ class Menu(object):
 
             elif event.type == l.MOUSEBUTTONDOWN:
 
-                flag = self._relay_input(l.K_SPACE)
+                if pygame.event.get_grab():
+
+                    flag = self._relay_input(l.K_SPACE)
+
+                else:
+
+                    pygame.event.set_grab(True)
+                    pygame.mouse.set_visible(False)
 
         return flag
 

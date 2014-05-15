@@ -21,15 +21,14 @@ if not pygame.mixer:
 
 
 def main():
-    menu = m.Menu('config/menu.conf', 'config/user.conf',
-                  'config/default.conf')
-
     pygame.init()
     fps_clock = pygame.time.Clock()
     fps = 32
     window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
+
     mode = "menu"
-    pygame.mouse.set_visible(False)
+    menu = m.Menu('config/menu.conf', 'config/user.conf',
+                  'config/default.conf')
 
     while(mode):
 
