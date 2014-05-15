@@ -249,9 +249,6 @@ class Game(object):
         # normals = np.r_[map_normals, player_normals]
         colours = np.r_[map_colours, player_colours]
 
-        # impose view boundaries:
-        pass
-
         # sort patches:
         order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
 
@@ -261,6 +258,7 @@ class Game(object):
         for n in order:
             if colours[n, 3]:
                 pygame.draw.polygon(surface, colours[n], patches[n])
+                pygame.draw.polygon(surface, colours[n], patches[n], 1)
 
         self.handle_inputs()
 
