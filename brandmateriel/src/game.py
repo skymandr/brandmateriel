@@ -11,7 +11,7 @@ KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_LEFT: 'left', l.K_h: 'left', l.K_a: 'left',
             l.K_RIGHT: 'right', l.K_l: 'right', l.K_d: 'right',
             l.K_RETURN: 'start', l.K_SPACE: 'start',
-            l.K_ESCAPE: 'quit', l.K_F1: 'help',
+            l.K_ESCAPE: 'quit', l.K_F1: 'help', l.K_TAB: 'pause'
             }
 
 
