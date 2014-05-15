@@ -86,9 +86,11 @@ class Game(object):
     def update_rear_camera(self):
         look_at = self.focus_position.copy()
         look_at[self.Z] = max(look_at[self.Z], 6.0)
-        offset = np.array([0, self._view[self.Y] / 2.0 + 9.0, -0.0])
+        offset = self._view[self.Y] / 2.0 + 9.0
 
-        self.camera.position = look_at - offset
+        self.camera.position = (look_at - offset *
+                                np.array([-np.sin(self.player.model.yaw),
+                                          np.cos(self.player.model.yaw), 0.0]))
 
         self.camera.look_at_point(look_at)
 
