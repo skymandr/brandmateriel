@@ -82,7 +82,8 @@ class Menu(object):
 
                     break
 
-            if self._structure["options"]["items"][n][1][0] == "toggle":
+            if self._structure["options"]["items"][n][1][0] in ("toggle",
+                                                                "lander"):
 
                 self._structure["options"]["items"][n][1][1] = int(
                     self.options[o])
@@ -105,7 +106,8 @@ class Menu(object):
 
                     break
 
-            if self._structure["options"]["items"][n][1][0] == "toggle":
+            if self._structure["options"]["items"][n][1][0] in ("toggle",
+                                                                "lander"):
 
                 self.options[o] = (1 == self._structure["options"
                                                         ]["items"][n][1][1])
@@ -219,7 +221,7 @@ class Menu(object):
 
         elif KEYBOARD[event_key] == 'left':
 
-            if self.item[1][0] == "toggle":
+            if self.item[1][0] in ("toggle", "lander"):
 
                 self.item[1][1] = (self.item[1][1] - 1) % 2
 
