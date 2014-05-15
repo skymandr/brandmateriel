@@ -1,26 +1,3 @@
-# Meny TODO:
-# DONE Simple cursor movement in pygame
-# DONE Extendable menu items.
-# DONE navigate between submenus
-# * Let menu do something:
-#   DONE cameratype: fixed or follow
-#   DONE resolution: 320x240(256), 640x480(512), 800x600(640)
-#   DONE view
-#   DONE (well... sort of) mixer levels
-#   DONE map
-#   - show models
-#   - show credits
-#   - show high-scores
-#   - start
-#   DONE exit
-#   DONE default settings
-# * DONE Resize window based on resolution.
-# * DONE Read options from file and parse correctly
-# * DONE Save options on exit and/or start
-# * exit dialog
-# DONE remove print statements
-# * Fancy background stuff.
-
 import json
 import pygame
 import pygame.locals as l
