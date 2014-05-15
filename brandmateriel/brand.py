@@ -45,15 +45,17 @@ def main():
 
             mode = menu.menu_navigation()
 
-        try:
-            game = g.Game(menu.config, 'assets/maps/{0}.npy'.format(
-                menu.config["map"]), menu.setup["font"],
-                menu.setup["fontsize"])
-            print "Loaded map: {0}".format(menu.config["map"])
-        except IOError:
-            game = g.Game(menu.config, 'assets/maps/legacy.npy',
-                          menu.setup["font"], menu.setup["fontsize"])
-            print "No such map: {0}; using Legacy".format(menu.config["map"])
+        if mode == "game":
+            try:
+                print "loading map: {0}".format(menu.config["map"])
+                game = g.Game(menu.config, 'assets/maps/{0}.npy'.format(
+                    menu.config["map"]), menu.setup["font"],
+                    menu.setup["fontsize"])
+            except IOError:
+                print "no such map: {0}; using Legacy".format(
+                    menu.config["map"])
+                game = g.Game(menu.config, 'assets/maps/legacy.npy',
+                              menu.setup["font"], menu.setup["fontsize"])
 
         while(mode == "game"):
             mode = game.do_step(window)
@@ -61,19 +63,19 @@ def main():
             fps_clock.tick(fps)
 
         while(mode == "hiscore"):
-            print "high-score list is not implemented. returning to menu..."
+            print "high-score list is not implemented. returning to menu ..."
             mode = "menu"
 
         while(mode == "gallery"):
-            print "gallery is not implemented. returning to menu..."
+            print "gallery is not implemented. returning to menu ..."
             mode = "menu"
 
         while(mode == "credits"):
-            print "game is not implemented. returning to menu..."
+            print "game is not implemented. returning to menu ..."
             mode = "menu"
 
         while(mode == "quit"):
-            print "Quitting game..."
+            print "quitting game ..."
             pygame.quit()
             mode = False
 

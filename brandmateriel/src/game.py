@@ -24,20 +24,29 @@ class Game(object):
     def __init__(self, config, world, font, fontsize):
         self._config = config
 
+        print "initialising world map ... ",
         self.world = e.mapper.Map(world)
+        print "DONE"
 
+        print "loading fonts ... ",
         fontsize *= config["resolution"][0] / 320
         self._font = pygame.font.Font(font, fontsize)
+        print "DONE"
 
+        print "loading game objects ... ",
         if not self._config[" "]:
             self.player = e.mobs.Player(e.triDobjects.FireFighter(scale=2.0))
         else:
             self.player = e.mobs.Player(e.triDobjects.Lander(scale=1.0))
 
         self.player.position = (np.array([64.0, 64.0, 5.0]))
+        print "DONE"
 
+        print "initialising game objects ... ",
         self._populate_world()
+        print "DONE"
 
+        print "seting up camera ... ",
         self.camera = e.camera.Camera(screen=e.camera.Screen(
             resolution=config["resolution"]))
 
@@ -64,11 +73,13 @@ class Game(object):
                                       cutoff_distance=self._view[self.Y])
 
         self.update_camera()
+        print "DONE"
 
         pygame.event.set_grab(True)
         pygame.mouse.set_visible(False)
 
         self._pause = False
+        print "game starting"
 
     @property
     def config(self):
