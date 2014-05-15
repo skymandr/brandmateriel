@@ -46,7 +46,13 @@ def main():
 
             mode = menu.menu_navigation()
 
-        game = g.Game(menu.config, 'assets/maps/zdata.npy')
+        try:
+            game = g.Game(menu.config, 'assets/maps/{0}.npy'.format(
+                menu.config["map"]))
+            print "Loaded map: {0}".format(menu.config["map"])
+        except IOError:
+            game = g.Game(menu.config, 'assets/maps/legacy.npy')
+            print "No such map: {0}; using Legacy".format(menu.config["map"])
 
         while(mode == "game"):
             mode = game.do_step(window)
