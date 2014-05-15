@@ -194,6 +194,7 @@ class Menu(object):
 
                     pygame.event.set_grab(True)
                     pygame.mouse.set_visible(False)
+                    pygame.mouse.get_rel()
 
         return flag
 

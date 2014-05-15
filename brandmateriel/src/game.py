@@ -21,16 +21,18 @@ class Game(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, config, world):
+    def __init__(self, config, world, font, fontsize):
         self._config = config
 
         self.world = e.mapper.Map(world)
+
+        fontsize *= config["resolution"][0] / 320
+        self._font = pygame.font.Font(font, fontsize)
 
         if not self._config[" "]:
             self.player = e.mobs.Player(e.triDobjects.FireFighter(scale=2.0))
         else:
             self.player = e.mobs.Player(e.triDobjects.Lander(scale=1.0))
-
 
         self.player.position = (np.array([64.0, 64.0, 5.0]))
 
@@ -62,6 +64,11 @@ class Game(object):
                                       cutoff_distance=self._view[self.Y])
 
         self.update_camera()
+
+        pygame.event.set_grab(True)
+        pygame.mouse.set_visible(False)
+
+        self._pause = False
 
     @property
     def config(self):
@@ -115,7 +122,7 @@ class Game(object):
         return "menu"
 
     def handle_inputs(self):
-        """ Should later handle inputs from user. """
+        """ Handles inputs from user. """
         flag = "game"
 
         for event in pygame.event.get():
@@ -150,12 +157,22 @@ class Game(object):
                     self.player.pitch = max(self.player.pitch - np.pi / 24,
                                             -np.pi * 0.5)
 
+                elif KEYBOARD[event.key] == 'pause':
+
+                    self._pause = not self._pause
+
+                    pygame.event.set_grab(not self._pause)
+
+                    pygame.mouse.set_visible(self._pause)
+
+                    pygame.mouse.get_rel()
+
                 else:
 
                     pass
                     # flag = self._relay_input(event.key)
 
-            elif event.type == l.MOUSEMOTION:
+            elif event.type == l.MOUSEMOTION and pygame.event.get_grab():
 
                 motion = np.array(pygame.mouse.get_rel())
 
@@ -175,17 +192,27 @@ class Game(object):
 
             elif event.type == l.MOUSEBUTTONDOWN:
 
-                if event.button == 1:
+                if pygame.event.get_grab():
 
-                    self.player.fire = True
+                    if event.button == 1:
 
-                elif event.button == 2:
+                        self.player.fire = True
 
-                    self.player.rocket = True
+                    elif event.button == 2:
 
-                elif event.button == 3:
+                        self.player.rocket = True
 
-                    self.player.thrust = True
+                    elif event.button == 3:
+
+                        self.player.thrust = True
+
+                else:
+
+                    pygame.event.set_grab(True)
+
+                    pygame.mouse.set_visible(False)
+
+                    pygame.mouse.get_rel()
 
             elif event.type == l.MOUSEBUTTONUP:
 
@@ -205,12 +232,6 @@ class Game(object):
 
     def do_step(self, surface):
         flag = self.handle_inputs()
-
-        self.player.move()
-
-        self.player.impose_boundary_conditions(self.world)
-
-        self.update_camera()
 
         # get map in view:
         if self.camera.position[self.Z] < self._culling_height:
@@ -263,6 +284,23 @@ class Game(object):
                 pygame.draw.polygon(surface, colours[n], patches[n])
                 pygame.draw.polygon(surface, colours[n], patches[n], 1)
 
-        self.handle_inputs()
+        if self._pause:
+
+            colour = (204, 153, 153, 153)
+
+            text = self._font.render("press TAB to UNPAUSE", True, colour)
+
+            textpos = text.get_rect(center=(self.config["resolution"][0] / 2,
+                                            self.config["resolution"][1] / 2))
+
+            surface.blit(text, textpos)
+
+        else:
+
+            self.player.move()
+
+            self.player.impose_boundary_conditions(self.world)
+
+            self.update_camera()
 
         return flag

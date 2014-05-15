@@ -47,10 +47,12 @@ def main():
 
         try:
             game = g.Game(menu.config, 'assets/maps/{0}.npy'.format(
-                menu.config["map"]))
+                menu.config["map"]), menu.setup["font"],
+                menu.setup["fontsize"])
             print "Loaded map: {0}".format(menu.config["map"])
         except IOError:
-            game = g.Game(menu.config, 'assets/maps/legacy.npy')
+            game = g.Game(menu.config, 'assets/maps/legacy.npy',
+                          menu.setup["font"], menu.setup["fontsize"])
             print "No such map: {0}; using Legacy".format(menu.config["map"])
 
         while(mode == "game"):
