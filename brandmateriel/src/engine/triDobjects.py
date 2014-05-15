@@ -185,7 +185,7 @@ class FireFighter(TriD):
     """
     Patches for FireFighter.
     """
-    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+    def __init__(self, basecolour=np.array([204, 0, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
                  yaw=0, pitch=0, roll=0, scale=1.0):
         points = np.array([
@@ -302,7 +302,7 @@ class FireFighterStripes(TriD):
     """
     Patches for FireFighter.
     """
-    def __init__(self, basecolour=np.array([0, 204, 0, 255]),
+    def __init__(self, basecolour=np.array([204, 0, 0, 255]),
                  position=np.array([0.0, 0.0, 0.0]),
                  yaw=0, pitch=0, roll=0, scale=1.0):
         points = np.array([
@@ -401,6 +401,116 @@ class FireFighterStripes(TriD):
                                   [204, 204, 0, 255],
                                   [204, 204, 0, 255],
                                   ])
+
+        self._orientation = np.array([[1.0, 0.0, 0.0],  # U
+                                      [0.0, 1.0, 0.0],  # V
+                                      [0.0, 0.0, 1.0]   # W
+                                      ])
+
+        self._basecolour = basecolour
+
+        self._position = position
+
+        self._yaw = yaw
+
+        self._pitch = pitch
+
+        self._roll = roll
+
+        self._calc_normals()
+
+        self._calc_positions()
+
+        self._colourise()
+
+        self._scale = scale
+
+
+class Pika(TriD):
+    """
+    Patches for Pika.
+    """
+    def __init__(self, basecolour=np.array([204, 204, 204, 255]),
+                 position=np.array([0.0, 0.0, 0.0]),
+                 yaw=0, pitch=0, roll=0, scale=1.0):
+        points = np.array([[0.0, 0.35, 0.05],   # 0
+                           [-0.1, 0.1, 0.05],   # 1
+                           [-0.2, 0.1, 0.05],   # 2
+                           [-0.6, 0.0, 0.0],    # 3
+                           [-0.7, -0.1, 0.0],   # 4
+                           [0.0, -0.2, 0.05],   # 5
+                           [-0.1, -0.65, 0.0],  # 6
+                           [0.0, -0.75, 0.05],  # 7
+                           [0.1, -0.65, 0.0],   # 8
+                           [0.7, -0.1, 0.0],    # 9
+                           [0.6, 0.0, 0.0],     # 10
+                           [0.2, 0.1, 0.05],    # 11
+                           [0.1, 0.1, 0.05],    # 12
+                           [0.0, 0.2, 0.15],    # 13
+                           [0.0, 0.0, 0.0],     # 14
+                           ])
+
+        self._patches = np.array([
+            # Body:
+            [points[0], points[1], points[13]],     # 0: head top left
+            [points[12], points[0], points[13]],    # 1: head top right
+            [points[1], points[5], points[13]],     # 2: back top left
+            [points[5], points[12], points[13]],    # 3: back top right
+            [points[1], points[0], points[14]],     # 4: head bottom left
+            [points[0], points[12], points[14]],    # 5: head bottom right
+            [points[5], points[1], points[14]],     # 6: back bottom left
+            [points[12], points[5], points[14]],    # 7: back bottom right
+            # Tail:
+            [points[5], points[6], points[7]],      # 8: top left
+            [points[8], points[5], points[7]],      # 9: top right
+            [points[6], points[5], points[7]],      # 10: bottom left
+            [points[5], points[8], points[7]],      # 11: bottom right
+            # Left wing
+            [points[1], points[2], points[5]],      # 12: inner top
+            [points[2], points[3], points[5]],      # 13: middle top
+            [points[3], points[4], points[5]],      # 14: tip top
+            [points[2], points[1], points[5]],      # 15: inner bottom
+            [points[3], points[2], points[5]],      # 16: middle bottom
+            [points[4], points[3], points[5]],      # 17: tip bottom
+            # Right wing
+            [points[11], points[12], points[5]],    # 18: inner top
+            [points[10], points[11], points[5]],    # 19: middle top
+            [points[9], points[10], points[5]],     # 20: tip top
+            [points[12], points[11], points[5]],    # 21: inner bottom
+            [points[11], points[10], points[5]],    # 22: middle bottom
+            [points[10], points[9], points[5]],     # 23: tip bottom
+            ])
+
+        self._colours = np.array([
+            # Body:
+            [0, 0, 0, 255],
+            [0, 0, 0, 255],
+            [0, 0, 26, 255],
+            [0, 0, 26, 255],
+            [204, 204, 204, 255],
+            [204, 204, 204, 255],
+            [0, 0, 0, 255],
+            [0, 0, 0, 255],
+            # Tail:
+            [0, 51, 0, 255],
+            [0, 51, 0, 255],
+            [0, 26, 0, 255],
+            [0, 26, 0, 255],
+            # Left wing:
+            [204, 204, 204, 255],
+            [0, 26, 0, 255],
+            [204, 204, 204, 255],
+            [204, 204, 204, 255],
+            [0, 0, 0, 255],
+            [204, 204, 204, 255],
+            # Right wing:
+            [204, 204, 204, 255],
+            [0, 26, 0, 255],
+            [204, 204, 204, 255],
+            [204, 204, 204, 255],
+            [0, 0, 0, 255],
+            [204, 204, 204, 255],
+            ]) - 51
 
         self._orientation = np.array([[1.0, 0.0, 0.0],  # U
                                       [0.0, 1.0, 0.0],  # V
