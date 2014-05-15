@@ -144,6 +144,7 @@ class Menu(object):
                 if KEYBOARD[event.key] == 'quit':
 
                     self.menu = "main menu"
+                    self._item = 0
 
                 elif KEYBOARD[event.key] == 'up':
 
