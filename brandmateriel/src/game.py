@@ -36,6 +36,7 @@ class Game(object):
         print "loading game objects ... ",
         if not self._config[" "]:
             self.player = e.mobs.Player(e.triDobjects.FireFighter(scale=2.0))
+            # self.player = e.mobs.Player(e.triDobjects.Pika(scale=3.0))
         else:
             self.player = e.mobs.Player(e.triDobjects.Lander(scale=1.0))
 
@@ -65,7 +66,7 @@ class Game(object):
             d = self.camera.distance
 
         self._culling_height = np.ceil((h * (D / d + 1.0) + np.ceil(
-            self.world.patch_positions[:, :, 2].max())))
+            self.world.patch_positions[:, :, self.Z].max())))
 
         self.light_source = e.shader.LightSource()
 
@@ -196,13 +197,13 @@ class Game(object):
                 self.player.pitch = (self.player.pitch - motion[self.Y] *
                                      np.pi / 360)
 
-                if self.player.pitch < -np.pi * 0.6082:
+                if self.player.pitch < -2.0 * np.pi / 3.0:
 
-                    self.player.pitch = -np.pi * 0.6082
+                    self.player.pitch = -2.0 * np.pi / 3.0
 
-                elif self.player.pitch > np.pi * 0.6082:
+                elif self.player.pitch > 3.0 * np.pi / 4.0:
 
-                    self.player.pitch = np.pi * 0.6082
+                    self.player.pitch = 3.0 * np.pi / 4.0
 
             elif event.type == l.MOUSEBUTTONDOWN:
 
