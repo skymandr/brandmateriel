@@ -115,7 +115,8 @@ class Shader(object):
 
     def __init__(self, light_source=LightSource(),
                  colour=np.array([204, 153, 153, 255]),
-                 distance_shading=True, cutoff_distance=None):
+                 distance_shading=True, cutoff_distance=None,
+                 linear_distance=None):
         self._light_source = light_source
 
         self._colour = colour
@@ -126,6 +127,11 @@ class Shader(object):
             self._cutoff_distance = self.light_source.distance
         else:
             self._cutoff_distance = cutoff_distance
+
+        if linear_distance is None:
+            self._linear_distance = self.light_source.distance
+        else:
+            self._linear_distance = linear_distance
 
     @property
     def light_source(self):
@@ -159,6 +165,14 @@ class Shader(object):
     def cutoff_distance(self, val):
         self._cutoff_distance = val
 
+    @property
+    def linear_distance(self):
+        return self._linear_distance
+
+    @linear_distance.setter
+    def linear_distance(self, val):
+        self._linear_distance = val
+
     def apply_lighting(self, positions, normals, colours, culling=True):
         """
         Questions:
@@ -182,8 +196,9 @@ class Shader(object):
             # colours /= 1 + 0.5 * np.exp(dists - 2 * self.cutoff_distance)
             # Linear with cut-off: (LinRange - dists + ConstRange) / LinRange
             colours *= np.fmin(1, np.fmax(0,
-                                          (2.50 * self.cutoff_distance - dists)
-                                          / (1.25 * self.cutoff_distance)))
+                                          (self.linear_distance +
+                                           self.cutoff_distance - dists)
+                                          / (self.linear_distance)))
 
         # Renormalise to allowed colour values:
         colours = np.where(colours > 255, 255, colours)

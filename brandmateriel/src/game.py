@@ -70,7 +70,10 @@ class Game(object):
         self.light_source = e.shader.LightSource()
 
         self.shader = e.shader.Shader(self.light_source,
-                                      cutoff_distance=self._view[self.Y])
+                                      cutoff_distance=self._view[self.Y] * 0.5
+                                      + self.camera.distance,
+                                      linear_distance=self._view[self.Y] *
+                                      0.75)
 
         self.update_camera()
         print "DONE"
