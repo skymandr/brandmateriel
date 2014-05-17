@@ -1,4 +1,5 @@
 import numpy as np
+import triDobjects as tD
 
 
 class Particle(object):
@@ -10,10 +11,8 @@ class Particle(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, inertia=1.0, gravity=1.0, friction=1.0,
-                 size=np.array([0.1, 0.1]),
-                 colour=np.array([204, 204, 153, 255]),
-                 lifetime=1.0):
+    def __init__(self, inertia=1.0, gravity=1.0, friction=1.0, size=0.5,
+                 colour=np.array([204, 204, 153, 255]), lifetime=1.0):
 
         self._inertia = inertia
         self._gravity = gravity
@@ -21,6 +20,7 @@ class Particle(object):
         self._size = size
         self._colour = colour
         self._lifetime = lifetime
+        self._model = tD.TriD(scale=size)
 
     @property
     def inertia(self):
@@ -40,27 +40,18 @@ class Particle(object):
 
     @property
     def friction(self):
-        return -self._friction * self._velocity
+        return -self._friction
 
     @friction.setter
     def friction(self, val):
         self._friction = val
 
     @property
-    def size(self):
-        return self._size
-
-    @size.setter
-    def size(self, val):
-        self._size = val
-
-    @property
-    def patch(self):
-        return np.array([
-            [self._size[self.X] * 0.5, self._size[self.Y] * 0.5, 0.0],
-            [-self._size[self.X] * 0.5, self._size[self.Y] * 0.5, 0.0],
-            [-self._size[self.X] * 0.5, -self._size[self.Y] * 0.5, 0.0],
-            [self._size[self.X] * 0.5, -self._size[self.Y] * 0.5, 0.0]])
+    def patches(self):
+        self._model.yaw = np.random.random() * 2 * np.pi
+        self._model.pitch = np.random.random() * 2 * np.pi
+        self._model.roll = np.random.random() * 2 * np.pi
+        return self._model.patches
 
     @property
     def colour(self):
@@ -114,8 +105,14 @@ class Particles(object):
 
     @property
     def patches(self):
-        return (self.positions[:, np.newaxis, :] +
-                self.particle.patch[np.newaxis, :])
+        temp = (self.positions[:, np.newaxis, np.newaxis, :] +
+                self.particle.patches[np.newaxis, :, :, :])
+        print temp
+        print temp.shape, self.particle.patches.shape, self.positions.shape
+
+        return (self.positions[:, np.newaxis, np.newaxis, :] +
+                self.particle.patches[np.newaxis, :, :, :]).reshape(
+                    self.number * 4, 3, 3)
 
     @property
     def velocities(self):
@@ -133,12 +130,6 @@ class Particles(object):
     def accelerations(self, val):
         self._accelerations = val
 
-    def move(self, dt=0.03125):
-        self.apply_forces()
-        self.velocities += self.accelerations * dt
-        self.positions += self.velocities * dt
-        self.ages += dt
-
     @property
     def ages(self):
         return self._ages
@@ -147,16 +138,28 @@ class Particles(object):
     def ages(self, val):
         self._ages = val
 
+    @property
+    def colours(self):
+
+        return (np.zeros((self.number * 4))[:, np.newaxis] +
+                self.particle.colour[np.newaxis])
+
+    def move(self, dt=0.03125):
+        self.apply_forces()
+        self.velocities += self.accelerations * dt
+        self.positions += self.velocities * dt
+        self.ages += dt
+
     def apply_forces(self):
-        forces = -(self.particle.friction * self.velocities +
-                   np.array([0.0, 0.0, 1.0]) * self.particle.gravity *
-                   self.particle.inertia)
+        forces = (-self.particle.friction * self.velocities +
+                  self.particle.gravity * self.particle.inertia)
         self.acceleration = forces / self.particle.inertia
 
     def bounce(self, world, n):
-        normal = world.normals[self.positions[n, self.X],
-                               self.position[n, self.Y]]
-        self.velocities[n] -= 2.0 * np.dot(self.velocities[n], normal) * normal
+        normals = world.normals[self.positions[n, self.X],
+                                self.positions[n, self.Y]]
+        self.velocities[n] -= 2.0 * normals * np.inner(self.velocities[n],
+                                                       normals)
 
     def impose_boundary_conditions(self, world):
         self.cull_aged()
@@ -164,11 +167,12 @@ class Particles(object):
         self.positions[:, self.X] %= world.shape[self.X]
         self.positions[:, self.Y] %= world.shape[self.Y]
 
-        heights = max(0, world.patches[self.positions[:, self.X],
-                                       self.positions[:, self.Y],
-                                       :, self.Z].max())
+        heights = world.patches[
+            self.positions[:, self.X].astype(np.int),
+            self.positions[:, self.Y].astype(np.int),
+            :, self.Z].max(-1)
 
-        bouncers = np.where(self.positions[:, self.Z] < heights)
+        bouncers = np.where(self.positions[:, self.Z] < heights)[0]
         for n in bouncers:
             self.positions[n, self.Z] = heights[n]
             self.bounce(world, n)
@@ -189,7 +193,8 @@ class Particles(object):
 
     def cull_aged(self):
         if (self.ages > self.particle.lifetime).any():
-            indices = np.where(self.ages < self.particle.lifetime)
+            indices = np.where(self.ages < self.particle.lifetime)[0]
             self.positions = self.positions[indices]
             self.velocities = self.velocities[indices]
             self.accelerations = self.accelerations[indices]
+            self.ages = self.ages[indices]
