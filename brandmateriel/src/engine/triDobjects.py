@@ -55,6 +55,11 @@ class TriD(object):
 
         self._scale = scale
 
+        self._engine = np.array([0.0, 0.0, 0.0])
+
+        self._gun = np.array([0.0, 0.0, 0.0])
+
+
     @property
     def orientation(self):
         return self._apply_rotation(self._orientation)
@@ -84,6 +89,16 @@ class TriD(object):
     def positions(self):
         return (self._scale * self._apply_rotation(self._positions) +
                 self.position[np.newaxis, :])
+
+    @property
+    def engine(self):
+        return (self._scale * self._apply_rotation(self._engine) +
+                self.position)
+
+    @property
+    def gun(self):
+        return (self._scale * self._apply_rotation(self._gun) +
+                self.position)
 
     @property
     def colours(self):
@@ -297,6 +312,10 @@ class FireFighter(TriD):
 
         self._scale = scale
 
+        self._engine = np.array([0.0, 0.0, 0.0])
+
+        self._gun = self.patches[8].mean(0)
+
 
 class FireFighterStripes(TriD):
     """
@@ -425,6 +444,10 @@ class FireFighterStripes(TriD):
 
         self._scale = scale
 
+        self._engine = np.array([0.0, 0.0, 0.0])
+
+        self._gun = self.patches[8].mean(0)
+
 
 class Pika(TriD):
     """
@@ -535,6 +558,10 @@ class Pika(TriD):
 
         self._scale = scale
 
+        self._engine = np.array([0.0, 0.0, 0.0])
+
+        self._gun = self.points[0]
+
 
 class Lander(TriD):
     """
@@ -614,6 +641,10 @@ class Lander(TriD):
         self._colourise()
 
         self._scale = scale
+
+        self._engine = np.array([0.0, 0.0, 0.0])
+
+        self._gun = np.array([0.0, 1.0, 0.0])
 
 
 class House(TriD):

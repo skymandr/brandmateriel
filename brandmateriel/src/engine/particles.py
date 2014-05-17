@@ -11,8 +11,8 @@ class Particle(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, inertia=1.0, gravity=1.0, friction=1.0, size=0.5,
-                 colour=np.array([204, 204, 153, 255]), lifetime=1.0):
+    def __init__(self, inertia=1.0, gravity=1.0, friction=0.0, size=0.05,
+                 colour=np.array([204, 204, 153, 255]), lifetime=5.0):
 
         self._inertia = inertia
         self._gravity = gravity
@@ -105,11 +105,6 @@ class Particles(object):
 
     @property
     def patches(self):
-        temp = (self.positions[:, np.newaxis, np.newaxis, :] +
-                self.particle.patches[np.newaxis, :, :, :])
-        print temp
-        print temp.shape, self.particle.patches.shape, self.positions.shape
-
         return (self.positions[:, np.newaxis, np.newaxis, :] +
                 self.particle.patches[np.newaxis, :, :, :]).reshape(
                     self.number * 4, 3, 3)
@@ -167,10 +162,11 @@ class Particles(object):
         self.positions[:, self.X] %= world.shape[self.X]
         self.positions[:, self.Y] %= world.shape[self.Y]
 
-        heights = world.patches[
+        heights = world.map_positions[
             self.positions[:, self.X].astype(np.int),
-            self.positions[:, self.Y].astype(np.int),
-            :, self.Z].max(-1)
+            self.positions[:, self.Y].astype(np.int), self.Z]
+
+        heights = np.where(heights < 0, 0, heights)
 
         bouncers = np.where(self.positions[:, self.Z] < heights)[0]
         for n in bouncers:

@@ -45,6 +45,7 @@ class Game(object):
 
         print "initialising game objects ... ",
         self._populate_world()
+        self.shots = e.particles.Particles()
         print "DONE"
 
         print "seting up camera ... ",
@@ -281,12 +282,29 @@ class Game(object):
                                                     player_normals,
                                                     player_colours)
 
+        # Handle particles:
+        if self.player.fire:
+            self.shots.add_particle(self.player.model.gun,
+                                    self.player.model.orientation[self.V] * 1
+                                    + self.player.velocity, np.zeros(3))
+
+        if self.shots.number:
+            shots_positions = self.shots.positions
+            shots_patches, shots_depths = self.camera.get_screen_coordinates(
+                self.shots.patches)
+            shots_colours = self.shots.colours
+        else:
+            shots_positions = np.empty((0, 3))
+            shots_patches = np.empty((0, 3, 2))
+            shots_colours = np.empty((0, 4))
+
         # aggregate object data:
-        positions = np.r_[map_positions, player_positions]
+        positions = np.r_[map_positions, player_positions, shots_positions]
         patches = list(map_patches[:])
         patches.extend(list(player_patches[:]))
+        patches.extend(list(shots_patches[:]))
         # normals = np.r_[map_normals, player_normals]
-        colours = np.r_[map_colours, player_colours]
+        colours = np.r_[map_colours, player_colours, shots_colours]
 
         # sort patches:
         order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
@@ -313,8 +331,11 @@ class Game(object):
         else:
 
             self.player.move()
-
             self.player.impose_boundary_conditions(self.world)
+
+            if self.shots.number:
+                self.shots.move()
+                self.shots.impose_boundary_conditions(self.world)
 
             self.update_camera()
 

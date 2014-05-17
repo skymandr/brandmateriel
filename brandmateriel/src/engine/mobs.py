@@ -128,6 +128,7 @@ class Movable(object):
     def impose_boundary_conditions(self, world):
         self.position[self.X] %= world.shape[self.X]
         self.position[self.Y] %= world.shape[self.Y]
+
         height = max(0, world.patches[self.position[self.X],
                                       self.position[self.Y],
                                       :, self.Z].max())
