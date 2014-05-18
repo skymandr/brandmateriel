@@ -116,15 +116,12 @@ class Shader(object):
     def __init__(self, light_source=LightSource(),
                  colour=np.array([1.6180, 1.4142, 1.4142, 1.0]),
                  glare=np.array([51, 51, 51, 255]),
-                 distance_shading=True, cutoff_distance=None,
-                 linear_distance=None):
+                 cutoff_distance=None, linear_distance=None):
         self._light_source = light_source
 
         self._colour = colour
 
         self._glare = glare
-
-        self._distance_shading = distance_shading
 
         if cutoff_distance is None:
             self._cutoff_distance = self.light_source.distance
@@ -184,7 +181,8 @@ class Shader(object):
     def linear_distance(self, val):
         self._linear_distance = val
 
-    def apply_lighting(self, positions, normals, colours, culling=True):
+    def apply_lighting(self, positions, normals, colours, culling=True,
+                       scatter=True, fading=True):
         """
         Questions:
             this is done explicitly by reference, changing original colours;
@@ -195,16 +193,20 @@ class Shader(object):
         deltas /= dists
 
         # Apply scatter:
-        scatter = -(deltas * normals).sum(-1)
-        colours = (colours + self.glare) * scatter[:, np.newaxis] * self.colour
+        if scatter:
+            scatter = -(deltas * normals).sum(-1)
+            colours = ((colours + self.glare) * scatter[:, np.newaxis]
+                       * self.colour)
 
         # Apply distance shading:
-        if self.distance_shading:
+        if fading:
             # Gauss:
             # colours *= np.exp(-(dists - self.cutoff_distance) ** 2 /
             #                  (4 * self.cutoff_distance ** 2))
+
             # Logistic:
             # colours /= 1 + 0.5 * np.exp(dists - 2 * self.cutoff_distance)
+
             # Linear with cut-off: (LinRange - dists + ConstRange) / LinRange
             colours *= np.fmin(1, np.fmax(0,
                                           (self.linear_distance +
