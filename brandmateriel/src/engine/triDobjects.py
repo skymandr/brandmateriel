@@ -829,3 +829,66 @@ class SimpleHouse(TriD):
         self._colourise()
 
         self._scale = scale
+
+
+class TriDGroup(object):
+
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
+    def __init__(self, model=House()):
+        self._model = model
+        self._positions = np.empty((0, 3))
+        self._patches = np.empty((0, 3, 3))
+        self._yaws = np.empty((0))
+        self._pitchs = np.empty((0))
+        self._rolls = np.empty((0))
+
+    @property
+    def model(self):
+        return self._model
+
+    @model.setter
+    def model(self, val):
+        self._model = val
+
+    @property
+    def number(self):
+        return self.positions.shape[0]
+
+    @property
+    def positions(self):
+        return self._positions
+
+    @positions.setter
+    def positions(self, val):
+        self._positions = val
+
+    def objects_in_view(self, position, view, map):
+        pass
+
+    def patches_positions(self, indices):
+        return (self.positions[:, np.newaxis, np.newaxis, :] +
+                self.particle.patches[np.newaxis, :, :, :]).mean(-2).reshape(
+                    self.number * 4, 3)
+
+    def patches(self, indices):
+        return (self.positions[:, np.newaxis, np.newaxis, :] +
+                self.particle.patches[np.newaxis, :, :, :]).reshape(
+                    self.number * 4, 3, 3)
+
+    def add_object(self, position, yaw, pitch, roll):
+        self.positions = np.r_[self.positions, position[np.newaxis]]
+        self.yaws = np.r_[self.yaws, yaw[np.newaxis]]
+        self.pitchs = np.r_[self.pitchs, pitch[np.newaxis]]
+        self.rolls = np.r_[self.rolls, 0.0]
+
+    def delete_object(self, n):
+        indices = np.r_[np.arange(n), np.arange(self.positions.shape[0])]
+        self.positions = self.positions[indices]
+        self.yaws = self.yaws[indices]
+        self.pitchs = self.pitchs[indices]
+        self.rolls = self.rolls[indices]
+
+

@@ -125,7 +125,30 @@ class Game(object):
         self.light_source.position = self.camera.position + np.array([0, 0, 0])
 
     def _populate_world(self):
-        pass
+        n_houses = 16
+        settlements = []
+        angles = 2 * np.pi * np.random.random(n_houses)
+        candidates = self.world.map_positions.copy()
+
+        for n in xrange(n_houses):
+            x, y = (np.random.random(2) * self.world.shape).astype(np.int)
+            X, Y = np.mgrid[x - 1: x + 2, y - 1: y + 2]
+            X %= self.world.shape[self.X]
+            Y %= self.world.shape[self.Y]
+
+            while((candidates[X, Y, self.Z] < 0).any()):
+                x, y = (np.random.random(2) * self.world.shape).astype(np.int)
+                X, Y = np.mgrid[x - 1: x + 2, y - 1: y + 2]
+                X %= self.world.shape[self.X]
+                Y %= self.world.shape[self.Y]
+
+            settlements.append(e.triDobjects.House(
+                position=np.array([x, y, candidates[x, y, self.Z]]),
+                yaw=angles[n]))
+
+            candidates[X, Y, self.Z] *= 0
+
+        self.houses = settlements
 
     def close_game(self):
         """ Close game. """
