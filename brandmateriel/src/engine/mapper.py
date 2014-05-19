@@ -387,10 +387,15 @@ class Map(object):
         colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 4],
                            dtype=np.int)
 
-        for x in xrange(colours.shape[0]):
-            for y in xrange(colours.shape[1]):
-                if self._positions[x, y, 2] > self.sealevel:
-                    colours[x, y] = np.array([102, 153, 0, 255])
+        max_height = self._positions[:, :, self.Z].max()
+        for x in xrange(colours.shape[self.X]):
+            for y in xrange(colours.shape[self.Y]):
+                height = self._positions[x, y, self.Z]
+                if height > self.sealevel:
+                    colours[x, y] = np.array([51, 102, 26, 255]) + np.array(
+                        [np.random.random() * height / max_height,
+                         np.random.random() * (1 - height / max_height),
+                         0, 0]) * 153
                 else:
                     colours[x, y] = np.array([0, 0, 77, 255])
 
