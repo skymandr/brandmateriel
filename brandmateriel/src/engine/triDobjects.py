@@ -59,7 +59,6 @@ class TriD(object):
 
         self._gun = np.array([0.0, 0.0, 0.0])
 
-
     @property
     def orientation(self):
         return self._apply_rotation(self._orientation)
@@ -97,8 +96,7 @@ class TriD(object):
 
     @property
     def gun(self):
-        return (self._scale * self._apply_rotation(self._gun) +
-                self.position)
+        return (self._scale * self._apply_rotation(self._gun) + self.position)
 
     @property
     def colours(self):
@@ -314,7 +312,7 @@ class FireFighter(TriD):
 
         self._engine = np.array([0.0, 0.0, 0.0])
 
-        self._gun = self.patches[8].mean(0)
+        self._gun = self._patches[8].mean(0)
 
 
 class FireFighterStripes(TriD):

@@ -152,7 +152,7 @@ class Player(Movable):
                  velocity=np.array([0.0, 0.0, 0.0]),
                  acceleration=np.array([0.0, 0.0, 0.0]),
                  yaw=0.0, pitch=0.0, roll=0.0,
-                 fuel=255, rockets=3, health=255, bombs=3):
+                 fuel=255, rockets=3, health=255, bombs=3, cool_down=0.0625):
 
         self._model = model
         self._inertia = inertia
@@ -171,6 +171,7 @@ class Player(Movable):
         self._rockets = rockets
         self._health = health
         self._bombs = bombs
+        self._cool_down = cool_down
 
         self._thrust = False
         self._fire = False
@@ -276,6 +277,14 @@ class Player(Movable):
     @bomb.setter
     def bomb(self, val):
         self._bomb = val and True
+
+    @property
+    def cool_down(self):
+        return self._cool_down
+
+    @cool_down.setter
+    def cool_down(self, val):
+        self._cool_down = val
 
     def apply_forces(self):
         force = (self.friction + self.gravity * self.inertia +

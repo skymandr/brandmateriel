@@ -283,16 +283,25 @@ class Game(object):
                                                     player_colours)
 
         # Handle particles:
-        if self.player.fire:
+        if self.player.fire and (self.shots.number == 0 or
+                                 self.shots.ages[-1] > self.player.cool_down):
             self.shots.add_particle(self.player.model.gun,
-                                    self.player.model.orientation[self.V] * 1
+                                    self.player.model.orientation[self.V] * 16
                                     + self.player.velocity, np.zeros(3))
 
         if self.shots.number:
-            shots_positions = self.shots.positions
+            shots_in_view = 1
+            shots_positions = self.shots.patches_positions(shots_in_view)
+            # anti impose boundaries
+            # cull view
+            # do this in patches_positions?
             shots_patches, shots_depths = self.camera.get_screen_coordinates(
-                self.shots.patches)
-            shots_colours = self.shots.colours
+                self.shots.patches(shots_in_view))
+            shots_colours = self.shots.colours(shots_in_view)
+            shots_colours = self.shader.apply_lighting(shots_positions,
+                                                       shots_positions,
+                                                       shots_colours,
+                                                       scatter=False)
         else:
             shots_positions = np.empty((0, 3))
             shots_patches = np.empty((0, 3, 2))

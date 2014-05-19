@@ -11,8 +11,8 @@ class Particle(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, inertia=1.0, gravity=1.0, friction=0.0, size=0.05,
-                 colour=np.array([204, 204, 153, 255]), lifetime=2.0):
+    def __init__(self, inertia=1.0, gravity=1.0, friction=0.05, size=0.05,
+                 colour=np.array([255, 255, 153, 255]), lifetime=2.0):
 
         self._inertia = inertia
         self._gravity = gravity
@@ -40,7 +40,7 @@ class Particle(object):
 
     @property
     def friction(self):
-        return -self._friction
+        return self._friction
 
     @friction.setter
     def friction(self, val):
@@ -103,8 +103,15 @@ class Particles(object):
     def positions(self, val):
         self._positions = val
 
-    @property
-    def patches(self):
+    def shots_in_view(self, position, view, map):
+        pass
+
+    def patches_positions(self, indices):
+        return (self.positions[:, np.newaxis, np.newaxis, :] +
+                self.particle.patches[np.newaxis, :, :, :]).mean(-2).reshape(
+                    self.number * 4, 3)
+
+    def patches(self, indices):
         return (self.positions[:, np.newaxis, np.newaxis, :] +
                 self.particle.patches[np.newaxis, :, :, :]).reshape(
                     self.number * 4, 3, 3)
@@ -133,9 +140,7 @@ class Particles(object):
     def ages(self, val):
         self._ages = val
 
-    @property
-    def colours(self):
-
+    def colours(self, indices):
         return (np.zeros((self.number * 4))[:, np.newaxis] +
                 self.particle.colour[np.newaxis])
 
@@ -148,7 +153,7 @@ class Particles(object):
     def apply_forces(self):
         forces = (-self.particle.friction * self.velocities +
                   self.particle.gravity * self.particle.inertia)
-        self.acceleration = forces / self.particle.inertia
+        self.accelerations = forces / self.particle.inertia
 
     def bounce(self, world, n):
         normals = world.normals[self.positions[n, self.X],
@@ -188,9 +193,8 @@ class Particles(object):
         self.ages = self.ages[indices]
 
     def cull_aged(self):
-        if (self.ages > self.particle.lifetime).any():
-            indices = np.where(self.ages < self.particle.lifetime)[0]
-            self.positions = self.positions[indices]
-            self.velocities = self.velocities[indices]
-            self.accelerations = self.accelerations[indices]
-            self.ages = self.ages[indices]
+        if self.ages[0] > self.particle.lifetime:
+            self.positions = self.positions[1:]
+            self.velocities = self.velocities[1:]
+            self.accelerations = self.accelerations[1:]
+            self.ages = self.ages[1:]
