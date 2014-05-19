@@ -366,7 +366,7 @@ class Map(object):
         patches = np.zeros((xsize, ysize, 4, 3))
 
         # Fill patches:
-        # This for-looops could and should be removed:
+        # These for-loops could be removed:
         for x in xrange(xsize):
             for y in xrange(ysize):
                 xinds = np.array([x, x + 1, x + 1, x])
