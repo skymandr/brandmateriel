@@ -303,6 +303,17 @@ class Map(object):
                                       view[self.Y] * 0.5 + 1.0)
         return positions
 
+    def positions_in_view(self, position, view, positions):
+        xmin = position[self.X] - view[self.X] * 0.5
+        xmax = position[self.X] + view[self.X] * 0.5
+        ymin = position[self.Y] - view[self.Y] * 0.5
+        ymax = position[self.Y] + view[self.Y] * 0.5
+
+        return np.where((positions[:, self.X] >= xmin) *
+                        (positions[:, self.X] <= xmax) *
+                        (positions[:, self.Y] >= ymin) *
+                        (positions[:, self.Y] <= ymax))[0]
+
     def _make_patches(self):
         """
         Create patches made up of four points (corners of squares in the

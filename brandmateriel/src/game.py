@@ -313,18 +313,30 @@ class Game(object):
                                     + self.player.velocity, np.zeros(3))
 
         if self.shots.number:
-            shots_in_view = 1
-            shots_positions = self.shots.patches_positions(shots_in_view)
-            # anti impose boundaries
-            # cull view
-            # do this in patches_positions?
-            shots_patches, shots_depths = self.camera.get_screen_coordinates(
-                self.shots.patches(shots_in_view))
-            shots_colours = self.shots.colours(shots_in_view)
-            shots_colours = self.shader.apply_lighting(shots_positions,
-                                                       shots_positions,
-                                                       shots_colours,
-                                                       scatter=False)
+            view = self._view + self.camera.distance
+            shots_positions = self.shots.patches_positions.copy()
+            shots_positions = self.world.fix_view(self.focus_position, view,
+                                                  shots_positions)
+            shots_in_view = self.world.positions_in_view(self.focus_position,
+                                                         view, shots_positions)
+
+            if shots_in_view.size:
+                shots_positions = shots_positions[shots_in_view]
+                shots_patches = self.world.fix_view(
+                    self.focus_position, view,
+                    self.shots.patches[shots_in_view])
+                (shots_patches, shots_depths) = \
+                    self.camera.get_screen_coordinates(shots_patches)
+                shots_colours = self.shots.colours[shots_in_view]
+                shots_colours = self.shader.apply_lighting(shots_positions,
+                                                           shots_positions,
+                                                           shots_colours,
+                                                           scatter=False)
+            else:
+                shots_positions = np.empty((0, 3))
+                shots_patches = np.empty((0, 3, 2))
+                shots_colours = np.empty((0, 4))
+
         else:
             shots_positions = np.empty((0, 3))
             shots_patches = np.empty((0, 3, 2))

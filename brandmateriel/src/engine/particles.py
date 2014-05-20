@@ -103,15 +103,14 @@ class Particles(object):
     def positions(self, val):
         self._positions = val
 
-    def shots_in_view(self, position, view, map):
-        pass
-
-    def patches_positions(self, indices):
+    @property
+    def patches_positions(self):
         return (self.positions[:, np.newaxis, np.newaxis, :] +
                 self.particle.patches[np.newaxis, :, :, :]).mean(-2).reshape(
                     self.number * 4, 3)
 
-    def patches(self, indices):
+    @property
+    def patches(self):
         return (self.positions[:, np.newaxis, np.newaxis, :] +
                 self.particle.patches[np.newaxis, :, :, :]).reshape(
                     self.number * 4, 3, 3)
@@ -140,7 +139,8 @@ class Particles(object):
     def ages(self, val):
         self._ages = val
 
-    def colours(self, indices):
+    @property
+    def colours(self):
         return (np.zeros((self.number * 4))[:, np.newaxis] +
                 self.particle.colour[np.newaxis])
 
