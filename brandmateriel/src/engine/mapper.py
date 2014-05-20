@@ -99,33 +99,7 @@ class Map(object):
         the_slice = self._patches[X, Y, :]
 
         # Fix periodicity:
-        if xmin <= 0.0:
-
-            the_slice[:, :, :, self.X] = ((the_slice[:, :, :, self.X] +
-                                           view[self.X] * 0.5 + 0.5) %
-                                          self.shape[self.X] -
-                                          view[self.X] * 0.5 - 0.5)
-
-        elif xmax >= self.shape[self.X] - 1.0:
-
-            the_slice[:, :, :, self.X] = ((the_slice[:, :, :, self.X] -
-                                           view[self.X] * 0.5 - 1.0) %
-                                          self.shape[self.X] +
-                                          view[self.X] * 0.5 + 1.0)
-
-        if ymin <= 0.0:
-
-            the_slice[:, :, :, self.Y] = ((the_slice[:, :, :, self.Y] +
-                                           view[self.Y] * 0.5 + 0.5) %
-                                          self.shape[self.Y] -
-                                          view[self.Y] * 0.5 - 0.5)
-
-        elif ymax >= self.shape[self.Y] - 1.0:
-
-            the_slice[:, :, :, self.Y] = ((the_slice[:, :, :, self.Y] -
-                                           view[self.Y] * 0.5 - 1.0) %
-                                          self.shape[self.Y] +
-                                          view[self.Y] * 0.5 + 1.0)
+        the_slice = self.fix_view(position, view, the_slice)
 
         # Impose view limits:
         the_slice[:, 0, (3, 0), self.Z] += ((the_slice[:, 0, (2, 1), self.Z] -
@@ -165,41 +139,10 @@ class Map(object):
 
         X, Y = self.slice(position, view)
 
-        xmin = position[self.X] - view[self.X] * 0.5
-        xmax = position[self.X] + view[self.X] * 0.5
-        ymin = position[self.Y] - view[self.Y] * 0.5
-        ymax = position[self.Y] + view[self.Y] * 0.5
-
         the_slice = self._positions[X, Y, :]
 
         # Fix periodicity:
-        if xmin <= 0.0:
-
-            the_slice[:, :, self.X] = ((the_slice[:, :, self.X] +
-                                        view[self.X] * 0.5 + 0.5) %
-                                       self.shape[self.X] - view[self.X] * 0.5
-                                       - 0.5)
-
-        elif xmax >= self.shape[self.X] - 1.0:
-
-            the_slice[:, :, self.X] = ((the_slice[:, :, self.X] -
-                                        view[self.X] * 0.5 - 1.0) %
-                                       self.shape[self.X] + view[self.X] * 0.5
-                                       + 1.0)
-
-        if ymin <= 0.0:
-
-            the_slice[:, :, self.Y] = ((the_slice[:, :, self.Y] +
-                                        view[self.Y] * 0.5 + 0.5) %
-                                       self.shape[self.Y] - view[self.Y] * 0.5
-                                       - 0.5)
-
-        elif ymax >= self.shape[self.Y] - 1.0:
-
-            the_slice[:, :, self.Y] = ((the_slice[:, :, self.Y] -
-                                        view[self.Y] * 0.5 - 1.0) %
-                                       self.shape[self.Y] + view[self.Y] * 0.5
-                                       + 1.0)
+        the_slice = self.fix_view(position, view, the_slice)
 
         return the_slice
 
@@ -211,41 +154,10 @@ class Map(object):
 
         X, Y = self.slice(position, view)
 
-        xmin = position[self.X] - view[self.X] * 0.5
-        xmax = position[self.X] + view[self.X] * 0.5
-        ymin = position[self.Y] - view[self.Y] * 0.5
-        ymax = position[self.Y] + view[self.Y] * 0.5
-
         the_slice = self._positions[X, Y, :]
 
         # Fix periodicity:
-        if xmin <= 0.0:
-
-            the_slice[:, :, self.X] = ((the_slice[:, :, self.X] +
-                                        view[self.X] * 0.5 + 0.5) %
-                                       self.shape[self.X] - view[self.X] * 0.5
-                                       - 0.5)
-
-        elif xmax >= self.shape[self.X] - 1.0:
-
-            the_slice[:, :, self.X] = ((the_slice[:, :, self.X] -
-                                        view[self.X] * 0.5 - 1.0) %
-                                       self.shape[self.X] + view[self.X] * 0.5
-                                       + 1.0)
-
-        if ymin <= 0.0:
-
-            the_slice[:, :, self.Y] = ((the_slice[:, :, self.Y] +
-                                        view[self.Y] * 0.5 + 0.5) %
-                                       self.shape[self.Y] - view[self.Y] * 0.5
-                                       - 0.5)
-
-        elif ymax >= self.shape[self.Y] - 1.0:
-
-            the_slice[:, :, self.Y] = ((the_slice[:, :, self.Y] -
-                                        view[self.Y] * 0.5 - 1.0) %
-                                       self.shape[self.Y] + view[self.Y] * 0.5
-                                       + 1.0)
+        the_slice = self.fix_view(position, view, the_slice)
 
         return the_slice
 
@@ -354,6 +266,42 @@ class Map(object):
         Returns colours in native shape.
         """
         return self._colours
+
+    def fix_view(self, position, view, positions):
+        xmin = position[self.X] - view[self.X] * 0.5
+        xmax = position[self.X] + view[self.X] * 0.5
+        ymin = position[self.Y] - view[self.Y] * 0.5
+        ymax = position[self.Y] + view[self.Y] * 0.5
+
+        # Fix periodicity:
+        if xmin <= 0.0:
+
+            positions[..., self.X] = ((positions[..., self.X] +
+                                       view[self.X] * 0.5 + 0.5) %
+                                      self.shape[self.X] -
+                                      view[self.X] * 0.5 - 0.5)
+
+        elif xmax >= self.shape[self.X] - 1.0:
+
+            positions[..., self.X] = ((positions[..., self.X] -
+                                       view[self.X] * 0.5 - 1.0) %
+                                      self.shape[self.X] +
+                                      view[self.X] * 0.5 + 1.0)
+
+        if ymin <= 0.0:
+
+            positions[..., self.Y] = ((positions[..., self.Y] +
+                                       view[self.Y] * 0.5 + 0.5) %
+                                      self.shape[self.Y] -
+                                      view[self.Y] * 0.5 - 0.5)
+
+        elif ymax >= self.shape[self.Y] - 1.0:
+
+            positions[..., self.Y] = ((positions[..., self.Y] -
+                                       view[self.Y] * 0.5 - 1.0) %
+                                      self.shape[self.Y] +
+                                      view[self.Y] * 0.5 + 1.0)
+        return positions
 
     def _make_patches(self):
         """
@@ -466,11 +414,12 @@ class Map(object):
 
 class TriMap(object):
     """
+    NOT UP TO DATE!
     The Map class contains data for displaying/rendering a map of an area.
 
     The data is:
     * patches:
-        - semi-rectangular patches that are the units of the map
+        - sets of four triangular patches that are the units of the map
 
     * positions:
         - positions of the patches, calculated as the man of the patches'
