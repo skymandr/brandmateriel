@@ -327,7 +327,7 @@ class Game(object):
                     self.shots.patches[shots_in_view])
                 (shots_patches, shots_depths) = \
                     self.camera.get_screen_coordinates(shots_patches)
-                shots_colours = self.shots.colours[shots_in_view]
+                shots_colours = self.shots.patches_colours[shots_in_view]
                 shots_colours = self.shader.apply_lighting(shots_positions,
                                                            shots_positions,
                                                            shots_colours,

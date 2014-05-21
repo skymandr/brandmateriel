@@ -82,6 +82,7 @@ class Particles(object):
         self._velocities = np.empty((0, 3))
         self._accelerations = np.empty((0, 3))
         self._ages = np.empty((0))
+        self._colours = np.empty((0, 4))
 
     @property
     def particle(self):
@@ -141,8 +142,15 @@ class Particles(object):
 
     @property
     def colours(self):
-        return (np.zeros((self.number * 4))[:, np.newaxis] +
-                self.particle.colour[np.newaxis])
+        return self._colours
+
+    @colours.setter
+    def colours(self, val):
+        self._colours = val
+
+    @property
+    def patches_colours(self):
+        return (self._colours * np.ones((4, 1, 1))).reshape(self.number * 4, 4)
 
     def move(self, dt=0.03125):
         self.apply_forces()
@@ -178,12 +186,18 @@ class Particles(object):
             self.positions[n, self.Z] = heights[n]
             self.bounce(world, n)
 
-    def add_particle(self, position, velocity, acceleration):
+    def add_particle(self, position, velocity, acceleration, age=0.0,
+                     colour=None):
         self.positions = np.r_[self.positions, position[np.newaxis]]
         self.velocities = np.r_[self.velocities, velocity[np.newaxis]]
         self.accelerations = np.r_[self.accelerations,
                                    acceleration[np.newaxis]]
-        self.ages = np.r_[self.ages, 0.0]
+        self.ages = np.r_[self.ages, age]
+        if colour is None:
+            self.colours = np.r_[self.colours,
+                                 self.particle.colour[np.newaxis]]
+        else:
+            self.colours = np.r_[self.colours, colour[np.newaxis]]
 
     def delete_particle(self, n):
         indices = np.r_[np.arange(n), np.arange(self.positions.shape[0])]
@@ -191,6 +205,7 @@ class Particles(object):
         self.velocities = self.velocities[indices]
         self.accelerations = self.accelerations[indices]
         self.ages = self.ages[indices]
+        self.colours = self.colours[indices]
 
     def cull_aged(self):
         if self.ages[0] > self.particle.lifetime:
@@ -198,3 +213,4 @@ class Particles(object):
             self.velocities = self.velocities[1:]
             self.accelerations = self.accelerations[1:]
             self.ages = self.ages[1:]
+            self.colours = self.colours[1:]
