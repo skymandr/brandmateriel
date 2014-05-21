@@ -251,11 +251,6 @@ class Menu(object):
                 self.item[1][1] = ((self.item[1][1] - 1) %
                                    len(self.item[1][2]))
 
-            elif self.item[1][0] == 'menu':
-
-                self.menu = self.item[1][1]
-                self._item = 0
-
         elif KEYBOARD[event_key] == 'right':
 
             if self.item[1][0] == "toggle":
@@ -266,11 +261,6 @@ class Menu(object):
 
                 self.item[1][1] = ((self.item[1][1] + 1) %
                                    len(self.item[1][2]))
-
-            elif self.item[1][0] == 'menu':
-
-                self.menu = self.item[1][1]
-                self._item = 0
 
         self._save_settings()
 
