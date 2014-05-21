@@ -267,3 +267,48 @@ class Shrapnel(Particles):
         self._accelerations = np.empty((0, 3))
         self._ages = np.empty((0))
         self._colours = np.empty((0, 4))
+
+
+class Exhaust(Particles):
+
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
+    def __init__(self, particle=Particle(
+            friction=0.0625, lifetime=1.0,
+            colour=np.array([255, 255, 153, 255]))):
+        self._particle = particle
+        self._positions = np.empty((0, 3))
+        self._velocities = np.empty((0, 3))
+        self._accelerations = np.empty((0, 3))
+        self._ages = np.empty((0))
+        self._colours = np.empty((0, 4))
+
+    def add_particle(self, position, velocity, acceleration, age=0.0,
+                     colour=None):
+        self.positions = np.r_[self.positions, position[np.newaxis]]
+        self.velocities = np.r_[self.velocities, velocity[np.newaxis]]
+        self.accelerations = np.r_[self.accelerations,
+                                   acceleration[np.newaxis]]
+        self.ages = np.r_[self.ages, age + np.random.random() *
+                          self.particle.lifetime]
+        if colour is None:
+            self.colours = np.r_[self.colours,
+                                 (0.5 + np.random.random((1, 4))) *
+                                 self.particle.colour[np.newaxis]]
+        else:
+            self.colours = np.r_[self.colours, colour[np.newaxis]]
+
+    def bounce(self, world, n):
+        normals = world.normals[self.positions[n, self.X],
+                                self.positions[n, self.Y]]
+        self.velocities[n] -= np.sqrt(2) * normals * np.inner(
+            self.velocities[n], normals)
+
+    def move(self, dt=0.03125):
+        self.apply_forces()
+        self.velocities += self.accelerations * dt
+        self.positions += self.velocities * dt
+        self.ages += dt
+        self.colours *= np.array([0.98, 0.96, 0.94, 1.0])

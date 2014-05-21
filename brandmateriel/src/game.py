@@ -47,6 +47,7 @@ class Game(object):
         self._populate_world()
         self.shots = e.particles.Shots()
         self.shrapnel = e.particles.Shrapnel()
+        self.exhaust = e.particles.Exhaust()
         print "DONE"
 
         print "seting up camera ... ",
@@ -313,6 +314,16 @@ class Game(object):
                                     self.player.model.orientation[self.V] * 16
                                     + self.player.velocity, np.zeros(3))
 
+        if self.player.thrust:
+            self.exhaust.add_particle(
+                self.player.model.engine,
+                -self.player.model.orientation[self.W] * 8 +
+                (2 * np.random.random() - 1) * 2 *
+                self.player.model.orientation[self.U] +
+                (2 * np.random.random() - 1) * 2 *
+                self.player.model.orientation[self.V] +
+                + self.player.velocity, np.zeros(3))
+
         if self.shots.number:
             view = self._view + self.camera.distance
             shots_positions = self.shots.patches_positions.copy()
@@ -343,13 +354,46 @@ class Game(object):
             shots_patches = np.empty((0, 3, 2))
             shots_colours = np.empty((0, 4))
 
+        if self.exhaust.number:
+            view = self._view
+            exhaust_positions = self.exhaust.patches_positions.copy()
+            exhaust_positions = self.world.fix_view(self.focus_position, view,
+                                                    exhaust_positions)
+            exhaust_in_view = self.world.positions_in_view(
+                self.focus_position, view, exhaust_positions)
+
+            if exhaust_in_view.size:
+                exhaust_positions = exhaust_positions[exhaust_in_view]
+                exhaust_patches = self.world.fix_view(
+                    self.focus_position, view,
+                    self.exhaust.patches[exhaust_in_view])
+                (exhaust_patches, exhaust_depths) = \
+                    self.camera.get_screen_coordinates(exhaust_patches)
+                exhaust_colours = self.exhaust.patches_colours[exhaust_in_view]
+                exhaust_colours = self.shader.apply_lighting(exhaust_positions,
+                                                             exhaust_positions,
+                                                             exhaust_colours,
+                                                             scatter=False)
+            else:
+                exhaust_positions = np.empty((0, 3))
+                exhaust_patches = np.empty((0, 3, 2))
+                exhaust_colours = np.empty((0, 4))
+
+        else:
+            exhaust_positions = np.empty((0, 3))
+            exhaust_patches = np.empty((0, 3, 2))
+            exhaust_colours = np.empty((0, 4))
+
         # aggregate object data:
-        positions = np.r_[map_positions, player_positions, shots_positions]
+        positions = np.r_[map_positions, player_positions, shots_positions,
+                          exhaust_positions]
         patches = list(map_patches[:])
         patches.extend(list(player_patches[:]))
         patches.extend(list(shots_patches[:]))
+        patches.extend(list(exhaust_patches[:]))
         # normals = np.r_[map_normals, player_normals]
-        colours = np.r_[map_colours, player_colours, shots_colours]
+        colours = np.r_[map_colours, player_colours, shots_colours,
+                        exhaust_colours]
 
         # sort patches:
         order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
@@ -379,8 +423,17 @@ class Game(object):
             self.player.impose_boundary_conditions(self.world)
 
             if self.shots.number:
-                self.shots.move()
+                shrapnel = self.shots.move()
+                """ create shrapnel """
                 self.shots.impose_boundary_conditions(self.world)
+
+            if self.shrapnel.number:
+                self.shrapnel.move()
+                self.shrapnel.impose_boundary_conditions(self.world)
+
+            if self.exhaust.number:
+                self.exhaust.move()
+                self.exhaust.impose_boundary_conditions(self.world)
 
             self.update_camera()
 
