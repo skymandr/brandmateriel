@@ -33,7 +33,6 @@ class Menu(object):
 
         self._load_options(options)
 
-        pygame.event.set_grab(True)
         pygame.mouse.set_visible(False)
 
     @property
@@ -165,36 +164,15 @@ class Menu(object):
 
                 elif KEYBOARD[event.key] == 'pause':
 
-                    pygame.event.set_grab(False)
                     pygame.mouse.set_visible(True)
 
                 else:
 
                     flag = self._relay_input(event.key)
 
-            elif event.type == l.MOUSEMOTION and pygame.event.get_grab():
-
-                motion = pygame.mouse.get_rel()
-
-                if motion[self.Y] > 0:
-
-                    self._item = (self._item + 1) % self._items
-
-                elif motion[self.Y] < 0:
-
-                    self._item = (self._item - 1) % self._items
-
             elif event.type == l.MOUSEBUTTONDOWN:
 
-                if pygame.event.get_grab():
-
-                    flag = self._relay_input(l.K_SPACE)
-
-                else:
-
-                    pygame.event.set_grab(True)
-                    pygame.mouse.set_visible(False)
-                    pygame.mouse.get_rel()
+                pygame.mouse.set_visible(False)
 
         return flag
 
