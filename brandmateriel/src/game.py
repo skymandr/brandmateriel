@@ -45,7 +45,8 @@ class Game(object):
 
         print "initialising game objects ... ",
         self._populate_world()
-        self.shots = e.particles.Particles()
+        self.shots = e.particles.Shots()
+        self.shrapnel = e.particles.Shrapnel()
         print "DONE"
 
         print "seting up camera ... ",

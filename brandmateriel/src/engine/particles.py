@@ -207,6 +207,14 @@ class Particles(object):
         self.ages = self.ages[indices]
         self.colours = self.colours[indices]
 
+    def delete_particles(self, to_delete):
+        indices = np.setdiff1d(np.arange(self.number), to_delete)
+        self.positions = self.positions[indices]
+        self.velocities = self.velocities[indices]
+        self.accelerations = self.accelerations[indices]
+        self.ages = self.ages[indices]
+        self.colours = self.colours[indices]
+
     def cull_aged(self):
         if self.ages[0] > self.particle.lifetime:
             self.positions = self.positions[1:]
@@ -214,3 +222,48 @@ class Particles(object):
             self.accelerations = self.accelerations[1:]
             self.ages = self.ages[1:]
             self.colours = self.colours[1:]
+
+
+class Shots(Particles):
+
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
+    def __init__(self, particle=Particle()):
+        self._particle = particle
+        self._positions = np.empty((0, 3))
+        self._velocities = np.empty((0, 3))
+        self._accelerations = np.empty((0, 3))
+        self._ages = np.empty((0))
+        self._colours = np.empty((0, 4))
+
+    def impose_boundary_conditions(self, world):
+        self.cull_aged()
+
+        self.positions[:, self.X] %= world.shape[self.X]
+        self.positions[:, self.Y] %= world.shape[self.Y]
+
+        heights = world.map_positions[
+            self.positions[:, self.X].astype(np.int),
+            self.positions[:, self.Y].astype(np.int), self.Z]
+
+        heights = np.where(heights < 0, 0, heights)
+
+        bouncers = np.where(self.positions[:, self.Z] < heights)[0]
+        self.delete_particles(bouncers)
+
+
+class Shrapnel(Particles):
+
+    X = U = 0
+    Y = V = 1
+    Z = W = 2
+
+    def __init__(self, particle=Particle(friction=0.5, lifetime=0.5)):
+        self._particle = particle
+        self._positions = np.empty((0, 3))
+        self._velocities = np.empty((0, 3))
+        self._accelerations = np.empty((0, 3))
+        self._ages = np.empty((0))
+        self._colours = np.empty((0, 4))
