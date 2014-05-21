@@ -306,6 +306,15 @@ class Game(object):
         player_colours = self.shader.apply_lighting(player_positions,
                                                     player_normals,
                                                     player_colours)
+        """
+        player_shadow, player_shadow_positions = e.shadow.get_shadows(
+            self.player.model.patches.copy(), player_positions.copy(),
+            self.world)
+        player_shadow, shadow_depths = self.camera.get_screen_coordinates(
+            player_shadow)
+        player_shadow_colours = np.array([[0, 0, 0, 1]]) * np.ones(
+            (player_colours.shape[0], 1))
+        """
 
         # Handle particles:
         if self.player.fire and (self.shots.number == 0 or
@@ -386,14 +395,14 @@ class Game(object):
 
         # aggregate object data:
         positions = np.r_[map_positions, player_positions, shots_positions,
-                          exhaust_positions]
+                          exhaust_positions, ]  # player_shadow_positions]
         patches = list(map_patches[:])
         patches.extend(list(player_patches[:]))
         patches.extend(list(shots_patches[:]))
         patches.extend(list(exhaust_patches[:]))
-        # normals = np.r_[map_normals, player_normals]
+        # patches.extend(list(player_shadow[:]))
         colours = np.r_[map_colours, player_colours, shots_colours,
-                        exhaust_colours]
+                        exhaust_colours, ]  # player_shadow_colours]
 
         # sort patches:
         order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
