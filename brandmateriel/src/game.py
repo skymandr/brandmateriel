@@ -307,7 +307,7 @@ class Game(object):
                                                     player_normals,
                                                     player_colours)
 
-        shadow = False
+        shadow = True
         if shadow:
             player_shadow, player_shadow_positions = e.shadow.get_shadows(
                 self.player.model.patches.copy(), self.world)
