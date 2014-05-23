@@ -22,7 +22,7 @@ def get_shadows(patches, world):
     dists2 = ((patches[..., np.newaxis, : Z] -
                world.patches[xind, yind, :, : Z]) ** 2).sum(-1)
     patches[..., Z] = (world.patches[xind, yind, :, Z]
-                       / dists2).sum(-1) / (1 / dists2).sum(-1) - 0.01
+                       / dists2).sum(-1) / (1 / dists2).sum(-1) - 0.0125
     patches[..., Z] = np.where(patches[..., Z] < 0, 0, patches[..., Z])
 
     return patches, positions
