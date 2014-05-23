@@ -11,7 +11,7 @@ class Particle(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, inertia=1.0, gravity=1.0, friction=0.05, size=0.05,
+    def __init__(self, inertia=1.0, gravity=1.0, friction=0.05, size=0.03,
                  colour=np.array([255, 255, 153, 255]), lifetime=2.0):
 
         self._inertia = inertia
