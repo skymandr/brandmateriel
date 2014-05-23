@@ -22,6 +22,9 @@ class Game(object):
     Z = W = 2
 
     def __init__(self, config, world, font, fontsize):
+        pygame.event.set_grab(True)
+        pygame.mouse.set_visible(False)
+
         self._config = config
 
         print "initialising world map ... ",
@@ -82,11 +85,8 @@ class Game(object):
         self.update_camera()
         print "DONE"
 
-        pygame.event.set_grab(True)
-        pygame.mouse.set_visible(False)
-        pygame.mouse.get_rel()
-
         self._pause = False
+        pygame.mouse.get_rel()
         print "game starting"
 
     @property
@@ -156,6 +156,8 @@ class Game(object):
 
     def close_game(self):
         """ Close game. """
+
+        pygame.event.set_grab(False)
 
         return "quit"
 
