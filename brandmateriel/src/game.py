@@ -315,15 +315,14 @@ class Game(object):
         player_colours = self.shader.apply_lighting(player_positions,
                                                     player_normals,
                                                     player_colours)
-
-        shadow = True
-        if shadow:
+        # get shadow:
+        if self.camera.position[self.Z] < self._culling_height:
             player_shadow, player_shadow_positions = e.shadow.get_shadows(
                 self.player.model.patches.copy(), self.world)
             player_shadow, shadow_depths = self.camera.get_screen_coordinates(
                 player_shadow)
             player_shadow_colours = np.array([[0, 0, 0, 1]]) * np.ones(
-                (player_colours.shape[0], 1))
+                (player_shadow.shape[0], 1))
         else:
             player_shadow_positions = np.empty((0, 3))
             player_shadow = np.empty((0, 4, 2))
@@ -359,6 +358,21 @@ class Game(object):
                 shots_patches = self.world.fix_view(
                     self.focus_position, view,
                     self.shots.patches[shots_in_view])
+
+                if self.camera.position[self.Z] < self._culling_height:
+                    shots_shadows, shots_shadow_positions = \
+                        e.shadow.get_shadows(shots_patches.copy(),
+                                             self.world)
+                    shots_shadows, shadow_depths = \
+                        self.camera.get_screen_coordinates(shots_shadows)
+                    shots_shadow_colours = np.array([[0, 0, 0, 1]]) * np.ones(
+                        (shots_shadows.shape[0], 1))
+
+                else:
+                    shots_shadow_positions = np.empty((0, 3))
+                    shots_shadows = np.empty((0, 4, 2))
+                    shots_shadow_colours = np.empty((0, 4))
+
                 (shots_patches, shots_depths) = \
                     self.camera.get_screen_coordinates(shots_patches)
                 shots_colours = self.shots.patches_colours[shots_in_view]
@@ -366,15 +380,24 @@ class Game(object):
                                                            shots_positions,
                                                            shots_colours,
                                                            scatter=False)
+
             else:
                 shots_positions = np.empty((0, 3))
                 shots_patches = np.empty((0, 3, 2))
                 shots_colours = np.empty((0, 4))
 
+                shots_shadow_positions = np.empty((0, 3))
+                shots_shadows = np.empty((0, 4, 2))
+                shots_shadow_colours = np.empty((0, 4))
+
         else:
             shots_positions = np.empty((0, 3))
             shots_patches = np.empty((0, 3, 2))
             shots_colours = np.empty((0, 4))
+
+            shots_shadow_positions = np.empty((0, 3))
+            shots_shadows = np.empty((0, 4, 2))
+            shots_shadow_colours = np.empty((0, 4))
 
         if self.exhaust.number:
             view = self._view
@@ -389,6 +412,22 @@ class Game(object):
                 exhaust_patches = self.world.fix_view(
                     self.focus_position, view,
                     self.exhaust.patches[exhaust_in_view])
+
+                if self.camera.position[self.Z] < self._culling_height:
+                    exhaust_shadows, exhaust_shadow_positions = \
+                        e.shadow.get_shadows(exhaust_patches.copy(),
+                                             self.world)
+                    exhaust_shadows, shadow_depths = \
+                        self.camera.get_screen_coordinates(exhaust_shadows)
+                    exhaust_shadow_colours = (
+                        np.array([[0, 0, 0, 1]]) *
+                        np.ones((exhaust_shadows.shape[0], 1)))
+
+                else:
+                    exhaust_shadow_positions = np.empty((0, 3))
+                    exhaust_shadows = np.empty((0, 4, 2))
+                    exhaust_shadow_colours = np.empty((0, 4))
+
                 (exhaust_patches, exhaust_depths) = \
                     self.camera.get_screen_coordinates(exhaust_patches)
                 exhaust_colours = self.exhaust.patches_colours[exhaust_in_view]
@@ -401,10 +440,18 @@ class Game(object):
                 exhaust_patches = np.empty((0, 3, 2))
                 exhaust_colours = np.empty((0, 4))
 
+                exhaust_shadow_positions = np.empty((0, 3))
+                exhaust_shadows = np.empty((0, 4, 2))
+                exhaust_shadow_colours = np.empty((0, 4))
+
         else:
             exhaust_positions = np.empty((0, 3))
             exhaust_patches = np.empty((0, 3, 2))
             exhaust_colours = np.empty((0, 4))
+
+            exhaust_shadow_positions = np.empty((0, 3))
+            exhaust_shadows = np.empty((0, 4, 2))
+            exhaust_shadow_colours = np.empty((0, 4))
 
         # aggregate draw data:
         object_positions = np.r_[player_positions, shots_positions,
@@ -414,9 +461,14 @@ class Game(object):
         object_patches.extend(list(exhaust_patches[:]))
         object_colours = np.r_[player_colours, shots_colours, exhaust_colours]
 
-        shadow_positions = np.r_[player_shadow_positions]
+        shadow_positions = np.r_[player_shadow_positions,
+                                 shots_shadow_positions,
+                                 exhaust_shadow_positions]
         shadow_patches = list(player_shadow[:])
-        shadow_colours = np.r_[player_shadow_colours]
+        shadow_patches.extend(list(shots_shadows[:]))
+        shadow_patches.extend(list(exhaust_shadows[:]))
+        shadow_colours = np.r_[player_shadow_colours, shots_shadow_colours,
+                               exhaust_shadow_colours]
 
         # sort patches:
 
@@ -456,12 +508,12 @@ class Game(object):
                 self.shots.impose_boundary_conditions(self.world)
 
             if self.shrapnel.number:
-                self.shrapnel.move()
                 self.shrapnel.impose_boundary_conditions(self.world)
+                self.shrapnel.move()
 
             if self.exhaust.number:
-                self.exhaust.move()
                 self.exhaust.impose_boundary_conditions(self.world)
+                self.exhaust.move()
 
             self.update_camera()
 

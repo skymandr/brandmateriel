@@ -241,17 +241,18 @@ class Shots(Particles):
     def impose_boundary_conditions(self, world):
         self.cull_aged()
 
-        self.positions[:, self.X] %= world.shape[self.X]
-        self.positions[:, self.Y] %= world.shape[self.Y]
+        if self.number:
+            self.positions[:, self.X] %= world.shape[self.X]
+            self.positions[:, self.Y] %= world.shape[self.Y]
 
-        heights = world.map_positions[
-            self.positions[:, self.X].astype(np.int),
-            self.positions[:, self.Y].astype(np.int), self.Z]
+            heights = world.map_positions[
+                self.positions[:, self.X].astype(np.int),
+                self.positions[:, self.Y].astype(np.int), self.Z]
 
-        heights = np.where(heights < 0, 0, heights)
+            heights = np.where(heights < 0, 0, heights)
 
-        bouncers = np.where(self.positions[:, self.Z] < heights)[0]
-        self.delete_particles(bouncers)
+            bouncers = np.where(self.positions[:, self.Z] < heights)[0]
+            self.delete_particles(bouncers)
 
 
 class Shrapnel(Particles):
