@@ -84,6 +84,7 @@ class Game(object):
 
         pygame.event.set_grab(True)
         pygame.mouse.set_visible(False)
+        pygame.mouse.get_rel()
 
         self._pause = False
         print "game starting"
