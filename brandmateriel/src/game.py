@@ -271,6 +271,15 @@ class Game(object):
 
         return flag
 
+    def draw_patches(self, positions, patches, colours, surface):
+        # draw objects and particles:
+        order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
+
+        for n in order:
+            if colours[n, 3]:
+                pygame.draw.polygon(surface, colours[n], patches[n])
+                pygame.draw.polygon(surface, colours[n], patches[n], 1)
+
     def do_step(self, surface):
         flag = self.handle_inputs()
 
@@ -397,27 +406,33 @@ class Game(object):
             exhaust_patches = np.empty((0, 3, 2))
             exhaust_colours = np.empty((0, 4))
 
-        # aggregate object data:
-        positions = np.r_[map_positions, player_positions, shots_positions,
-                          exhaust_positions, player_shadow_positions]
-        patches = list(map_patches[:])
-        patches.extend(list(player_patches[:]))
-        patches.extend(list(shots_patches[:]))
-        patches.extend(list(exhaust_patches[:]))
-        patches.extend(list(player_shadow[:]))
-        colours = np.r_[map_colours, player_colours, shots_colours,
-                        exhaust_colours, player_shadow_colours]
+        # aggregate draw data:
+        object_positions = np.r_[player_positions, shots_positions,
+                                 exhaust_positions]
+        object_patches = list(player_patches[:])
+        object_patches.extend(list(shots_patches[:]))
+        object_patches.extend(list(exhaust_patches[:]))
+        object_colours = np.r_[player_colours, shots_colours, exhaust_colours]
+
+        shadow_positions = np.r_[player_shadow_positions]
+        shadow_patches = list(player_shadow[:])
+        shadow_colours = np.r_[player_shadow_colours]
 
         # sort patches:
-        order = np.argsort(-((positions - self.camera.position) ** 2).mean(-1))
 
         # draw:
         surface.fill((0, 0, 0))
 
-        for n in order:
-            if colours[n, 3]:
-                pygame.draw.polygon(surface, colours[n], patches[n])
-                pygame.draw.polygon(surface, colours[n], patches[n], 1)
+        # draw landscape:
+        self.draw_patches(map_positions, map_patches, map_colours, surface)
+
+        # draw shadows:
+        self.draw_patches(shadow_positions, shadow_patches, shadow_colours,
+                          surface)
+
+        # draw objects and particles:
+        self.draw_patches(object_positions, object_patches, object_colours,
+                          surface)
 
         if self._pause:
 
