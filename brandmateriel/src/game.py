@@ -127,8 +127,9 @@ class Game(object):
         self.light_source.position = self.camera.position + np.array([0, 0, 0])
 
     def _populate_world(self):
-        n_houses = 16
-        settlements = []
+        n_houses = 42
+        settlements = e.triDobjects.TriDGroup(model=e.triDobjects.House(
+            scale=0.618))
         angles = 2 * np.pi * np.random.random(n_houses)
         candidates = self.world.map_positions.copy()
 
@@ -138,15 +139,15 @@ class Game(object):
             X %= self.world.shape[self.X]
             Y %= self.world.shape[self.Y]
 
-            while((candidates[X, Y, self.Z] < 0).any()):
+            while((candidates[X, Y, self.Z] <= 0).any()):
                 x, y = (np.random.random(2) * self.world.shape).astype(np.int)
                 X, Y = np.mgrid[x - 1: x + 2, y - 1: y + 2]
                 X %= self.world.shape[self.X]
                 Y %= self.world.shape[self.Y]
 
-            settlements.append(e.triDobjects.House(
+            settlements.add_object(
                 position=np.array([x, y, candidates[x, y, self.Z]]),
-                yaw=angles[n]))
+                yaw=angles[n])
 
             candidates[X, Y, self.Z] *= 0
 
@@ -304,7 +305,39 @@ class Game(object):
             map_colours = np.empty((0, 4))
 
         # get objects in view:
-        pass
+        if self.camera.position[self.Z] < self._culling_height:
+            view = self._view
+            houses_positions = self.houses.positions.copy()
+            houses_positions = self.world.fix_view(self.focus_position, view,
+                                                   houses_positions)
+            houses_in_view = self.world.positions_in_view(
+                self.focus_position, view, houses_positions)
+
+            if houses_in_view.size:
+                houses_positions = self.world.fix_view(
+                    self.focus_position, view,
+                    self.houses.patch_positions(houses_in_view))
+                houses_patches = self.world.fix_view(
+                    self.focus_position, view,
+                    self.houses.patches(houses_in_view))
+
+                (houses_patches, houses_depths) = \
+                    self.camera.get_screen_coordinates(houses_patches)
+                houses_normals = self.houses.normals(houses_in_view)
+                houses_colours = self.houses.colours(houses_in_view)
+                houses_colours = self.shader.apply_lighting(houses_positions,
+                                                            houses_normals,
+                                                            houses_colours)
+
+            else:
+                houses_positions = np.empty((0, 3))
+                houses_patches = np.empty((0, 3, 2))
+                houses_colours = np.empty((0, 4))
+
+        else:
+            houses_positions = np.empty((0, 3))
+            houses_patches = np.empty((0, 3, 2))
+            houses_colours = np.empty((0, 4))
 
         # get player:
         player_positions = self.player.model.positions
@@ -455,11 +488,13 @@ class Game(object):
 
         # aggregate draw data:
         object_positions = np.r_[player_positions, shots_positions,
-                                 exhaust_positions]
+                                 exhaust_positions, houses_positions]
         object_patches = list(player_patches[:])
         object_patches.extend(list(shots_patches[:]))
         object_patches.extend(list(exhaust_patches[:]))
-        object_colours = np.r_[player_colours, shots_colours, exhaust_colours]
+        object_patches.extend(list(houses_patches[:]))
+        object_colours = np.r_[player_colours, shots_colours, exhaust_colours,
+                               houses_colours]
 
         shadow_positions = np.r_[player_shadow_positions,
                                  shots_shadow_positions,

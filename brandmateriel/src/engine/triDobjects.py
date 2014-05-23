@@ -832,6 +832,15 @@ class SimpleHouse(TriD):
 
 
 class TriDGroup(object):
+    """
+    What do I want from a TriDGroup?
+
+    * To add models.
+    * To delete models.
+    * To get patches/colours/patch positions for a single model
+    * To get all patches/colours/pach positions.
+    * To get all objects centre positions
+    """
 
     X = U = 0
     Y = V = 1
@@ -839,8 +848,13 @@ class TriDGroup(object):
 
     def __init__(self, model=House()):
         self._model = model
+        N = self._model.patches.shape[0]
         self._positions = np.empty((0, 3))
-        self._patches = np.empty((0, 3, 3))
+        self._patches = np.empty((0, N, 3, 3))
+        self._patch_positions = np.empty((0, N, 3))
+        self._normals = np.empty((0, N, 3))
+        self._colours = np.empty((0, N, 4))
+        self._bboxes = np.empty((0, 2, 3))
         self._yaws = np.empty((0))
         self._pitchs = np.empty((0))
         self._rolls = np.empty((0))
@@ -861,34 +875,51 @@ class TriDGroup(object):
     def positions(self):
         return self._positions
 
-    @positions.setter
-    def positions(self, val):
-        self._positions = val
-
-    def objects_in_view(self, position, view, map):
-        pass
+    def patches(self, indices):
+        N = self._patches.shape[1] * indices.size
+        return self._patches[indices].reshape((N, 3, 3))
 
     def patch_positions(self, indices):
-        return (self.positions[:, np.newaxis, np.newaxis, :] +
-                self.particle.patches[np.newaxis, :, :, :]).mean(-2).reshape(
-                    self.number * 4, 3)
+        N = self._patch_positions.shape[1] * indices.size
+        return self._patch_positions[indices].reshape((N, 3))
 
-    def patches(self, indices):
-        return (self.positions[:, np.newaxis, np.newaxis, :] +
-                self.particle.patches[np.newaxis, :, :, :]).reshape(
-                    self.number * 4, 3, 3)
+    def normals(self, indices):
+        N = self._normals.shape[1] * indices.size
+        return self._normals[indices].reshape((N, 3))
 
-    def add_object(self, position, yaw, pitch, roll):
-        self.positions = np.r_[self.positions, position[np.newaxis]]
-        self.yaws = np.r_[self.yaws, yaw[np.newaxis]]
-        self.pitchs = np.r_[self.pitchs, pitch[np.newaxis]]
-        self.rolls = np.r_[self.rolls, 0.0]
+    def colours(self, indices):
+        N = self._colours.shape[1] * indices.size
+        return self._colours[indices].reshape((N, 4))
+
+    def bboxes(self, indices):
+        return self._bboxes[indices]
+
+    def add_object(self, position, yaw=0.0, pitch=0.0, roll=0.0):
+        self._positions = np.r_[self._positions, position[np.newaxis]]
+        self._yaws = np.r_[self._yaws, yaw]
+        self._pitchs = np.r_[self._pitchs, pitch]
+        self._rolls = np.r_[self._rolls, roll]
+
+        self.model.position = position
+        self.model.yaw = yaw
+        self.model.pitch = pitch
+        self.model.roll = roll
+
+        self._patches = np.r_[self._patches, self.model.patches[np.newaxis]]
+        self._patch_positions = np.r_[self._patch_positions,
+                                      self.model.positions[np.newaxis]]
+        self._normals = np.r_[self._normals, self.model.normals[np.newaxis]]
+        self._colours = np.r_[self._colours, self.model.colours[np.newaxis]]
+        self._bboxes = np.r_[self._bboxes, self.model.bounding_box[np.newaxis]]
 
     def delete_object(self, n):
         indices = np.r_[np.arange(n), np.arange(self.positions.shape[0])]
-        self.positions = self.positions[indices]
-        self.yaws = self.yaws[indices]
-        self.pitchs = self.pitchs[indices]
-        self.rolls = self.rolls[indices]
-
-
+        self._positions = self._positions[indices]
+        self._yaws = self._yaws[indices]
+        self._pitchs = self._pitchs[indices]
+        self._rolls = self._rolls[indices]
+        self._patches = self._patches[indices]
+        self._patch_positions = self._patch_positions[indices]
+        self._normals = self._normals[indices]
+        self._colours = self._colours[indices]
+        self._bboxes = self._bboxes[indices]
