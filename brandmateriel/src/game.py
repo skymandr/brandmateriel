@@ -541,13 +541,15 @@ class Game(object):
             self.player.impose_boundary_conditions(self.world)
 
             if self.shots.number:
-                shrapnel = self.shots.move()
-                """ create shrapnel """
-                self.shots.impose_boundary_conditions(self.world)
+                self.shots.move()
+                shrapnel = self.shots.impose_boundary_conditions(self.world)
+                if shrapnel is not None:
+                    self.shrapnel.add_particles(*shrapnel)
 
             if self.shrapnel.number:
                 self.shrapnel.impose_boundary_conditions(self.world)
                 self.shrapnel.move()
+                print self.shrapnel.number
 
             if self.exhaust.number:
                 self.exhaust.impose_boundary_conditions(self.world)

@@ -168,7 +168,7 @@ class Particles(object):
                                 self.positions[n, self.Y]]
         self.velocities[n] -= (2.0 * normals *
                                (self.velocities[n] *
-                                normals).sum(-1)[:, np.newaxis])
+                                normals).sum(-1)[..., np.newaxis])
 
     def impose_boundary_conditions(self, world):
         self.cull_aged()
@@ -254,14 +254,9 @@ class Shots(Particles):
 
             bouncers = np.where(self.positions[:, self.Z] < heights)[0]
             if bouncers.size:
-                normals = world.normals[
-                    self.positions[bouncers, self.X].astype(np.int),
-                    self.positions[bouncers, self.Y].astype(np.int)]
-                velocities = (self.velocities[bouncers] - 2.0 * normals *
-                              (self.velocities[bouncers] *
-                               normals).sum(-1)[:, np.newaxis])
-
                 positions = self.positions[bouncers]
+
+                velocities = self.velocities[bouncers]
 
                 colours = world.colours[
                     self.positions[bouncers, self.X].astype(np.int),
@@ -287,7 +282,15 @@ class Shrapnel(Particles):
         self._colours = np.empty((0, 4))
 
     def add_particles(self, positions, velocities, colours):
-        print positions, velocities, colours
+        self._positions = np.r_[self._positions, positions]
+        self._colours = np.r_[self._colours, colours]
+        self._velocities = np.r_[self._velocities, velocities]
+        self._accelerations = np.r_[self._accelerations,
+                                    np.zeros(positions.shape)]
+        self._ages = np.r_[self._ages, np.zeros(positions.shape[0])]
+
+        print (np.random.random(np.r_[12, velocities.shape]) +
+               velocities[np.newaxis]).shape
 
 
 class Exhaust(Particles):
@@ -320,12 +323,6 @@ class Exhaust(Particles):
                                  self.particle.colour[np.newaxis]]
         else:
             self.colours = np.r_[self.colours, colour[np.newaxis]]
-
-    def bounce(self, world, n):
-        normals = world.normals[self.positions[n, self.X],
-                                self.positions[n, self.Y]]
-        self.velocities[n] -= np.sqrt(2) * normals * np.inner(
-            self.velocities[n], normals)
 
     def move(self, dt=0.03125):
         self.apply_forces()
