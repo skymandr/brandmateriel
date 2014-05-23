@@ -868,7 +868,7 @@ class TriDGroup(object):
     def objects_in_view(self, position, view, map):
         pass
 
-    def patches_positions(self, indices):
+    def patch_positions(self, indices):
         return (self.positions[:, np.newaxis, np.newaxis, :] +
                 self.particle.patches[np.newaxis, :, :, :]).mean(-2).reshape(
                     self.number * 4, 3)

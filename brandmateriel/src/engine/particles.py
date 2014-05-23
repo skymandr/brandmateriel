@@ -105,7 +105,7 @@ class Particles(object):
         self._positions = val
 
     @property
-    def patches_positions(self):
+    def patch_positions(self):
         return (self.positions[:, np.newaxis, np.newaxis, :] +
                 self.particle.patches[np.newaxis, :, :, :]).mean(-2).reshape(
                     self.number * 4, 3)
@@ -149,7 +149,7 @@ class Particles(object):
         self._colours = val
 
     @property
-    def patches_colours(self):
+    def patch_colours(self):
         return (self._colours * np.ones((4, 1, 1))).reshape(self.number * 4, 4)
 
     def move(self, dt=0.03125):

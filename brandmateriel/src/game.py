@@ -347,7 +347,7 @@ class Game(object):
 
         if self.shots.number:
             view = self._view + self.camera.distance
-            shots_positions = self.shots.patches_positions.copy()
+            shots_positions = self.shots.patch_positions.copy()
             shots_positions = self.world.fix_view(self.focus_position, view,
                                                   shots_positions)
             shots_in_view = self.world.positions_in_view(self.focus_position,
@@ -375,7 +375,7 @@ class Game(object):
 
                 (shots_patches, shots_depths) = \
                     self.camera.get_screen_coordinates(shots_patches)
-                shots_colours = self.shots.patches_colours[shots_in_view]
+                shots_colours = self.shots.patch_colours[shots_in_view]
                 shots_colours = self.shader.apply_lighting(shots_positions,
                                                            shots_positions,
                                                            shots_colours,
@@ -401,7 +401,7 @@ class Game(object):
 
         if self.exhaust.number:
             view = self._view
-            exhaust_positions = self.exhaust.patches_positions.copy()
+            exhaust_positions = self.exhaust.patch_positions.copy()
             exhaust_positions = self.world.fix_view(self.focus_position, view,
                                                     exhaust_positions)
             exhaust_in_view = self.world.positions_in_view(
@@ -430,7 +430,7 @@ class Game(object):
 
                 (exhaust_patches, exhaust_depths) = \
                     self.camera.get_screen_coordinates(exhaust_patches)
-                exhaust_colours = self.exhaust.patches_colours[exhaust_in_view]
+                exhaust_colours = self.exhaust.patch_colours[exhaust_in_view]
                 exhaust_colours = self.shader.apply_lighting(exhaust_positions,
                                                              exhaust_positions,
                                                              exhaust_colours,
