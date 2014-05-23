@@ -361,8 +361,8 @@ class Game(object):
 
                 if self.camera.position[self.Z] < self._culling_height:
                     shots_shadows, shots_shadow_positions = \
-                        e.shadow.get_shadows(shots_patches.copy(),
-                                             self.world)
+                        e.shadow.get_small_shadows(shots_patches.copy(),
+                                                   self.world)
                     shots_shadows, shadow_depths = \
                         self.camera.get_screen_coordinates(shots_shadows)
                     shots_shadow_colours = np.array([[0, 0, 0, 1]]) * np.ones(
@@ -415,8 +415,8 @@ class Game(object):
 
                 if self.camera.position[self.Z] < self._culling_height:
                     exhaust_shadows, exhaust_shadow_positions = \
-                        e.shadow.get_shadows(exhaust_patches.copy(),
-                                             self.world)
+                        e.shadow.get_small_shadows(exhaust_patches.copy(),
+                                                   self.world)
                     exhaust_shadows, shadow_depths = \
                         self.camera.get_screen_coordinates(exhaust_shadows)
                     exhaust_shadow_colours = (
