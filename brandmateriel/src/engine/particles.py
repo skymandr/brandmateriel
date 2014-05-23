@@ -166,8 +166,9 @@ class Particles(object):
     def bounce(self, world, n):
         normals = world.normals[self.positions[n, self.X],
                                 self.positions[n, self.Y]]
-        self.velocities[n] -= 2.0 * normals * np.inner(self.velocities[n],
-                                                       normals)
+        self.velocities[n] -= (2.0 * normals *
+                               (self.velocities[n] *
+                                normals).sum(-1)[:, np.newaxis])
 
     def impose_boundary_conditions(self, world):
         self.cull_aged()
@@ -252,7 +253,23 @@ class Shots(Particles):
             heights = np.where(heights < 0, 0, heights)
 
             bouncers = np.where(self.positions[:, self.Z] < heights)[0]
-            self.delete_particles(bouncers)
+            if bouncers.size:
+                normals = world.normals[
+                    self.positions[bouncers, self.X].astype(np.int),
+                    self.positions[bouncers, self.Y].astype(np.int)]
+                velocities = (self.velocities[bouncers] - 2.0 * normals *
+                              (self.velocities[bouncers] *
+                               normals).sum(-1)[:, np.newaxis])
+
+                positions = self.positions[bouncers]
+
+                colours = world.colours[
+                    self.positions[bouncers, self.X].astype(np.int),
+                    self.positions[bouncers, self.Y].astype(np.int)]
+
+                self.delete_particles(bouncers)
+
+                return positions, velocities, colours
 
 
 class Shrapnel(Particles):
@@ -268,6 +285,9 @@ class Shrapnel(Particles):
         self._accelerations = np.empty((0, 3))
         self._ages = np.empty((0))
         self._colours = np.empty((0, 4))
+
+    def add_particles(self, positions, velocities, colours):
+        print positions, velocities, colours
 
 
 class Exhaust(Particles):
