@@ -347,12 +347,29 @@ class Exhaust(Particles):
                                    acceleration[np.newaxis]]
         self.ages = np.r_[self.ages, age + np.random.random() *
                           self.particle.lifetime]
+
         if colour is None:
             self.colours = np.r_[self.colours,
                                  (0.5 + np.random.random((1, 4))) *
                                  self.particle.colour[np.newaxis]]
         else:
             self.colours = np.r_[self.colours, colour[np.newaxis]]
+
+    def add_particles(self, positions, velocities, accelerations,
+                      colours=None):
+        N = positions.shape[0]
+        self.positions = np.r_[self.positions, positions]
+        self.velocities = np.r_[self.velocities, velocities]
+        self.accelerations = np.r_[self.accelerations, accelerations]
+        self.ages = np.r_[self.ages, np.random.random(N) *
+                          self.particle.lifetime]
+
+        if colours is None:
+            self.colours = np.r_[self.colours,
+                                 (0.5 + np.random.random((N, 4))) *
+                                 self.particle.colour[np.newaxis]]
+        else:
+            self.colours = np.r_[self.colours, colours]
 
     def move(self, dt=0.03125):
         self.apply_forces()

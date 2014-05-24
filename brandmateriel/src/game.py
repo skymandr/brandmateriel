@@ -284,6 +284,59 @@ class Game(object):
                 pygame.draw.polygon(surface, colours[n], patches[n])
                 pygame.draw.polygon(surface, colours[n], patches[n], 1)
 
+    def get_particle_patches(self, particles, view):
+        if particles.number:
+            positions = particles.patch_positions.copy()
+            positions = self.world.fix_view(self.focus_position, view,
+                                            positions)
+            in_view = self.world.positions_in_view(self.focus_position, view,
+                                                   positions)
+
+            if in_view.size:
+                positions = positions[in_view]
+                patches = self.world.fix_view(
+                    self.focus_position, view,
+                    particles.patches[in_view])
+
+                if self.camera.position[self.Z] < self._culling_height:
+                    shadows, shadow_positions = e.shadow.get_shadows(
+                        patches.copy(), self.world)
+                    shadows, shadow_depths = \
+                        self.camera.get_screen_coordinates(shadows)
+                    shadow_colours = np.array([[0, 0, 0, 1]]) * np.ones(
+                        (shadows.shape[0], 1))
+
+                else:
+                    shadow_positions = np.empty((0, 3))
+                    shadows = np.empty((0, 4, 2))
+                    shadow_colours = np.empty((0, 4))
+
+                (patches, depths) = self.camera.get_screen_coordinates(patches)
+                colours = particles.patch_colours[in_view]
+                colours = self.shader.apply_lighting(positions, positions,
+                                                     colours, scatter=False)
+
+            else:
+                positions = np.empty((0, 3))
+                patches = np.empty((0, 3, 2))
+                colours = np.empty((0, 4))
+
+                shadow_positions = np.empty((0, 3))
+                shadows = np.empty((0, 4, 2))
+                shadow_colours = np.empty((0, 4))
+
+        else:
+            positions = np.empty((0, 3))
+            patches = np.empty((0, 3, 2))
+            colours = np.empty((0, 4))
+
+            shadow_positions = np.empty((0, 3))
+            shadows = np.empty((0, 4, 2))
+            shadow_colours = np.empty((0, 4))
+
+        return (positions, patches, colours, shadow_positions, shadows,
+                shadow_colours)
+
     def do_step(self, surface):
         flag = self.handle_inputs()
 
@@ -375,177 +428,30 @@ class Game(object):
                                     + self.player.velocity, np.zeros(3))
 
         if self.player.thrust:
-            self.exhaust.add_particle(
-                self.player.model.engine,
-                -self.player.model.orientation[self.W] *
-                (7 + 2 * np.random.random()) +
-                (2 * np.random.random() - 1) * 2 *
+            N = np.random.randint(0, 5)
+            self.exhaust.add_particles(
+                self.player.model.engine * np.ones((N, 3)),
+                (2 * np.random.random((N, 3)) - 1) * 2 *
                 self.player.model.orientation[self.U] +
-                (2 * np.random.random() - 1) * 2 *
+                (2 * np.random.random((N, 3)) - 1) * 2 *
                 self.player.model.orientation[self.V] +
-                + self.player.velocity, np.zeros(3))
+                -self.player.model.orientation[self.W] *
+                (7 + 2 * np.random.random((N, 3))) +
+                self.player.velocity * np.ones((N, 3)), np.zeros((N, 3)))
 
-        if self.shots.number:
-            view = self._view + self.camera.distance
-            shots_positions = self.shots.patch_positions.copy()
-            shots_positions = self.world.fix_view(self.focus_position, view,
-                                                  shots_positions)
-            shots_in_view = self.world.positions_in_view(self.focus_position,
-                                                         view, shots_positions)
+        (shots_positions, shots_patches, shots_colours,
+         shots_shadow_positions, shots_shadows, shots_shadow_colours) = \
+            self.get_particle_patches(self.shots, self._view +
+                                      self.camera.distance)
 
-            if shots_in_view.size:
-                shots_positions = shots_positions[shots_in_view]
-                shots_patches = self.world.fix_view(
-                    self.focus_position, view,
-                    self.shots.patches[shots_in_view])
+        (exhaust_positions, exhaust_patches, exhaust_colours,
+         exhaust_shadow_positions, exhaust_shadows, exhaust_shadow_colours) = \
+            self.get_particle_patches(self.exhaust, self._view +
+                                      self.camera.distance)
 
-                if self.camera.position[self.Z] < self._culling_height:
-                    shots_shadows, shots_shadow_positions = \
-                        e.shadow.get_shadows(shots_patches.copy(),
-                                             self.world)
-                    shots_shadows, shadow_depths = \
-                        self.camera.get_screen_coordinates(shots_shadows)
-                    shots_shadow_colours = np.array([[0, 0, 0, 1]]) * np.ones(
-                        (shots_shadows.shape[0], 1))
-
-                else:
-                    shots_shadow_positions = np.empty((0, 3))
-                    shots_shadows = np.empty((0, 4, 2))
-                    shots_shadow_colours = np.empty((0, 4))
-
-                (shots_patches, shots_depths) = \
-                    self.camera.get_screen_coordinates(shots_patches)
-                shots_colours = self.shots.patch_colours[shots_in_view]
-                shots_colours = self.shader.apply_lighting(shots_positions,
-                                                           shots_positions,
-                                                           shots_colours,
-                                                           scatter=False)
-
-            else:
-                shots_positions = np.empty((0, 3))
-                shots_patches = np.empty((0, 3, 2))
-                shots_colours = np.empty((0, 4))
-
-                shots_shadow_positions = np.empty((0, 3))
-                shots_shadows = np.empty((0, 4, 2))
-                shots_shadow_colours = np.empty((0, 4))
-
-        else:
-            shots_positions = np.empty((0, 3))
-            shots_patches = np.empty((0, 3, 2))
-            shots_colours = np.empty((0, 4))
-
-            shots_shadow_positions = np.empty((0, 3))
-            shots_shadows = np.empty((0, 4, 2))
-            shots_shadow_colours = np.empty((0, 4))
-
-        if self.exhaust.number:
-            view = self._view
-            exhaust_positions = self.exhaust.patch_positions.copy()
-            exhaust_positions = self.world.fix_view(self.focus_position, view,
-                                                    exhaust_positions)
-            exhaust_in_view = self.world.positions_in_view(
-                self.focus_position, view, exhaust_positions)
-
-            if exhaust_in_view.size:
-                exhaust_positions = exhaust_positions[exhaust_in_view]
-                exhaust_patches = self.world.fix_view(
-                    self.focus_position, view,
-                    self.exhaust.patches[exhaust_in_view])
-
-                if self.camera.position[self.Z] < self._culling_height:
-                    exhaust_shadows, exhaust_shadow_positions = \
-                        e.shadow.get_shadows(exhaust_patches.copy(),
-                                             self.world)
-                    exhaust_shadows, shadow_depths = \
-                        self.camera.get_screen_coordinates(exhaust_shadows)
-                    exhaust_shadow_colours = (
-                        np.array([[0, 0, 0, 1]]) *
-                        np.ones((exhaust_shadows.shape[0], 1)))
-
-                else:
-                    exhaust_shadow_positions = np.empty((0, 3))
-                    exhaust_shadows = np.empty((0, 4, 2))
-                    exhaust_shadow_colours = np.empty((0, 4))
-
-                (exhaust_patches, exhaust_depths) = \
-                    self.camera.get_screen_coordinates(exhaust_patches)
-                exhaust_colours = self.exhaust.patch_colours[exhaust_in_view]
-                exhaust_colours = self.shader.apply_lighting(exhaust_positions,
-                                                             exhaust_positions,
-                                                             exhaust_colours,
-                                                             scatter=False)
-            else:
-                exhaust_positions = np.empty((0, 3))
-                exhaust_patches = np.empty((0, 3, 2))
-                exhaust_colours = np.empty((0, 4))
-
-                exhaust_shadow_positions = np.empty((0, 3))
-                exhaust_shadows = np.empty((0, 4, 2))
-                exhaust_shadow_colours = np.empty((0, 4))
-
-        else:
-            exhaust_positions = np.empty((0, 3))
-            exhaust_patches = np.empty((0, 3, 2))
-            exhaust_colours = np.empty((0, 4))
-
-            exhaust_shadow_positions = np.empty((0, 3))
-            exhaust_shadows = np.empty((0, 4, 2))
-            exhaust_shadow_colours = np.empty((0, 4))
-
-        if self.shrapnel.number:
-            view = self._view
-            shrapnel_positions = self.shrapnel.patch_positions.copy()
-            shrapnel_positions = self.world.fix_view(self.focus_position, view,
-                                                     shrapnel_positions)
-            shrapnel_in_view = self.world.positions_in_view(
-                self.focus_position, view, shrapnel_positions)
-
-            if shrapnel_in_view.size:
-                shrapnel_positions = shrapnel_positions[shrapnel_in_view]
-                shrapnel_patches = self.world.fix_view(
-                    self.focus_position, view,
-                    self.shrapnel.patches[shrapnel_in_view])
-
-                if self.camera.position[self.Z] < self._culling_height:
-                    shrapnel_shadows, shrapnel_shadow_positions = \
-                        e.shadow.get_shadows(shrapnel_patches.copy(),
-                                             self.world)
-                    shrapnel_shadows, shadow_depths = \
-                        self.camera.get_screen_coordinates(shrapnel_shadows)
-                    shrapnel_shadow_colours = (
-                        np.array([[0, 0, 0, 1]]) *
-                        np.ones((shrapnel_shadows.shape[0], 1)))
-
-                else:
-                    shrapnel_shadow_positions = np.empty((0, 3))
-                    shrapnel_shadows = np.empty((0, 4, 2))
-                    shrapnel_shadow_colours = np.empty((0, 4))
-
-                (shrapnel_patches, shrapnel_depths) = \
-                    self.camera.get_screen_coordinates(shrapnel_patches)
-                shrapnel_colours = self.shrapnel.patch_colours[
-                    shrapnel_in_view]
-                shrapnel_colours = self.shader.apply_lighting(
-                    shrapnel_positions, shrapnel_positions, shrapnel_colours,
-                    scatter=False)
-            else:
-                shrapnel_positions = np.empty((0, 3))
-                shrapnel_patches = np.empty((0, 3, 2))
-                shrapnel_colours = np.empty((0, 4))
-
-                shrapnel_shadow_positions = np.empty((0, 3))
-                shrapnel_shadows = np.empty((0, 4, 2))
-                shrapnel_shadow_colours = np.empty((0, 4))
-
-        else:
-            shrapnel_positions = np.empty((0, 3))
-            shrapnel_patches = np.empty((0, 3, 2))
-            shrapnel_colours = np.empty((0, 4))
-
-            shrapnel_shadow_positions = np.empty((0, 3))
-            shrapnel_shadows = np.empty((0, 4, 2))
-            shrapnel_shadow_colours = np.empty((0, 4))
+        (shrapnel_positions, shrapnel_patches, shrapnel_colours,
+         shrapnel_shadow_positions, shrapnel_shadows, shrapnel_shadow_colours) = \
+            self.get_particle_patches(self.shrapnel, self._view)
 
         # aggregate draw data:
         object_positions = np.r_[player_positions, shots_positions,
