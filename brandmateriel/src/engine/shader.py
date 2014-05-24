@@ -114,7 +114,7 @@ class Shader(object):
     Z = W = 2
 
     def __init__(self, light_source=LightSource(),
-                 colour=np.array([1.6180, 1.4142, 1.4142, 1.0]),
+                 colour=np.array([1.4142, 1.4142, 1.4142, 1.0]),
                  glare=np.array([51, 51, 51, 255]),
                  cutoff_distance=None, linear_distance=None):
         self._light_source = light_source
@@ -193,10 +193,10 @@ class Shader(object):
         deltas /= dists
 
         # Apply scatter:
+        colours = (colours + self.glare) * self.colour
         if scatter:
             scatter = -(deltas * normals).sum(-1)
-            colours = ((colours + self.glare) * scatter[:, np.newaxis]
-                       * self.colour)
+            colours *= scatter[:, np.newaxis]
 
         # Apply distance shading:
         if fading:

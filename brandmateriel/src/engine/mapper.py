@@ -356,7 +356,7 @@ class Map(object):
                          np.random.random() * (1 - height / max_height),
                          0, 0]) * 153
                 else:
-                    colours[x, y] = np.array([0, 0, 77, 255])
+                    colours[x, y] = np.array([1, 1, 77, 255])
 
         self._colours = colours
 

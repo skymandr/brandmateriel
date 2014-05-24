@@ -365,6 +365,9 @@ class Game(object):
             player_shadow_colours = np.empty((0, 4))
 
         # Handle particles:
+        """
+        The stuff below really needs refactoring...
+        """
         if self.player.fire and (self.shots.number == 0 or
                                  self.shots.ages[-1] > self.player.cool_down):
             self.shots.add_particle(self.player.model.gun,
@@ -374,7 +377,8 @@ class Game(object):
         if self.player.thrust:
             self.exhaust.add_particle(
                 self.player.model.engine,
-                -self.player.model.orientation[self.W] * 8 +
+                -self.player.model.orientation[self.W] *
+                (7 + 2 * np.random.random()) +
                 (2 * np.random.random() - 1) * 2 *
                 self.player.model.orientation[self.U] +
                 (2 * np.random.random() - 1) * 2 *
@@ -489,24 +493,82 @@ class Game(object):
             exhaust_shadows = np.empty((0, 4, 2))
             exhaust_shadow_colours = np.empty((0, 4))
 
+        if self.shrapnel.number:
+            view = self._view
+            shrapnel_positions = self.shrapnel.patch_positions.copy()
+            shrapnel_positions = self.world.fix_view(self.focus_position, view,
+                                                     shrapnel_positions)
+            shrapnel_in_view = self.world.positions_in_view(
+                self.focus_position, view, shrapnel_positions)
+
+            if shrapnel_in_view.size:
+                shrapnel_positions = shrapnel_positions[shrapnel_in_view]
+                shrapnel_patches = self.world.fix_view(
+                    self.focus_position, view,
+                    self.shrapnel.patches[shrapnel_in_view])
+
+                if self.camera.position[self.Z] < self._culling_height:
+                    shrapnel_shadows, shrapnel_shadow_positions = \
+                        e.shadow.get_shadows(shrapnel_patches.copy(),
+                                             self.world)
+                    shrapnel_shadows, shadow_depths = \
+                        self.camera.get_screen_coordinates(shrapnel_shadows)
+                    shrapnel_shadow_colours = (
+                        np.array([[0, 0, 0, 1]]) *
+                        np.ones((shrapnel_shadows.shape[0], 1)))
+
+                else:
+                    shrapnel_shadow_positions = np.empty((0, 3))
+                    shrapnel_shadows = np.empty((0, 4, 2))
+                    shrapnel_shadow_colours = np.empty((0, 4))
+
+                (shrapnel_patches, shrapnel_depths) = \
+                    self.camera.get_screen_coordinates(shrapnel_patches)
+                shrapnel_colours = self.shrapnel.patch_colours[
+                    shrapnel_in_view]
+                shrapnel_colours = self.shader.apply_lighting(
+                    shrapnel_positions, shrapnel_positions, shrapnel_colours,
+                    scatter=False)
+            else:
+                shrapnel_positions = np.empty((0, 3))
+                shrapnel_patches = np.empty((0, 3, 2))
+                shrapnel_colours = np.empty((0, 4))
+
+                shrapnel_shadow_positions = np.empty((0, 3))
+                shrapnel_shadows = np.empty((0, 4, 2))
+                shrapnel_shadow_colours = np.empty((0, 4))
+
+        else:
+            shrapnel_positions = np.empty((0, 3))
+            shrapnel_patches = np.empty((0, 3, 2))
+            shrapnel_colours = np.empty((0, 4))
+
+            shrapnel_shadow_positions = np.empty((0, 3))
+            shrapnel_shadows = np.empty((0, 4, 2))
+            shrapnel_shadow_colours = np.empty((0, 4))
+
         # aggregate draw data:
         object_positions = np.r_[player_positions, shots_positions,
-                                 exhaust_positions, houses_positions]
+                                 exhaust_positions, shrapnel_positions,
+                                 houses_positions]
         object_patches = list(player_patches[:])
         object_patches.extend(list(shots_patches[:]))
         object_patches.extend(list(exhaust_patches[:]))
+        object_patches.extend(list(shrapnel_patches[:]))
         object_patches.extend(list(houses_patches[:]))
         object_colours = np.r_[player_colours, shots_colours, exhaust_colours,
-                               houses_colours]
+                               shrapnel_colours, houses_colours]
 
         shadow_positions = np.r_[player_shadow_positions,
                                  shots_shadow_positions,
-                                 exhaust_shadow_positions]
+                                 exhaust_shadow_positions,
+                                 shrapnel_shadow_positions]
         shadow_patches = list(player_shadow[:])
         shadow_patches.extend(list(shots_shadows[:]))
         shadow_patches.extend(list(exhaust_shadows[:]))
+        shadow_patches.extend(list(shrapnel_shadows[:]))
         shadow_colours = np.r_[player_shadow_colours, shots_shadow_colours,
-                               exhaust_shadow_colours]
+                               exhaust_shadow_colours, shrapnel_shadow_colours]
 
         # sort patches:
 
@@ -549,7 +611,6 @@ class Game(object):
             if self.shrapnel.number:
                 self.shrapnel.impose_boundary_conditions(self.world)
                 self.shrapnel.move()
-                print self.shrapnel.number
 
             if self.exhaust.number:
                 self.exhaust.impose_boundary_conditions(self.world)
