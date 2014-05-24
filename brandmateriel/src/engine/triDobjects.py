@@ -558,7 +558,7 @@ class Pika(TriD):
 
         self._engine = np.array([0.0, 0.0, 0.0])
 
-        self._gun = self.points[0]
+        self._gun = points[0]
 
 
 class Lander(TriD):
