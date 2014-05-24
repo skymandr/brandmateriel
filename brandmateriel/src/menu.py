@@ -280,9 +280,14 @@ def draw_menu(menu, surface):
 
             colour = menu.setup["colour"]
 
-        if i[1][0] in ("list", "toggle"):
+        if i[1][0] == "toggle":
 
             text = font.render("  {0}: {1}  ".format(i[0], i[1][2][i[1][1]]),
+                               True, colour)
+
+        if i[1][0] == "list":
+
+            text = font.render("  {0}: {1}  ".format(i[0], i[1][3][i[1][1]]),
                                True, colour)
 
         else:
