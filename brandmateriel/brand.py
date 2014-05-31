@@ -60,7 +60,7 @@ def main():
         while(mode == "game"):
             mode = game.do_step(window)
             pygame.display.flip()
-            fps_clock.tick(fps)
+            print fps_clock.tick(fps)
 
         while(mode == "hiscore"):
             print "high-score list is not implemented. returning to menu ..."

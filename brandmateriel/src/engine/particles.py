@@ -93,6 +93,7 @@ class Particles(object):
         self._accelerations = np.empty((0, 3))
         self._ages = np.empty((0))
         self._colours = np.empty((0, 4))
+        self._visible = True
 
     @property
     def particle(self):
@@ -105,6 +106,14 @@ class Particles(object):
     @property
     def number(self):
         return self.positions.shape[0]
+
+    @property
+    def visible(self):
+        return self._visible
+
+    @visible.setter
+    def visible(self, val):
+        self._visible = val
 
     @property
     def positions(self):
@@ -233,11 +242,6 @@ class Particles(object):
 
 
 class Shots(Particles):
-
-    X = U = 0
-    Y = V = 1
-    Z = W = 2
-
     def __init__(self, particle=Particle()):
         self._particle = particle
         self._positions = np.empty((0, 3))
@@ -245,6 +249,7 @@ class Shots(Particles):
         self._accelerations = np.empty((0, 3))
         self._ages = np.empty((0))
         self._colours = np.empty((0, 4))
+        self._visible = True
 
     def impose_boundary_conditions(self, world):
         self.cull_aged()
@@ -283,11 +288,6 @@ class Shots(Particles):
 
 
 class Shrapnel(Particles):
-
-    X = U = 0
-    Y = V = 1
-    Z = W = 2
-
     def __init__(self, particle=Particle(friction=0.5, lifetime=0.5,
                                          elasticity=np.sqrt(3) * 0.5)):
         self._particle = particle
@@ -296,6 +296,7 @@ class Shrapnel(Particles):
         self._accelerations = np.empty((0, 3))
         self._ages = np.empty((0))
         self._colours = np.empty((0, 4))
+        self._visible = True
 
     def add_particles(self, positions, velocities, colours):
         N = np.random.randint(4, 10)
@@ -324,11 +325,6 @@ class Shrapnel(Particles):
 
 
 class Exhaust(Particles):
-
-    X = U = 0
-    Y = V = 1
-    Z = W = 2
-
     def __init__(self, particle=Particle(
             friction=0.125, lifetime=1.618, elasticity=0.25,
             colour=np.array([255, 255, 153, 255]))):
@@ -338,6 +334,7 @@ class Exhaust(Particles):
         self._accelerations = np.empty((0, 3))
         self._ages = np.empty((0))
         self._colours = np.empty((0, 4))
+        self._visible = True
 
     def add_particle(self, position, velocity, acceleration, age=0.0,
                      colour=None):
@@ -377,3 +374,71 @@ class Exhaust(Particles):
         self.positions += self.velocities * dt
         self.ages += dt
         self.colours *= np.array([0.96, 0.92, 0.88, 1.0])
+
+
+class Stars(Particles):
+    def __init__(self, N, world, mean_speed=1.0, min_height=21.0,
+                 max_height=42.0, particle=Particle(
+            gravity=0.0, friction=0.0, lifetime=1.618, elasticity=0.0,
+            colour=np.array([255, 153, 204, 255]))):
+        self._particle = particle
+        self._positions = np.empty((0, 3))
+        self._velocities = np.empty((0, 3))
+        self._accelerations = np.empty((0, 3))
+        self._ages = np.empty((0))
+        self._colours = np.empty((0, 4))
+        self._min_height = min_height
+        self._max_height = max_height
+        self._world_shape = world.shape
+        self.add_particles(N, mean_speed)
+        self._visible = True
+
+    @property
+    def min_height(self):
+        return self._min_height
+
+    @min_height.setter
+    def min_height(self, val):
+        self._min_height = val
+
+    @property
+    def max_height(self):
+        return self._max_height
+
+    @max_height.setter
+    def max_height(self, val):
+        self._max_height = val
+
+    def add_particles(self, N, mean_speed=1.0, colour=None):
+        x = np.random.random(N) * self._world_shape[self.X]
+        y = np.random.random(N) * self._world_shape[self.Y]
+        z = (np.random.random(N) * (self._max_height - self._min_height) +
+             self._min_height)
+
+        positions = np.c_[x, y, z]
+
+        velocities = (2.0 * np.random.random((N, 3)) - 1.0) * mean_speed
+
+        self.positions = np.r_[self.positions, positions]
+        self.velocities = np.r_[self.velocities, velocities]
+        self.accelerations = np.empty((self.number, 3))
+        self.ages = np.empty(self.number)
+
+        if colour is None:
+            self.colours = np.r_[self.colours,
+                                 (0.5 + np.random.random((N, 4))) *
+                                 self.particle.colour[np.newaxis]]
+        else:
+            self.colours = np.r_[self.colours, colour * np.ones((N, 4))]
+
+    def move(self, dt=0.03125):
+        self.positions += self.velocities * dt
+
+    def impose_boundary_conditions(self, world):
+        if self.number:
+            self.positions[:, self.X] %= world.shape[self.X]
+            self.positions[:, self.Y] %= world.shape[self.Y]
+            self.positions[:, self.Z] = ((self.positions[:, self.Z] -
+                                          self._min_height) %
+                                         (self._max_height - self._min_height)
+                                         + self._min_height)

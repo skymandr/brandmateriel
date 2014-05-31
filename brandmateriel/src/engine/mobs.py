@@ -137,9 +137,10 @@ class Movable(object):
             self.position[self.Z] += (height -
                                       self.model.bounding_box[0, self.Z])
             self.bounce(world)
-        elif self.position[self.Z] > 42.0:
-            self.position[self.Z] = 42.0
-            self.velocity[self.Z] = 0.0
+        elif self.position[self.Z] > 36.0 and self.velocity[self.Z] > 0:
+            self.velocity[self.Z] *= 0.9
+            if self.acceleration[self.Z] > 0:
+                self.acceleration[self.Z] = 0.0
 
 
 class Player(Movable):
@@ -288,6 +289,7 @@ class Player(Movable):
 
     def apply_forces(self):
         force = (self.friction + self.gravity * self.inertia +
-                 20 * self.thrust * self.model.orientation[self.W])
+                 20 * (self.thrust and self.position[self.Z] < 36.0) *
+                 self.model.orientation[self.W])
 
         self.acceleration = force / self.inertia

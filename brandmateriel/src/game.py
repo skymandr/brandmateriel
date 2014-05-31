@@ -46,18 +46,17 @@ class Game(object):
         self.player.position = (np.array([64.0, 64.0, 5.0]))
         print "DONE"
 
-        print "initialising game objects ... ",
-        self._populate_world()
-        self.shots = e.particles.Shots()
-        self.shrapnel = e.particles.Shrapnel()
-        self.exhaust = e.particles.Exhaust()
-        print "DONE"
-
         print "seting up camera ... ",
         self.camera = e.camera.Camera(screen=e.camera.Screen(
             resolution=config["resolution"]))
 
-        if config["camera"] == "rear":
+        if config["camera"] == "fixed":
+            self.update_camera = self.update_fixed_camera
+            D = self._view[self.Y]
+            h = (self.camera.screen.extent[self.Y] * 0.5 -
+                 self.camera.screen.position[self.Z])
+            d = self.camera.distance
+        elif config["camera"] == "rear":
             self.update_camera = self.update_rear_camera
             self.config["view"] = (self._view[0], self._view[0])
             D = self._view[self.Y] * (1 + np.sqrt(2)) * 0.5
@@ -73,6 +72,7 @@ class Game(object):
 
         self._culling_height = np.ceil((h * (D / d + 1.0) + np.ceil(
             self.world.patch_positions[:, :, self.Z].max())))
+        self._star_field_height = self._culling_height
 
         self.light_source = e.shader.LightSource()
 
@@ -83,6 +83,15 @@ class Game(object):
                                       0.75)
 
         self.update_camera()
+        print "DONE"
+
+        print "initialising game objects ... ",
+        self._populate_world()
+        self.shots = e.particles.Shots()
+        self.shrapnel = e.particles.Shrapnel()
+        self.exhaust = e.particles.Exhaust()
+        self.star_field = e.particles.Stars(42 ** 2, self.world,
+                                            min_height=self._star_field_height)
         print "DONE"
 
         self._pause = False
@@ -285,7 +294,7 @@ class Game(object):
                 pygame.draw.polygon(surface, colours[n], patches[n], 1)
 
     def get_particle_patches(self, particles, view):
-        if particles.number:
+        if particles.number and particles.visible:
             positions = particles.patch_positions.copy()
             positions = self.world.fix_view(self.focus_position, view,
                                             positions)
@@ -418,9 +427,6 @@ class Game(object):
             player_shadow_colours = np.empty((0, 4))
 
         # Handle particles:
-        """
-        The stuff below really needs refactoring...
-        """
         if self.player.fire and (self.shots.number == 0 or
                                  self.shots.ages[-1] > self.player.cool_down):
             self.shots.add_particle(self.player.model.gun,
@@ -439,31 +445,43 @@ class Game(object):
                 (7 + 2 * np.random.random((N, 3))) +
                 self.player.velocity * np.ones((N, 3)), np.zeros((N, 3)))
 
+        if self.player.position[self.Z] < self.star_field.min_height - 3:
+            self.star_field.visible = False
+        else:
+            self.star_field.visible = True
+
         (shots_positions, shots_patches, shots_colours,
          shots_shadow_positions, shots_shadows, shots_shadow_colours) = \
             self.get_particle_patches(self.shots, self._view +
-                                      self.camera.distance)
+                                      self.camera.distance - 1.0)
 
         (exhaust_positions, exhaust_patches, exhaust_colours,
          exhaust_shadow_positions, exhaust_shadows, exhaust_shadow_colours) = \
             self.get_particle_patches(self.exhaust, self._view +
-                                      self.camera.distance)
+                                      self.camera.distance - 1.0)
 
         (shrapnel_positions, shrapnel_patches, shrapnel_colours,
-         shrapnel_shadow_positions, shrapnel_shadows, shrapnel_shadow_colours) = \
-            self.get_particle_patches(self.shrapnel, self._view)
+         shrapnel_shadow_positions, shrapnel_shadows,
+         shrapnel_shadow_colours) = self.get_particle_patches(self.shrapnel,
+                                                              self._view)
+
+        (stars_positions, stars_patches, stars_colours,
+         stars_shadow_positions, stars_shadows, stars_shadow_colours) = \
+            self.get_particle_patches(self.star_field, self._view +
+                                      self.camera.distance - 1.0)
 
         # aggregate draw data:
         object_positions = np.r_[player_positions, shots_positions,
                                  exhaust_positions, shrapnel_positions,
-                                 houses_positions]
+                                 houses_positions, stars_positions]
         object_patches = list(player_patches[:])
         object_patches.extend(list(shots_patches[:]))
         object_patches.extend(list(exhaust_patches[:]))
         object_patches.extend(list(shrapnel_patches[:]))
         object_patches.extend(list(houses_patches[:]))
+        object_patches.extend(list(stars_patches[:]))
         object_colours = np.r_[player_colours, shots_colours, exhaust_colours,
-                               shrapnel_colours, houses_colours]
+                               shrapnel_colours, houses_colours, stars_colours]
 
         shadow_positions = np.r_[player_shadow_positions,
                                  shots_shadow_positions,
@@ -521,6 +539,10 @@ class Game(object):
             if self.exhaust.number:
                 self.exhaust.impose_boundary_conditions(self.world)
                 self.exhaust.move()
+
+            if self.star_field.number and self.star_field.visible:
+                self.star_field.impose_boundary_conditions(self.world)
+                self.star_field.move()
 
             self.update_camera()
 
