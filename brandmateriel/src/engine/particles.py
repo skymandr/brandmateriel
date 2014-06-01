@@ -377,10 +377,17 @@ class Exhaust(Particles):
 
 
 class Stars(Particles):
-    def __init__(self, N, world, mean_speed=1.0, min_height=21.0,
+    """
+    TODO:
+        * Change  world --> view.
+        * map coordinates to ((0, 0); (view.max())
+        * make a return, which offsets by player X and Y.
+    """
+
+    def __init__(self, N, view, mean_speed=1.0, min_height=21.0,
                  max_height=42.0, particle=Particle(
             gravity=0.0, friction=0.0, lifetime=1.618, elasticity=0.0,
-            colour=np.array([255, 153, 204, 255]))):
+            colour=np.array([204, 102, 204, 255]))):
         self._particle = particle
         self._positions = np.empty((0, 3))
         self._velocities = np.empty((0, 3))
@@ -389,7 +396,8 @@ class Stars(Particles):
         self._colours = np.empty((0, 4))
         self._min_height = min_height
         self._max_height = max_height
-        self._world_shape = world.shape
+        self._view = view
+        self._offset = np.zeros(3)
         self.add_particles(N, mean_speed)
         self._visible = True
 
@@ -410,8 +418,8 @@ class Stars(Particles):
         self._max_height = val
 
     def add_particles(self, N, mean_speed=1.0, colour=None):
-        x = np.random.random(N) * self._world_shape[self.X]
-        y = np.random.random(N) * self._world_shape[self.Y]
+        x = np.random.random(N) * self._view[self.X]
+        y = np.random.random(N) * self._view[self.Y]
         z = (np.random.random(N) * (self._max_height - self._min_height) +
              self._min_height)
 
@@ -419,7 +427,7 @@ class Stars(Particles):
 
         velocities = (2.0 * np.random.random((N, 3)) - 1.0) * mean_speed
 
-        self.positions = np.r_[self.positions, positions]
+        self._positions = np.r_[self._positions, positions]
         self.velocities = np.r_[self.velocities, velocities]
         self.accelerations = np.empty((self.number, 3))
         self.ages = np.empty(self.number)
@@ -431,28 +439,39 @@ class Stars(Particles):
         else:
             self.colours = np.r_[self.colours, colour * np.ones((N, 4))]
 
-    def move(self, dt=0.03125):
-        self.positions += self.velocities * dt
+    def move(self, velocity, dt=0.03125):
+        self._positions += (self.velocities - velocity[np.newaxis]) * dt
 
-    def impose_boundary_conditions(self, position, view):
+    def impose_boundary_conditions(self):
         if self.number:
-            xmin = position[self.X] - view[self.X] * 0.5
-            ymin = position[self.Y] - view[self.Y] * 0.5
-
-            self.positions[:, self.X] = ((self.positions[:, self.X] - xmin) %
-                                         view[self.X] + xmin)
-            self.positions[:, self.Y] = ((self.positions[:, self.Y] - ymin) %
-                                         view[self.X] + ymin)
-            self.positions[:, self.Z] = ((self.positions[:, self.Z] -
-                                          self._min_height) %
-                                         (self._max_height - self._min_height)
-                                         + self._min_height)
+            self._positions[:, self.X] = (self._positions[:, self.X] %
+                                          self._view[self.X])
+            self._positions[:, self.Y] = (self._positions[:, self.Y] %
+                                          self._view[self.X])
+            self._positions[:, self.Z] = ((self._positions[:, self.Z] -
+                                           self._min_height) %
+                                          (self._max_height - self._min_height)
+                                          + self._min_height)
 
     def impose_boundary_conditions_old(self, world):
         if self.number:
-            self.positions[:, self.X] %= world.shape[self.X]
-            self.positions[:, self.Y] %= world.shape[self.Y]
-            self.positions[:, self.Z] = ((self.positions[:, self.Z] -
-                                          self._min_height) %
-                                         (self._max_height - self._min_height)
-                                         + self._min_height)
+            self._positions[:, self.X] %= world.shape[self.X]
+            self._positions[:, self.Y] %= world.shape[self.Y]
+            self._positions[:, self.Z] = ((self.positions[:, self.Z] -
+                                           self._min_height) %
+                                          (self._max_height - self._min_height)
+                                          + self._min_height)
+
+    @property
+    def offset(self):
+        return self._offset
+
+    @offset.setter
+    def offset(self, position):
+        self._offset = np.array([position[self.X] - self._view[self.X] * 0.5,
+                                 position[self.Y] - self._view[self.Y] * 0.5,
+                                 0.0])
+
+    @property
+    def positions(self):
+        return self._positions + self.offset

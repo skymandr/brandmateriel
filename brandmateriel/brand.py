@@ -23,7 +23,7 @@ if not pygame.mixer:
 def main():
     pygame.init()
     fps_clock = pygame.time.Clock()
-    fps = 32
+    fps = 23.8
     window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
 
     mode = "menu"
@@ -50,12 +50,12 @@ def main():
                 print "loading map: {0}".format(menu.config["map"])
                 game = g.Game(menu.config, 'assets/maps/{0}.npy'.format(
                     menu.config["map"]), menu.setup["font"],
-                    menu.setup["fontsize"])
+                    menu.setup["fontsize"], fps)
             except IOError:
                 print "no such map: {0}; using Legacy".format(
                     menu.config["map"])
                 game = g.Game(menu.config, 'assets/maps/legacy.npy',
-                              menu.setup["font"], menu.setup["fontsize"])
+                              menu.setup["font"], menu.setup["fontsize"], fps)
 
         while(mode == "game"):
             mode = game.do_step(window)

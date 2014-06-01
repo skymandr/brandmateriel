@@ -21,11 +21,12 @@ class Game(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, config, world, font, fontsize):
+    def __init__(self, config, world, font, fontsize, fps):
         pygame.event.set_grab(True)
         pygame.mouse.set_visible(False)
 
         self._config = config
+        self._dt = 1.0 / fps
 
         print "initialising world map ... ",
         self.world = e.mapper.Map(world)
@@ -91,7 +92,8 @@ class Game(object):
         self.shrapnel = e.particles.Shrapnel()
         self.exhaust = e.particles.Exhaust()
         self.star_field = e.particles.Stars(0.25 * self._view[0] ** 2,
-                                            self.world,
+                                            self._view + self.camera.distance
+                                            - 0.5,
                                             min_height=self._star_field_height)
         print "DONE"
 
@@ -455,12 +457,12 @@ class Game(object):
         (shots_positions, shots_patches, shots_colours,
          shots_shadow_positions, shots_shadows, shots_shadow_colours) = \
             self.get_particle_patches(self.shots, self._view +
-                                      self.camera.distance - 1.0)
+                                      self.camera.distance - 0.5)
 
         (exhaust_positions, exhaust_patches, exhaust_colours,
          exhaust_shadow_positions, exhaust_shadows, exhaust_shadow_colours) = \
             self.get_particle_patches(self.exhaust, self._view +
-                                      self.camera.distance - 1.0)
+                                      self.camera.distance - 0.5)
 
         (shrapnel_positions, shrapnel_patches, shrapnel_colours,
          shrapnel_shadow_positions, shrapnel_shadows,
@@ -470,7 +472,7 @@ class Game(object):
         (stars_positions, stars_patches, stars_colours,
          stars_shadow_positions, stars_shadows, stars_shadow_colours) = \
             self.get_particle_patches(self.star_field, self._view +
-                                      self.camera.distance - 1.0)
+                                      self.camera.distance - 0.5)
 
         # aggregate draw data:
         object_positions = np.r_[player_positions, shots_positions,
@@ -525,29 +527,28 @@ class Game(object):
 
         else:
 
-            self.player.move()
+            self.player.move(self._dt)
             self.player.impose_boundary_conditions(self.world)
 
             if self.shots.number:
-                self.shots.move()
+                self.shots.move(self._dt)
                 shrapnel = self.shots.impose_boundary_conditions(self.world)
                 if shrapnel is not None:
                     self.shrapnel.add_particles(*shrapnel)
 
             if self.shrapnel.number:
                 self.shrapnel.impose_boundary_conditions(self.world)
-                self.shrapnel.move()
+                self.shrapnel.move(self._dt)
 
             if self.exhaust.number:
                 self.exhaust.impose_boundary_conditions(self.world)
-                self.exhaust.move()
+                self.exhaust.move(self._dt)
 
             if self.star_field.number and self.star_field.visible:
-                # self.star_field.impose_boundary_conditions_old(self.world)
-                self.star_field.impose_boundary_conditions(
-                    self.player.position, self._view + self.camera.distance
-                    - 1.0)
-                self.star_field.move()
+                self.star_field.offset = self.player.position
+                self.star_field.impose_boundary_conditions()
+                self.star_field.move(self.player.velocity *
+                                     np.array([1.0, 1.0, 0.0]), self._dt)
 
             self.update_camera()
 
