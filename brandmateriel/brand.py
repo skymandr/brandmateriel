@@ -51,11 +51,17 @@ def main():
                 game = g.Game(menu.config, 'assets/maps/{0}.npy'.format(
                     menu.config["map"]), menu.setup["font"],
                     menu.setup["fontsize"], fps)
+                pygame.event.set_grab(True)
+                pygame.mouse.set_visible(False)
+                pygame.mouse.get_rel()
             except IOError:
                 print "no such map: {0}; using Legacy".format(
                     menu.config["map"])
                 game = g.Game(menu.config, 'assets/maps/legacy.npy',
                               menu.setup["font"], menu.setup["fontsize"], fps)
+                pygame.event.set_grab(True)
+                pygame.mouse.set_visible(False)
+                pygame.mouse.get_rel()
 
         while(mode == "game"):
             mode = game.do_step(window)
