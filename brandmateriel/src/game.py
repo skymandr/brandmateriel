@@ -26,6 +26,7 @@ class Game(object):
         pygame.mouse.set_visible(False)
 
         self._config = config
+        self._sensitivity = np.pi / config["control"]
         self._dt = 1.0 / fps
 
         print "initialising world map ... ",
@@ -234,10 +235,10 @@ class Game(object):
                 motion = np.array(pygame.mouse.get_rel())
 
                 self.player.yaw = (self.player.yaw - motion[self.X] *
-                                   np.pi / 360) % (2 * np.pi)
+                                   self._sensitivity) % (2 * np.pi)
 
                 self.player.pitch = (self.player.pitch - motion[self.Y] *
-                                     np.pi / 360)
+                                     self._sensitivity)
 
                 if self.player.pitch < -2.0 * np.pi / 3.0:
 
