@@ -90,7 +90,8 @@ class Game(object):
         self.shots = e.particles.Shots()
         self.shrapnel = e.particles.Shrapnel()
         self.exhaust = e.particles.Exhaust()
-        self.star_field = e.particles.Stars(42 ** 2, self.world,
+        self.star_field = e.particles.Stars(0.25 * self._view[0] ** 2,
+                                            self.world,
                                             min_height=self._star_field_height)
         print "DONE"
 
@@ -445,7 +446,8 @@ class Game(object):
                 (7 + 2 * np.random.random((N, 3))) +
                 self.player.velocity * np.ones((N, 3)), np.zeros((N, 3)))
 
-        if self.player.position[self.Z] < self.star_field.min_height - 3:
+        if (self.player.position[self.Z] < self.star_field.min_height -
+                self.camera.screen.extent[self.V] * 0.5):
             self.star_field.visible = False
         else:
             self.star_field.visible = True
@@ -541,7 +543,10 @@ class Game(object):
                 self.exhaust.move()
 
             if self.star_field.number and self.star_field.visible:
-                self.star_field.impose_boundary_conditions(self.world)
+                # self.star_field.impose_boundary_conditions_old(self.world)
+                self.star_field.impose_boundary_conditions(
+                    self.player.position, self._view + self.camera.distance
+                    - 1.0)
                 self.star_field.move()
 
             self.update_camera()

@@ -434,7 +434,21 @@ class Stars(Particles):
     def move(self, dt=0.03125):
         self.positions += self.velocities * dt
 
-    def impose_boundary_conditions(self, world):
+    def impose_boundary_conditions(self, position, view):
+        if self.number:
+            xmin = position[self.X] - view[self.X] * 0.5
+            ymin = position[self.Y] - view[self.Y] * 0.5
+
+            self.positions[:, self.X] = ((self.positions[:, self.X] - xmin) %
+                                         view[self.X] + xmin)
+            self.positions[:, self.Y] = ((self.positions[:, self.Y] - ymin) %
+                                         view[self.X] + ymin)
+            self.positions[:, self.Z] = ((self.positions[:, self.Z] -
+                                          self._min_height) %
+                                         (self._max_height - self._min_height)
+                                         + self._min_height)
+
+    def impose_boundary_conditions_old(self, world):
         if self.number:
             self.positions[:, self.X] %= world.shape[self.X]
             self.positions[:, self.Y] %= world.shape[self.Y]
