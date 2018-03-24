@@ -183,8 +183,8 @@ class Particles(object):
         self.accelerations = forces / self.particle.inertia
 
     def bounce(self, world, n):
-        normals = world.normals[self.positions[n, self.X],
-                                self.positions[n, self.Y]]
+        normals = world.normals[int(self.positions[n, self.X]),
+                                int(self.positions[n, self.Y])]
         self.velocities[n] -= ((1 + self.particle.elasticity) * normals *
                                (self.velocities[n] *
                                 normals).sum(-1)[..., np.newaxis])

@@ -120,7 +120,8 @@ class Movable(object):
         self.acceleration = force / self.inertia
 
     def bounce(self, world):
-        normal = world.normals[self.position[self.X], self.position[self.Y]]
+        normal = world.normals[int(self.position[self.X]),
+                               int(self.position[self.Y])]
         self._velocity -= 2.0 * np.dot(self._velocity, normal) * normal
 
         # self._velocity[self.Z] = np.abs(self._velocity[self.Z])
@@ -129,8 +130,8 @@ class Movable(object):
         self.position[self.X] %= world.shape[self.X]
         self.position[self.Y] %= world.shape[self.Y]
 
-        height = max(0, world.patches[self.position[self.X],
-                                      self.position[self.Y],
+        height = max(0, world.patches[int(self.position[self.X]),
+                                      int(self.position[self.Y]),
                                       :, self.Z].max())
 
         if self.model.bounding_box[0, self.Z] < height:

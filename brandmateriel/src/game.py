@@ -92,7 +92,7 @@ class Game(object):
         self.shots = e.particles.Shots()
         self.shrapnel = e.particles.Shrapnel()
         self.exhaust = e.particles.Exhaust()
-        self.star_field = e.particles.Stars(0.25 * self._view[0] ** 2,
+        self.star_field = e.particles.Stars(int(0.25 * self._view[0] ** 2),
                                             self._view + self.camera.distance
                                             - 0.5,
                                             min_height=self._star_field_height)

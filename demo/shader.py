@@ -171,7 +171,7 @@ class Shader(object):
 
         # Apply scatter:
         scatter = (deltas * normals).sum(-1)
-        colours -= self.colour * scatter[:, np.newaxis]
+        colours -= (self.colour * scatter[:, np.newaxis]).astype(int)
 
         # Apply distance shading:
         if self.distance_shading:
@@ -183,7 +183,8 @@ class Shader(object):
             # Linear with cut-off: (LinRange - dists + ConstRange) / LinRange
             colours *= np.fmin(1, np.fmax(0,
                                           (4 * self.cutoff_distance - dists)
-                                          / (2 * self.cutoff_distance)))
+                                          / (2 * self.cutoff_distance))
+                               ).astype(int)
 
         # Renormalise to allowed colour values:
         colours = np.where(colours > 255, 255, colours)
