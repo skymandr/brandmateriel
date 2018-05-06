@@ -350,13 +350,18 @@ class Map(object):
         for x in xrange(colours.shape[self.X]):
             for y in xrange(colours.shape[self.Y]):
                 height = self._positions[x, y, self.Z]
-                if height > self.sealevel:
+                if height > self.sealevel + 0.14:
                     colours[x, y] = np.array([51, 102, 26, 255]) + np.array(
                         [np.random.random() * height / max_height,
                          np.random.random() * (1 - height / max_height),
                          0, 0]) * 153
-                else:
+                elif height < self.sealevel - 0.28:
                     colours[x, y] = np.array([1, 1, 77, 255])
+                else:
+                    colours[x, y] = np.array([204, 153, 51, 255]) + np.array(
+                        [np.random.random() * height / max_height,
+                         np.random.random() * height / max_height,
+                         0, 0]) * 153
 
         self._colours = colours
 
