@@ -1,3 +1,4 @@
+import datetime as dt
 import numpy as np
 import pygame
 from pygame import locals as l
@@ -99,7 +100,12 @@ class Game(object):
         print "DONE"
 
         self._pause = False
+        self._gameover = False
+        self._gameover_timer = None
+        self._points = 0
+
         pygame.mouse.get_rel()
+
         print "game starting"
 
     @property
@@ -448,6 +454,13 @@ class Game(object):
                 -self.player.model.orientation[self.W] *
                 (7 + 2 * np.random.random((N, 3))) +
                 self.player.velocity * np.ones((N, 3)), np.zeros((N, 3)))
+        elif self.player.model.exploding:
+            N = np.random.randint(0, 42)
+            self.exhaust.add_particles(
+                self.player.position * np.ones((N, 3)),
+                (2 * np.random.random((N, 3)) - 1) * 5
+                + 0.9 * self.player.velocity * np.ones((N, 3)),
+                np.zeros((N, 3)))
 
         if (self.player.position[self.Z] < self.star_field.min_height -
                 self.camera.screen.extent[self.V] * 0.5):
@@ -526,6 +539,49 @@ class Game(object):
 
             surface.blit(text, textpos)
 
+        elif self._gameover:
+
+            colour = (204, 153, 153, 153)
+
+            text = self._font.render(
+                "GAME OVER", True, colour,
+            )
+
+            textpos = text.get_rect(
+                center=(self.config["resolution"][0] / 2,
+                        self.config["resolution"][1] / 3)
+            )
+
+            surface.blit(text, textpos)
+
+            text = self._font.render(
+                "Points: {}".format(self._points), True, colour,
+            )
+
+            textpos = text.get_rect(
+                center=(self.config["resolution"][0] / 2,
+                        self.config["resolution"][1] / 2)
+            )
+
+            surface.blit(text, textpos)
+
+            text = self._font.render(
+                "Press ESCAPE to RETURN TO MENU", True, colour,
+            )
+
+            textpos = text.get_rect(
+                center=(self.config["resolution"][0] / 2,
+                        2 * self.config["resolution"][1] / 3)
+            )
+
+            surface.blit(text, textpos)
+
+            pygame.event.set_grab(not self._gameover)
+
+            pygame.mouse.set_visible(self._gameover)
+
+            pygame.mouse.get_rel()
+
         else:
 
             self.player.move(self._dt)
@@ -533,6 +589,7 @@ class Game(object):
 
             if self.shots.number:
                 self.shots.move(self._dt)
+                self.check_shots_hit()
                 shrapnel = self.shots.impose_boundary_conditions(self.world)
                 if shrapnel is not None:
                     self.shrapnel.add_particles(*shrapnel)
@@ -553,4 +610,32 @@ class Game(object):
 
             self.update_camera()
 
+        if self.player.model.exploding:
+            try:
+                self._gameover = (
+                    self._gameover_timer
+                    < dt.datetime.now() - dt.timedelta(seconds=1)
+                )
+            except TypeError:
+                self._gameover_timer = dt.datetime.now()
+
         return flag
+
+    def check_shots_hit(self):
+        hits = (((
+            self.shots.positions[:, np.newaxis]
+            - self.houses.positions[np.newaxis, :]
+        ) ** 2).sum(axis=2) < self.houses.model.scale).sum(axis=0)
+
+        for house_index, house_position in enumerate(self.houses.positions):
+            if hits[house_index]:
+                print "BOOM!"
+                N = np.random.randint(42, 100)
+                self.exhaust.add_particles(
+                    house_position * np.ones((N, 3)),
+                    (2 * np.random.random((N, 3)) - 1) * 5,
+                    np.zeros((N, 3))
+                )
+                self.houses.delete_object(house_index)
+                self._points -= 1
+                break
