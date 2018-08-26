@@ -2,5 +2,5 @@ This directory contains demos of what the engine can do, written as the first
 part of the development.
 
 While parts of the engine implemented here is out of date compared to the
-engine used in the game, at least "pygame_demo.py" remains fairlyillustrative
+engine used in the game, at least "pygame_demo.py" remains fairly illustrative
 to how the engine works.
