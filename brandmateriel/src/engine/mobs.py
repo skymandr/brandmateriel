@@ -138,6 +138,8 @@ class Movable(object):
             self.position[self.Z] += (height -
                                       self.model.bounding_box[0, self.Z])
             self.bounce(world)
+            if abs(self.velocity[self.Z]) > 2.5:
+                self.model.exploding = True
         elif self.position[self.Z] > 36.0 and self.velocity[self.Z] > 0:
             self.velocity[self.Z] *= 0.9
             if self.acceleration[self.Z] > 0:
@@ -294,3 +296,6 @@ class Player(Movable):
                  self.model.orientation[self.W])
 
         self.acceleration = force / self.inertia
+
+        if self.model.exploding:
+            self.model.explode()
