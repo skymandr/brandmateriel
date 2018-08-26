@@ -2,7 +2,7 @@ This is the repository for Brandmateriel, a 3D game and engine inspired by
 Zarch and written by Andreas Skyman in 2014.
 
 The game is found in the "brandmateriel" sub-directory. It is started by
-running "brand.py".
+running "brand.py". It requires Python 2.7, unforunately.
 
 The subdirectory "demo" contains a few examples, the code of which is in some
 cases out of date, but should be illustrative.

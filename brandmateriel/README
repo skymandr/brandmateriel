@@ -1,6 +1,14 @@
 To control the lander, use the mouse.:
     * Mouse movement changes pitch and yaw.
     * Right mouse button engages thruster.
-    * Left and Middle mouse buttons will do violence in a possible future.
+    * Left does violence at the present.
+    * The Middle mouse buttos will do violence in a possible future.
+    * Don't run into the ground with too high velocity!
 
-The lander can also be turned using arrow keys, but that's not recommended.
+The objective is to save the houses from a raging forest fire, started
+and spread by possibly extra-terrestrial pyromaniacs, neither of which
+is currently not implemented. Make sure not to blow up any houses,
+since this will lead to deduction of points...
+
+The lander can also be turned using arrow keys and 'hjkl', but that's
+not recommended.
