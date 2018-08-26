@@ -77,7 +77,7 @@ def main():
             mode = "menu"
 
         while(mode == "credits"):
-            print "game is not implemented. returning to menu ..."
+            print "credits is not implemented. returning to menu ..."
             mode = "menu"
 
         while(mode == "quit"):
