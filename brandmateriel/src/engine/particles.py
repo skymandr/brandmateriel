@@ -336,6 +336,33 @@ class Exhaust(Particles):
         self._colours = np.empty((0, 4))
         self._visible = True
 
+    def impose_boundary_conditions(self, world):
+        self.cull_aged()
+
+        if self.number:
+            self.positions[:, self.X] %= world.shape[self.X]
+            self.positions[:, self.Y] %= world.shape[self.Y]
+
+            heights = world.map_positions[
+                self.positions[:, self.X].astype(np.int),
+                self.positions[:, self.Y].astype(np.int), self.Z]
+
+            heights = np.where(heights < 0, 0, heights)
+
+            bouncers = np.where(self.positions[:, self.Z] < heights)[0]
+            if bouncers.size:
+                positions = self.positions[bouncers]
+
+                velocities = self.velocities[bouncers]
+
+                colours = world.colours[
+                    self.positions[bouncers, self.X].astype(np.int),
+                    self.positions[bouncers, self.Y].astype(np.int)]
+
+                self.delete_particles(bouncers)
+
+                return positions, velocities, colours
+
     def add_particle(self, position, velocity, acceleration, age=0.0,
                      colour=None):
         self.positions = np.r_[self.positions, position[np.newaxis]]
