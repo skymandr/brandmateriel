@@ -57,6 +57,8 @@ class TriD(object):
 
         self._exploding = False
 
+        self._exploded = False
+
     @property
     def orientation(self):
         return self._apply_rotation(self._orientation)
@@ -199,9 +201,23 @@ class TriD(object):
     def exploding(self, val):
         self._exploding = True if val else False
 
+    @property
+    def exploded(self):
+        return self._exploded
+
+    @exploded.setter
+    def exploded(self, val):
+        self._exploded = True if val else False
+
     def explode(self):
         if self.exploding:
-            self._patches += (np.random.random(self.patches.shape) - 0.5) * 0.2
+            self._patches += (
+                (np.random.random(self.patches.shape) - 0.5) * 0.1
+                + np.random.random(self.patches.shape[0])[
+                    :, np.newaxis, np.newaxis
+                ] * np.ones(self.patches.shape)
+                * self.normals[:, np.newaxis, :] * 0.1
+            )
         else:
             self.exploding = True
 

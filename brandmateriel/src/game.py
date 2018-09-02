@@ -443,7 +443,16 @@ class Game(object):
                                     self.player.model.orientation[self.V] * 16
                                     + self.player.velocity, np.zeros(3))
 
-        if self.player.thrust:
+        if self.player.model.exploding:
+            if not self.player.model.exploded:
+                N = np.random.randint(144, 233)
+                self.exhaust.add_particles(
+                    self.player.position * np.ones((N, 3)),
+                    (2 * np.random.random((N, 3)) - 1) * 5
+                    + 0.9 * self.player.velocity * np.ones((N, 3)),
+                    np.zeros((N, 3)))
+                self.player.model.exploded = True
+        elif self.player.thrust:
             N = np.random.randint(0, 5)
             self.exhaust.add_particles(
                 self.player.model.engine * np.ones((N, 3)),
@@ -454,13 +463,7 @@ class Game(object):
                 -self.player.model.orientation[self.W] *
                 (7 + 2 * np.random.random((N, 3))) +
                 self.player.velocity * np.ones((N, 3)), np.zeros((N, 3)))
-        elif self.player.model.exploding:
-            N = np.random.randint(0, 42)
-            self.exhaust.add_particles(
-                self.player.position * np.ones((N, 3)),
-                (2 * np.random.random((N, 3)) - 1) * 5
-                + 0.9 * self.player.velocity * np.ones((N, 3)),
-                np.zeros((N, 3)))
+
 
         if (self.player.position[self.Z] < self.star_field.min_height -
                 self.camera.screen.extent[self.V] * 0.5):
