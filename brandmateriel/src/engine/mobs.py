@@ -292,7 +292,11 @@ class Player(Movable):
 
     def apply_forces(self):
         force = (self.friction + self.gravity * self.inertia +
-                 20 * (self.thrust and self.position[self.Z] < 36.0) *
+                 20 * (
+                     self.thrust
+                     and self.position[self.Z] < 36.0
+                     and not self.model.exploding
+                 ) *
                  self.model.orientation[self.W])
 
         self.acceleration = force / self.inertia
