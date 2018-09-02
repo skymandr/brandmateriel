@@ -212,11 +212,11 @@ class TriD(object):
     def explode(self):
         if self.exploding:
             self._patches += (
-                (np.random.random(self.patches.shape) - 0.5) * 0.1
+                (np.random.random(self.patches.shape) - 0.5) * 0.05
                 + np.random.random(self.patches.shape[0])[
                     :, np.newaxis, np.newaxis
                 ] * np.ones(self.patches.shape)
-                * self.normals[:, np.newaxis, :] * 0.1
+                * self.normals[:, np.newaxis, :] * 0.15
             )
         else:
             self.exploding = True
