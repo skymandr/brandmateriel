@@ -270,9 +270,14 @@ class Shots(Particles):
 
                 velocities = self.velocities[bouncers]
 
-                colours = world.colours[
+                mixing = (
+                    np.random.random(bouncers.shape)
+                    * (positions[:, self.Z] <= 0)
+                )
+                colours = np.clip(world.colours[
                     self.positions[bouncers, self.X].astype(np.int),
-                    self.positions[bouncers, self.Y].astype(np.int)]
+                    self.positions[bouncers, self.Y].astype(np.int),
+                ] + 64 * mixing[:, np.newaxis], 0, 255)
 
                 self.delete_particles(bouncers)
 
@@ -355,9 +360,14 @@ class Exhaust(Particles):
 
                 velocities = self.velocities[bouncers]
 
-                colours = world.colours[
+                mixing = (
+                    np.random.random(bouncers.shape)
+                    * (positions[:, self.Z] <= 0)
+                )
+                colours = np.clip(world.colours[
                     self.positions[bouncers, self.X].astype(np.int),
-                    self.positions[bouncers, self.Y].astype(np.int)]
+                    self.positions[bouncers, self.Y].astype(np.int),
+                ] + 64 * mixing[:, np.newaxis], 0, 255)
 
                 self.delete_particles(bouncers)
 

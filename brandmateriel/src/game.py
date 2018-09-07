@@ -602,8 +602,10 @@ class Game(object):
                 self.shrapnel.move(self._dt)
 
             if self.exhaust.number:
-                self.exhaust.impose_boundary_conditions(self.world)
+                shrapnel = self.exhaust.impose_boundary_conditions(self.world)
                 self.exhaust.move(self._dt)
+                if shrapnel is not None:
+                    self.shrapnel.add_particles(*shrapnel)
 
             if self.star_field.number and self.star_field.visible:
                 self.star_field.offset = self.player.position
