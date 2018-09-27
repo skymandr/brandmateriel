@@ -183,6 +183,7 @@ class Game(object):
     def return_to_menu(self):
         """ Close game. """
 
+        self.player.velocity *= 0.0
         return "menu"
 
     def handle_inputs(self):
