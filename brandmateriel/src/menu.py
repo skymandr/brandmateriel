@@ -21,7 +21,7 @@ class Menu(object):
     Z = W = 2
 
     def __init__(self, _structure='menu.conf', options='user.conf',
-                 default='default.conf'):
+                 default='default.conf', mixer=None):
         self._item = 0
         self.menu = "main menu"
 
@@ -32,6 +32,14 @@ class Menu(object):
         self._config = options
 
         self._load_options(options)
+
+        if mixer is not None:
+            try:
+                self._menu_sound = mixer.Sound(self.setup.get("sound"))
+            except pygame.error:
+                self._menu_sound = None
+        else:
+            self._menu_sound = None
 
         pygame.mouse.set_visible(False)
 
@@ -167,7 +175,7 @@ class Menu(object):
                     pygame.mouse.set_visible(True)
 
                 else:
-
+                    self.play_sound()
                     flag = self._relay_input(event.key)
 
             elif event.type == l.MOUSEBUTTONDOWN:
@@ -244,6 +252,9 @@ class Menu(object):
 
         return "menu"
 
+    def play_sound(self):
+        if self._menu_sound:
+            self._menu_sound.play()
 
 def draw_menu(menu, surface):
     centre = menu.setup["centre"]

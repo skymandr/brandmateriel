@@ -13,22 +13,30 @@ KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_RETURN: 'start', l.K_SPACE: 'start',
             l.K_ESCAPE: 'quit', l.K_F1: 'help'}
 
+FONTS = True
 if not pygame.font:
     print "Warning: no fonts detected; fonts disabled."
+    FONTS = False
 
 if not pygame.mixer:
     print "Warning: no sound detected; sound disabled."
+    MIXER = None
+else:
+    pygame.mixer.init()
+    MIXER = pygame.mixer
 
 
 def main():
     pygame.init()
+
+
     fps_clock = pygame.time.Clock()
     fps = 23.8
     window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
 
     mode = "menu"
     menu = m.Menu('config/menu.conf', 'config/user.conf',
-                  'config/default.conf')
+                  'config/default.conf', MIXER)
 
     while(mode):
 
