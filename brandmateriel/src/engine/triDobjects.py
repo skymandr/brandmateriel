@@ -1,3 +1,5 @@
+import datetime as dt
+
 import numpy as np
 
 
@@ -825,7 +827,7 @@ class TriDGroup(object):
     Y = V = 1
     Z = W = 2
 
-    def __init__(self, model=House()):
+    def __init__(self, model=House(), timeout=3):
         self._model = model
         N = self._model.patches.shape[0]
         self._positions = np.empty((0, 3))
@@ -837,6 +839,8 @@ class TriDGroup(object):
         self._yaws = np.empty((0))
         self._pitchs = np.empty((0))
         self._rolls = np.empty((0))
+        self._exploding = np.empty((0), dtype=object)
+        self._timeout = dt.timedelta(seconds=timeout)
 
     @property
     def model(self):
@@ -890,6 +894,7 @@ class TriDGroup(object):
         self._normals = np.r_[self._normals, self.model.normals[np.newaxis]]
         self._colours = np.r_[self._colours, self.model.colours[np.newaxis]]
         self._bboxes = np.r_[self._bboxes, self.model.bounding_box[np.newaxis]]
+        self._exploding = np.r_[self._exploding, [False]]
 
     def delete_object(self, n):
         indices = np.arange(self._positions.shape[0]) != n
@@ -902,3 +907,24 @@ class TriDGroup(object):
         self._normals = self._normals[indices]
         self._colours = self._colours[indices]
         self._bboxes = self._bboxes[indices]
+        self._exploding = self._exploding[indices]
+
+    @property
+    def exploding(self):
+        return self._exploding
+
+    @property
+    def timeout(self):
+        return self._timeout
+
+    def explode_object(self, n):
+        if self._exploding[n]:
+            self._patches[n] += (
+                (np.random.random(self._patches[n].shape) - 0.5) * 0.1
+                + np.random.random(self._patches[n].shape[0])[
+                    :, np.newaxis, np.newaxis
+                ] * np.ones(self._patches[n].shape)
+                * self._normals[n, :, np.newaxis, :] * 0.1
+            )
+        else:
+            self._exploding[n] = dt.datetime.now()

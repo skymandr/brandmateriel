@@ -304,7 +304,7 @@ class Shrapnel(Particles):
         self._visible = True
 
     def add_particles(self, positions, velocities, colours):
-        N = np.random.randint(4, 10)
+        N = np.random.randint(5, 8)
         positions = (positions + np.zeros(np.r_[N, positions.shape])).reshape(
             (positions.shape[0] * N, 3))
         velocities = (velocities * (1.0 / np.sqrt(N)) + 2 * (np.random.random(

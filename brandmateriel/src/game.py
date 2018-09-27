@@ -148,8 +148,10 @@ class Game(object):
 
     def _populate_world(self):
         n_houses = 42
-        settlements = e.triDobjects.TriDGroup(model=e.triDobjects.House(
-            scale=0.618))
+        settlements = e.triDobjects.TriDGroup(
+            model=e.triDobjects.House(scale=0.618),
+            timeout=1,
+        )
         angles = 2 * np.pi * np.random.random(n_houses)
         candidates = self.world.map_positions.copy()
 
@@ -379,6 +381,15 @@ class Game(object):
             map_normals = np.empty((0, 3))
             map_patches = np.empty((0, 4, 2))
             map_colours = np.empty((0, 4))
+
+        # explode houses:
+        if np.any(self.houses.exploding):
+            for ind, t in enumerate(self.houses.exploding):
+                if t:
+                    if (dt.datetime.now() - t < self.houses.timeout):
+                        self.houses.delete_object(ind)
+                    else:
+                        self.houses.explode_object(ind)
 
         # get objects in view:
         if self.camera.position[self.Z] < self._culling_height:
@@ -634,14 +645,16 @@ class Game(object):
         ) ** 2).sum(axis=2) < self.houses.model.scale).sum(axis=0)
 
         for house_index, house_position in enumerate(self.houses.positions):
-            if hits[house_index]:
+            if hits[house_index] and not self.houses.exploding[house_index]:
                 print "BOOM!"
-                N = np.random.randint(42, 100)
+                N = np.random.randint(89, 144)
+                offset = np.ones((N, 3))
+                offset[:, self.Z] = 0
                 self.exhaust.add_particles(
                     house_position * np.ones((N, 3)),
-                    (2 * np.random.random((N, 3)) - 1) * 5,
+                    (2 * np.random.random((N, 3)) - offset) * 5,
                     np.zeros((N, 3))
                 )
-                self.houses.delete_object(house_index)
+                self.houses.explode_object(house_index)
                 self._points -= 1
                 break
