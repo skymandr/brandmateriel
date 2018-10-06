@@ -150,7 +150,7 @@ class Game(object):
         n_houses = 42
         settlements = e.triDobjects.TriDGroup(
             model=e.triDobjects.House(scale=0.618),
-            timeout=1,
+            timeout=0.5,
         )
         angles = 2 * np.pi * np.random.random(n_houses)
         candidates = self.world.map_positions.copy()

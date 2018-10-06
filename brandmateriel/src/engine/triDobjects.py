@@ -920,11 +920,11 @@ class TriDGroup(object):
     def explode_object(self, n):
         if self._exploding[n]:
             self._patches[n] += (
-                (np.random.random(self._patches[n].shape) - 0.5) * 0.1
+                (np.random.random(self._patches[n].shape) - 0.5) * 0.15
                 + np.random.random(self._patches[n].shape[0])[
                     :, np.newaxis, np.newaxis
                 ] * np.ones(self._patches[n].shape)
-                * self._normals[n, :, np.newaxis, :] * 0.1
+                * self._normals[n, :, np.newaxis, :] * 0.05
             )
         else:
             self._exploding[n] = dt.datetime.now()
