@@ -124,8 +124,6 @@ class Movable(object):
                                int(self.position[self.Y])]
         self._velocity -= 2.0 * np.dot(self._velocity, normal) * normal
 
-        # self._velocity[self.Z] = np.abs(self._velocity[self.Z])
-
     def impose_boundary_conditions(self, world):
         self.position[self.X] %= world.shape[self.X]
         self.position[self.Y] %= world.shape[self.Y]
