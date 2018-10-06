@@ -386,8 +386,9 @@ class Game(object):
         if np.any(self.houses.exploding):
             for ind, t in enumerate(self.houses.exploding):
                 if t:
-                    if (dt.datetime.now() - t < self.houses.timeout):
+                    if (dt.datetime.now() - t > self.houses.timeout):
                         self.houses.delete_object(ind)
+                        break
                     else:
                         self.houses.explode_object(ind)
 
