@@ -4,18 +4,18 @@ DONE Boundary conditions for map
 DONE View culling:
         DONE sides
         DONE height
-* Shadow
-* Random houses
-* Tweak movement:
+DONE Shadow
+DONE Random houses
+DONE Tweak movement:
     DONE thrust
     DONE friction
     DONE gravity
-    - pitch-angles
-    - max height
+    DONE pitch-angles
+    DONE max height
 DONE Tweak lighting:
-    - colour
-    - intensity
-    - cutoffs
+    DONE colour
+    DONE intensity
+    DONE cutoffs
 DONE Tweak landscape colours
 * Credits in Menu
 DONE Help in Menu
