@@ -36,7 +36,7 @@ class Menu(object):
         if mixer is not None:
             try:
                 self._menu_sound = mixer.Sound(self.setup.get("sound"))
-            except pygame.error:
+            except (pygame.error, IOError):
                 self._menu_sound = None
         else:
             self._menu_sound = None
