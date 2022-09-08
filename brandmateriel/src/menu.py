@@ -1,3 +1,6 @@
+
+from __future__ import print_function
+
 import json
 import pygame
 import pygame.locals as l
@@ -76,7 +79,7 @@ class Menu(object):
             with open(filename, 'r') as f:
                 self.options = json.load(f)
         except IOError:
-            print "Loading default settings..."
+            print( "Loading default settings..." )
             with open(self._default, 'r') as f:
                 self.options = json.load(f)
 
@@ -128,7 +131,7 @@ class Menu(object):
                     self._structure["options"]["items"][n][1][1]]
 
             else:
-                print o
+                print( o )
 
         with open(self._config, 'w') as f:
             json.dump(self.options, f)
@@ -259,7 +262,7 @@ class Menu(object):
 def draw_menu(menu, surface):
     centre = menu.setup["centre"]
     resolution = menu.options["resolution"]
-    fontsize = menu.setup["fontsize"] * resolution[0] / 320
+    fontsize = int( menu.setup["fontsize"] * resolution[0] / 320 )
     font = pygame.font.Font(menu.setup["font"], fontsize)
 
     surface.fill((0, 0, 0))

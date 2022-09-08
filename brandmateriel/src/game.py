@@ -1,8 +1,12 @@
+
+
+from __future__ import print_function
+
 import datetime as dt
 import numpy as np
 import pygame
 from pygame import locals as l
-import engine as e
+from . import engine as e
 
 KEYBOARD = {l.K_UP: 'up', l.K_k: 'up', l.K_w: 'up',
             l.K_DOWN: 'down', l.K_j: 'down', l.K_s: 'down',
@@ -30,16 +34,16 @@ class Game(object):
         self._sensitivity = np.pi / config["control"]
         self._dt = 1.0 / fps
 
-        print "initialising world map ... ",
+        print( "initialising world map ... ", end=" " )
         self.world = e.mapper.Map(world)
-        print "DONE"
+        print( "DONE" )
 
-        print "loading fonts ... ",
-        fontsize *= config["resolution"][0] / 320
+        print( "loading fonts ... ", end= " ")
+        fontsize = int( fontsize * config["resolution"][0] / 320 )
         self._font = pygame.font.Font(font, fontsize)
-        print "DONE"
+        print( "DONE" )
 
-        print "loading game objects ... ",
+        print( "loading game objects ... ", end=" ")
         if not self._config[" "]:
             self.player = e.mobs.Player(e.triDobjects.FireFighter(scale=2.0))
             # self.player = e.mobs.Player(e.triDobjects.Pika(scale=3.0))
@@ -47,9 +51,9 @@ class Game(object):
             self.player = e.mobs.Player(e.triDobjects.Lander(scale=1.0))
 
         self.player.position = (np.array([64.0, 64.0, 5.0]))
-        print "DONE"
+        print( "DONE" )
 
-        print "seting up camera ... ",
+        print( "seting up camera ... ", end=" ")
         self.camera = e.camera.Camera(screen=e.camera.Screen(
             resolution=config["resolution"]))
 
@@ -86,9 +90,9 @@ class Game(object):
                                       0.75)
 
         self.update_camera()
-        print "DONE"
+        print( "DONE" )
 
-        print "initialising game objects ... ",
+        print( "initialising game objects ... ", end=" " )
         self._populate_world()
         self.shots = e.particles.Shots()
         self.shrapnel = e.particles.Shrapnel()
@@ -97,7 +101,7 @@ class Game(object):
                                             self._view + self.camera.distance
                                             - 0.5,
                                             min_height=self._star_field_height)
-        print "DONE"
+        print( "DONE" )
 
         self._pause = False
         self._gameover = False
@@ -106,7 +110,7 @@ class Game(object):
 
         pygame.mouse.get_rel()
 
-        print "game starting"
+        print( "game starting" )
 
     @property
     def config(self):
@@ -155,7 +159,7 @@ class Game(object):
         angles = 2 * np.pi * np.random.random(n_houses)
         candidates = self.world.map_positions.copy()
 
-        for n in xrange(n_houses):
+        for n in range(n_houses):
             x, y = (np.random.random(2) * self.world.shape).astype(np.int)
             X, Y = np.mgrid[x - 1: x + 2, y - 1: y + 2]
             X %= self.world.shape[self.X]
@@ -647,7 +651,7 @@ class Game(object):
 
         for house_index, house_position in enumerate(self.houses.positions):
             if hits[house_index] and not self.houses.exploding[house_index]:
-                print "BOOM!"
+                print( "BOOM!" )
                 N = np.random.randint(89, 144)
                 offset = np.ones((N, 3))
                 offset[:, self.Z] = 0
