@@ -254,8 +254,7 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
         pygame.display.flip()
 
         if save_fig:
-            pygame.image.save(screen,
-                              'out/{0}.png'.format(string.zfill(str(N), 2)))
+            pygame.image.save(screen, 'out/{0}.png'.format(str(N).zfill(3)))
 
         the_tick = fps_clock.tick(fps)
         print( "Frame update time: {0} ms".format(the_tick) )
