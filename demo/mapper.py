@@ -36,7 +36,7 @@ class Map(object):
 
         self._make_patches()
 
-        self._size = self._patches.size / 12
+        self._size = int( self._patches.size / 12 )
 
         self._calc_positions()
 
@@ -91,8 +91,8 @@ class Map(object):
 
         # Fill patches:
         # This for-looops could and should be removed:
-        for x in xrange(xsize):
-            for y in xrange(ysize):
+        for x in range(xsize):
+            for y in range(ysize):
                 xinds = np.array([x, x + 1, x + 1, x])
                 yinds = np.array([y, y, y + 1, y + 1])
                 patches[x, y, :, 0] = np.array(xinds) - 0.5
@@ -111,8 +111,8 @@ class Map(object):
         colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 4],
                            dtype=np.int)
 
-        for x in xrange(colours.shape[0]):
-            for y in xrange(colours.shape[1]):
+        for x in range(colours.shape[0]):
+            for y in range(colours.shape[1]):
                 if self._positions[x, y, 2] > self.sealevel:
                     colours[x, y] = np.array([102, 153, 0, 255])
                 else:
