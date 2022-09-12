@@ -1,5 +1,5 @@
 import numpy as np
-import triDobjects as tD
+from . import triDobjects as tD
 
 
 class Particle(object):

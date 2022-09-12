@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+
+from __future__ import print_function
+
 import sys
 import numpy as np
 import pygame
@@ -9,7 +12,14 @@ import mapper as m
 import shader as s
 import triDobjects as o
 import contextlib
-import cStringIO
+
+
+try:
+    from StringIO import StringIO as cStringIO
+except ImportError:
+    from io import StringIO as cStringIO
+# import cStringIO
+
 
 RESOLUTION = np.array([640, 480])
 KEYBOARD = {l.K_UP: 'up', l.K_k: 'up',
@@ -21,10 +31,10 @@ KEYBOARD = {l.K_UP: 'up', l.K_k: 'up',
             l.K_ESCAPE: 'quit', l.K_F1: 'help'}
 
 if not pygame.font:
-    print "Warning: no fonts detected; fonts disabled."
+    print( "Warning: no fonts detected; fonts disabled." )
 
 if not pygame.mixer:
-    print "Warning: no sound detected; sound disabled."
+    print( "Warning: no sound detected; sound disabled." )
 
 
 @contextlib.contextmanager
@@ -47,26 +57,26 @@ def handle_inputs():
         elif event.type == l.KEYDOWN:
             flag = relay_input(event.key) and flag
         else:
-            print "Unknown event: \n{0}\n({1})".format(event, event.type)
+            print( "Unknown event: \n{0}\n({1})".format(event, event.type) )
 
     return flag
 
 
 def relay_input(event_key):
     if event_key in KEYBOARD.keys():
-        print "Key pressed: {0} ({1})".format(KEYBOARD[event_key],
-                                              str(event_key))
+        print( "Key pressed: {0} ({1})".format(KEYBOARD[event_key],
+                                              str(event_key)))
         if KEYBOARD[event_key] == 'quit':
             return close()
     else:
-        print "Unknown key pressed. ({0})".format(str(event_key))
+        print( "Unknown key pressed. ({0})".format(str(event_key)) )
 
     return True
 
 
 def close():
     """ Close game. """
-    print "Quitting game..."
+    print( "Quitting game..." )
     pygame.quit()
     return False
 
@@ -244,11 +254,10 @@ def do_brand_demo(filename='zdata.npy', sealevel=0.0, steps=42, fps=30,
         pygame.display.flip()
 
         if save_fig:
-            pygame.image.save(screen,
-                              'out/{0}.png'.format(string.zfill(str(N), 2)))
+            pygame.image.save(screen, 'out/{0}.png'.format(str(N).zfill(3)))
 
         the_tick = fps_clock.tick(fps)
-        print "Frame update time: {0} ms".format(the_tick)
+        print( "Frame update time: {0} ms".format(the_tick) )
 
         if frames is not None:
             frames.append(the_tick / 1000.0)
@@ -266,7 +275,7 @@ def print_cpu_model():
 
     for ln in cpuinfo.split("\n"):
         if "model name" in ln:
-            print "Cpu Model:", ln.split(":")[1]
+            print( "Cpu Model:", ln.split(":")[1] )
             return
 
 
@@ -274,8 +283,8 @@ def benchmark_demo():
     """
     run do_brand_demo and benchmark fps
     """
-    print "Running Benchmarks, silent, virtualdisplay"
-    print "Don't Panic! This will take a moment.\n\n"
+    print( "Running Benchmarks, silent, virtualdisplay" )
+    print( "Don't Panic! This will take a moment.\n\n" )
 
     from pyvirtualdisplay import Display
     display = Display(visible=0, size=(1440, 900))
@@ -286,15 +295,15 @@ def benchmark_demo():
     with silence():
         do_brand_demo(save_fig=False, frames=fps)
 
-    print "Benchmarking On"
+    print( "Benchmarking On" )
     print_cpu_model()
 
-    print "fps stats"
-    print "Mean: %0.4f\nMedian: %0.4f\nVariance: %0.4f" % \
-        (np.average(fps), np.median(fps), np.var(fps))
-    print "Min: %0.4f\nMax: %0.4f" % \
-        (min(fps), max(fps))
-    print "Total Frames:", len(fps)
+    print( "fps stats" )
+    print( "Mean: %0.4f\nMedian: %0.4f\nVariance: %0.4f" %
+            (np.average(fps), np.median(fps), np.var(fps)) )
+    print( "Min: %0.4f\nMax: %0.4f" % 
+        (min(fps), max(fps)) )
+    print( "Total Frames:", len(fps) )
 
     return 0
 

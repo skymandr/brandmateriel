@@ -326,8 +326,8 @@ class Map(object):
 
         # Fill patches:
         # These for-loops could be removed:
-        for x in xrange(xsize):
-            for y in xrange(ysize):
+        for x in range(xsize):
+            for y in range(ysize):
                 xinds = np.array([x, x + 1, x + 1, x])
                 yinds = np.array([y, y, y + 1, y + 1])
                 patches[x, y, :, 0] = xinds - 0.5
@@ -347,8 +347,8 @@ class Map(object):
                            dtype=np.int)
 
         max_height = self._positions[:, :, self.Z].max()
-        for x in xrange(colours.shape[self.X]):
-            for y in xrange(colours.shape[self.Y]):
+        for x in range(colours.shape[self.X]):
+            for y in range(colours.shape[self.Y]):
                 height = self._positions[x, y, self.Z]
                 if height > self.sealevel + 0.14:
                     colours[x, y] = np.array([51, 102, 26, 255]) + np.array(
@@ -659,14 +659,14 @@ class TriMap(object):
 
         # Fill patches:
         # This for-looops could and should be removed:
-        for x in xrange(xsize):
-            for y in xrange(ysize):
+        for x in range(xsize):
+            for y in range(ysize):
                 xinds = np.array([x, x + 1, x + 1, x, x])
                 yinds = np.array([y, y, y + 1, y + 1, y])
                 xcentre = xinds[: 4].mean() - 0.5
                 ycentre = yinds[: 4].mean() - 0.5
                 zcentre = self.raw_map[yinds, xsize - xinds].mean()
-                for n in xrange(4):
+                for n in range(4):
                     patches[x, y, n, :, 0] = np.r_[xinds[n: n + 2] - 0.5,
                                                    xcentre]
                     patches[x, y, n, :, 1] = np.r_[yinds[n: n + 2] - 0.5,
@@ -686,8 +686,8 @@ class TriMap(object):
         colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 4,
                             4], dtype=np.int)
 
-        for x in xrange(colours.shape[0]):
-            for y in xrange(colours.shape[1]):
+        for x in range(colours.shape[0]):
+            for y in range(colours.shape[1]):
                 if self._map_positions[x, y, 2] > self.sealevel:
                     colours[x, y, :] = np.array([102, 153, 0, 255])
                 else:

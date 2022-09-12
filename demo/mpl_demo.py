@@ -1,5 +1,9 @@
+
+
+from __future__ import print_function
+
 import numpy as np
-import camera_old as c
+import old_camera as c
 
 
 def get_scene(filename=None):
