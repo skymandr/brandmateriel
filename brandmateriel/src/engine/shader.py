@@ -182,7 +182,7 @@ class Shader(object):
         self._linear_distance = val
 
     def apply_lighting(self, positions, normals, colours, culling=True,
-                       scatter=True, fading=True):
+                       scatter=True, fading=False):
         """
         Questions:
             this is done explicitly by reference, changing original colours;

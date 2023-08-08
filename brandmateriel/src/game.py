@@ -160,13 +160,13 @@ class Game(object):
         candidates = self.world.map_positions.copy()
 
         for n in range(n_houses):
-            x, y = (np.random.random(2) * self.world.shape).astype(np.int)
+            x, y = (np.random.random(2) * self.world.shape).astype(int)
             X, Y = np.mgrid[x - 1: x + 2, y - 1: y + 2]
             X %= self.world.shape[self.X]
             Y %= self.world.shape[self.Y]
 
             while((candidates[X, Y, self.Z] <= 0).any()):
-                x, y = (np.random.random(2) * self.world.shape).astype(np.int)
+                x, y = (np.random.random(2) * self.world.shape).astype(int)
                 X, Y = np.mgrid[x - 1: x + 2, y - 1: y + 2]
                 X %= self.world.shape[self.X]
                 Y %= self.world.shape[self.Y]
@@ -636,7 +636,7 @@ class Game(object):
             try:
                 self._gameover = (
                     self._gameover_timer
-                    < dt.datetime.now() - dt.timedelta(seconds=1)
+                    < dt.datetime.now() - dt.timedelta(seconds=10)
                 )
             except TypeError:
                 self._gameover_timer = dt.datetime.now()

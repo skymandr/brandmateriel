@@ -196,8 +196,8 @@ class Particles(object):
         self.positions[:, self.Y] %= world.shape[self.Y]
 
         heights = world.map_positions[
-            self.positions[:, self.X].astype(np.int),
-            self.positions[:, self.Y].astype(np.int), self.Z]
+            self.positions[:, self.X].astype(int),
+            self.positions[:, self.Y].astype(int), self.Z]
 
         heights = np.where(heights < 0, 0, heights)
 
@@ -259,8 +259,8 @@ class Shots(Particles):
             self.positions[:, self.Y] %= world.shape[self.Y]
 
             heights = world.map_positions[
-                self.positions[:, self.X].astype(np.int),
-                self.positions[:, self.Y].astype(np.int), self.Z]
+                self.positions[:, self.X].astype(int),
+                self.positions[:, self.Y].astype(int), self.Z]
 
             heights = np.where(heights < 0, 0, heights)
 
@@ -275,8 +275,8 @@ class Shots(Particles):
                     * (positions[:, self.Z] <= 0)
                 )
                 colours = np.clip(world.colours[
-                    self.positions[bouncers, self.X].astype(np.int),
-                    self.positions[bouncers, self.Y].astype(np.int),
+                    self.positions[bouncers, self.X].astype(int),
+                    self.positions[bouncers, self.Y].astype(int),
                 ] + 64 * mixing[:, np.newaxis], 0, 255)
 
                 self.delete_particles(bouncers)
@@ -349,8 +349,8 @@ class Exhaust(Particles):
             self.positions[:, self.Y] %= world.shape[self.Y]
 
             heights = world.map_positions[
-                self.positions[:, self.X].astype(np.int),
-                self.positions[:, self.Y].astype(np.int), self.Z]
+                self.positions[:, self.X].astype(int),
+                self.positions[:, self.Y].astype(int), self.Z]
 
             heights = np.where(heights < 0, 0, heights)
 
@@ -365,8 +365,8 @@ class Exhaust(Particles):
                     * (positions[:, self.Z] <= 0)
                 )
                 colours = np.clip(world.colours[
-                    self.positions[bouncers, self.X].astype(np.int),
-                    self.positions[bouncers, self.Y].astype(np.int),
+                    self.positions[bouncers, self.X].astype(int),
+                    self.positions[bouncers, self.Y].astype(int),
                 ] + 64 * mixing[:, np.newaxis], 0, 255)
 
                 self.delete_particles(bouncers)
