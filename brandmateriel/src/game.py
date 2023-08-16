@@ -636,7 +636,7 @@ class Game(object):
             try:
                 self._gameover = (
                     self._gameover_timer
-                    < dt.datetime.now() - dt.timedelta(seconds=10)
+                    < dt.datetime.now() - dt.timedelta(seconds=1)
                 )
             except TypeError:
                 self._gameover_timer = dt.datetime.now()
