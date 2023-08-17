@@ -28,7 +28,7 @@ class TriD(object):
             [points[0], points[1], points[3]],  # front side
             ])
 
-        self._colours = np.array([[204, 0, 255],
+        self._colours = np.array([[204, 0, 0, 255],
                                   [0, 204, 0, 255],
                                   [0, 0, 204, 255],
                                   [204, 204, 204, 255],
@@ -152,7 +152,7 @@ class TriD(object):
         """
         Not yet fully implemented, but should assign colours...
         """
-        # colours = np.zeros([self._patches.shape[0], 3], dtype=np.int)
+        # colours = np.zeros([self._patches.shape[0], 3], dtype=int)
 
         # self._colours = colours + self.basecolour
 
@@ -183,10 +183,10 @@ class TriD(object):
 
         Rx = np.array([[1, 0, 0],
                        [0, np.cos(p), - np.sin(p)],
-                       [0, np.sin(p), np.cos(p)]])
+                       [0, np.sin(p),   np.cos(p)]])
 
-        Ry = np.array([[np.cos(r), 0, np.sin(r)],
-                       [0, 1, 0],
+        Ry = np.array([[ np.cos(r), 0, np.sin(r)],
+                       [        0,  1,        0],
                        [-np.sin(r), 0, np.cos(r)]])
 
         Rz = np.array([[np.cos(y), np.sin(y), 0],

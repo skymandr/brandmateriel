@@ -71,10 +71,10 @@ class Map(object):
         return self._raw_map
 
     def slice(self, position, view):
-        xmin = np.round(position[self.X] - view[self.X] * 0.5).astype(np.int)
-        xmax = np.round(position[self.X] + view[self.X] * 0.5).astype(np.int)
-        ymin = np.round(position[self.Y] - view[self.Y] * 0.5).astype(np.int)
-        ymax = np.round(position[self.Y] + view[self.Y] * 0.5).astype(np.int)
+        xmin = np.round(position[self.X] - view[self.X] * 0.5).astype(int)
+        xmax = np.round(position[self.X] + view[self.X] * 0.5).astype(int)
+        ymin = np.round(position[self.Y] - view[self.Y] * 0.5).astype(int)
+        ymax = np.round(position[self.Y] + view[self.Y] * 0.5).astype(int)
 
         Y, X = np.mgrid[ymin: ymax + 1, xmin: xmax + 1]
 
@@ -103,7 +103,7 @@ class Map(object):
 
         # Impose view limits:
         the_slice[:, 0, (3, 0), self.Z] += ((the_slice[:, 0, (2, 1), self.Z] -
-                                            the_slice[:, 0, (3, 0), self.Z])
+                                             the_slice[:, 0, (3, 0), self.Z])
                                             * (xmin - the_slice[:, 0, (3, 0),
                                                                 self.X]))
 
@@ -344,7 +344,7 @@ class Map(object):
         Currently debug wit just green and blue.
         """
         colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 4],
-                           dtype=np.int)
+                           dtype=int)
 
         max_height = self._positions[:, :, self.Z].max()
         for x in range(colours.shape[self.X]):
@@ -499,7 +499,7 @@ class TriMap(object):
         return self._raw_map
 
     def slice(self, position, view):
-        the_position = np.round(position).astype(np.int)
+        the_position = np.round(position).astype(int)
 
         Y, X = np.mgrid[the_position[self.Y] - view[self.Y] / 2 - 1:
                         the_position[self.Y] + view[self.Y] / 2 + 1,
@@ -684,7 +684,7 @@ class TriMap(object):
         Currently debug wit just green and blue.
         """
         colours = np.zeros([self._patches.shape[0], self._patches.shape[1], 4,
-                            4], dtype=np.int)
+                            4], dtype=int)
 
         for x in range(colours.shape[0]):
             for y in range(colours.shape[1]):

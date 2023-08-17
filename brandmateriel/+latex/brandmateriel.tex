@@ -1,0 +1,51 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[a4paper, total={18cm, 27cm}]{geometry}
+\usepackage{listings}
+\usepackage[scaled]{beramono}
+\renewcommand{\familydefault}{\ttdefault}
+
+\lstset{
+  language=Python,
+  showstringspaces=false,
+  showlines=false,
+  emptylines=1,
+  formfeed=\newpage,
+  tabsize=4,
+  commentstyle=\textit, %%\itshape,
+  numbers=left,
+  stepnumber=5,
+  numbersep=5pt,
+  firstnumber=1,
+  basicstyle=\ttfamily,
+  morekeywords={models, lambda, forms}
+}
+
+\newcommand{\code}[2]{
+  %%\hrulefill
+  \subsection*{#1}
+  \lstset{name=#1}
+  %%  title=#1}
+  \lstinputlisting{#2}
+  \vspace{2em}
+}
+
+\begin{document}
+
+\code{brandmateriel/brand.py}{../brand.py}
+
+\code{brandmateriel/src/game.py}{../src/game.py}
+\code{brandmateriel/src/menu.py}{../src/menu.py}
+\code{brandmateriel/src/engine/\_\_init\_\_.py}{../src/engine/__init__.py}
+\code{brandmateriel/src/engine/camera.py}{../src/engine/camera.py}
+\code{brandmateriel/src/engine/mapper.py}{../src/engine/mapper.py}
+\code{brandmateriel/src/engine/mobs.py}{../src/engine/mobs.py}
+\code{brandmateriel/src/engine/particles.py}{../src/engine/particles.py}
+\code{brandmateriel/src/engine/shader.py}{../src/engine/shader.py}
+\code{brandmateriel/src/engine/shadow.py}{../src/engine/shadow.py}
+\code{brandmateriel/src/engine/shadow.py}{../src/engine/shadow.py}
+\code{brandmateriel/src/engine/triDobjects.py}{../src/engine/triDobjects.py}
+
+
+
+\end{document}

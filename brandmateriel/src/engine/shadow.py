@@ -15,8 +15,8 @@ def get_shadows(patches, world):
     positions = patches.mean(-2)
 
     positions[..., Z] = np.where(positions[..., Z] < 0, 0, positions[..., Z])
-    xind = patches[..., X].astype(np.int) % world.shape[X]
-    yind = patches[..., Y].astype(np.int) % world.shape[Y]
+    xind = patches[..., X].astype(int) % world.shape[X]
+    yind = patches[..., Y].astype(int) % world.shape[Y]
 
     # This needs to be made more accurate
     dists2 = ((patches[..., np.newaxis, : Z] -
@@ -38,8 +38,8 @@ def get_small_shadows(patches, world):
     positions = patches.mean(-2)
 
     positions[..., Z] = np.where(positions[..., Z] < 0, 0, positions[..., Z])
-    xind = patches[..., X].astype(np.int) % world.shape[X]
-    yind = patches[..., Y].astype(np.int) % world.shape[Y]
+    xind = patches[..., X].astype(int) % world.shape[X]
+    yind = patches[..., Y].astype(int) % world.shape[Y]
 
     patches[..., Z] = (world.map_positions[xind, yind, Z].mean(-1)
                        )[:, np.newaxis]
