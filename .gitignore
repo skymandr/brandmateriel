@@ -6,6 +6,5 @@
 notrack/*
 user.conf
 *.orig
-*/+latex/*.aux
-*/+latex/*.log
-*/+latex/*.pdf
+*/+latex
+*/*.leo

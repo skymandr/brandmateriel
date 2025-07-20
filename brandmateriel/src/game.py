@@ -71,14 +71,16 @@ class Game(object):
                  self.camera.screen.position[self.Z])
             d = self.camera.distance
         else:
+            # copy of fixed - should never be called
             self.update_camera = self.update_fixed_camera
             D = self._view[self.Y]
             h = (self.camera.screen.extent[self.Y] * 0.5 -
                  self.camera.screen.position[self.Z])
             d = self.camera.distance
 
-        self._culling_height = np.ceil((h * (D / d + 1.0) + np.ceil(
-            self.world.patch_positions[:, :, self.Z].max())))
+        self._culling_height = np.ceil(
+                (h * (D / d + 1.0)
+                + np.ceil( self.world.patch_positions[:, :, self.Z].max())))
         self._star_field_height = self._culling_height
 
         self.light_source = e.shader.LightSource()
@@ -144,7 +146,8 @@ class Game(object):
 
         self.camera.position = (look_at - offset *
                                 np.array([-np.sin(self.player.model.yaw),
-                                          np.cos(self.player.model.yaw), 0.0]))
+                                           np.cos(self.player.model.yaw),
+                                           0.0]))
 
         self.camera.look_at_point(look_at)
 
@@ -413,8 +416,7 @@ class Game(object):
                     self.focus_position, view,
                     self.houses.patches(houses_in_view))
 
-                (houses_patches, houses_depths) = \
-                    self.camera.get_screen_coordinates(houses_patches)
+                (houses_patches, houses_depths) = self.camera.get_screen_coordinates(houses_patches)
                 houses_normals = self.houses.normals(houses_in_view)
                 houses_colours = self.houses.colours(houses_in_view)
                 houses_colours = self.shader.apply_lighting(houses_positions,

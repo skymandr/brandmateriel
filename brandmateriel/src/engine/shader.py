@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class LightSource(object):
     """
     This object has a position (and orientation) for the light source.
@@ -218,6 +217,11 @@ class Shader(object):
         colours = np.where(colours < 0, 0, colours)
         colours[:, 3] = 255
         if culling:
-            colours[np.where(scatter < 0)] = 0
+            try:
+                colours[np.where(scatter < 0)] = 0
+            except:
+                pass
+        
+        
 
         return colours

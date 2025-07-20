@@ -35,11 +35,13 @@ def main():
 
     fps_clock = pygame.time.Clock()
     fps = 23.8
-    window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
+    # window = pygame.display.set_mode((640, 480), pygame.DOUBLEBUF)
 
     mode = "menu"
     menu = m.Menu('config/menu.conf', 'config/user.conf',
                   'config/default.conf', MIXER)
+
+    window = pygame.display.set_mode(menu.resolution, pygame.DOUBLEBUF)
 
     while(mode):
 

@@ -280,6 +280,7 @@ class Player(Movable):
     def bomb(self, val):
         self._bomb = val and True
 
+    # UNUSED
     @property
     def cool_down(self):
         return self._cool_down
@@ -289,13 +290,13 @@ class Player(Movable):
         self._cool_down = val
 
     def apply_forces(self):
-        force = (self.friction + self.gravity * self.inertia +
-                 20 * (
+        force = (   self.friction
+                  + self.gravity * self.inertia
+                  + 20 * (
                      self.thrust
                      and self.position[self.Z] < 36.0
-                     and not self.model.exploding
-                 ) *
-                 self.model.orientation[self.W])
+                     and not self.model.exploding )
+                  * self.model.orientation[self.W])
 
         self.acceleration = force / self.inertia
 
